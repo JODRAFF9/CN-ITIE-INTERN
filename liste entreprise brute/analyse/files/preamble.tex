@@ -1,0 +1,95 @@
+% ============================================================
+%  Préambule personnel — XeLaTeX / Traoré / ENSAE Dakar
+% ============================================================
+
+% --- Fontes (XeLaTeX : fontspec remplace mathptmx) ----------
+\usepackage{fontspec}
+\setmainfont{Times New Roman}   % équivalent mathptmx sous XeLaTeX
+\usepackage{unicode-math}
+\setmathfont{XITS Math}         % fontes mathématiques compatibles
+
+% --- Langue -------------------------------------------------
+\usepackage[main=french]{babel}
+
+% --- Couleurs -----------------------------------------------
+\usepackage{xcolor}
+\definecolor{MidnightBlue}{RGB}{25, 25, 112}
+\definecolor{RoyalBlue}{RGB}{65, 105, 225}
+\definecolor{gold}{RGB}{212, 175, 55}
+
+% --- Mise en page -------------------------------------------
+\usepackage{geometry}
+\geometry{margin=1.5cm}
+\usepackage{setspace}
+\setstretch{1.5}
+
+% --- En-têtes / pieds de page -------------------------------
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textcolor{MidnightBlue}{\small Analyse des Paiements Sociaux — ITIE}}
+\fancyhead[R]{\textcolor{MidnightBlue}{\small \thepage}}
+\fancyfoot[C]{\textcolor{MidnightBlue}{\small ENSAE Pierre Ndiaye}}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% --- Titres de chapitres (fncychap) -------------------------
+\usepackage[Conny]{fncychap}
+\ChNameVar{\Large\color{MidnightBlue}\bfseries}
+\ChTitleVar{\large\color{MidnightBlue}}
+
+% --- Sections en bleu ---------------------------------------
+\usepackage{titlesec}
+\titleformat{\section}
+  {\color{MidnightBlue}\normalfont\Large\bfseries}
+  {\thesection}{1em}{}
+\titleformat{\subsection}
+  {\color{MidnightBlue}\normalfont\large\bfseries}
+  {\thesubsection}{1em}{}
+\titleformat{\subsubsection}
+  {\color{RoyalBlue}\normalfont\normalsize\bfseries}
+  {\thesubsubsection}{1em}{}
+
+% --- Tableaux -----------------------------------------------
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{colortbl}
+\usepackage{array}
+
+% --- Boîtes tcolorbox ---------------------------------------
+\usepackage{tcolorbox}
+\tcbuselibrary{most}
+
+\newtcolorbox{boitedef}[1]{
+  colback=MidnightBlue!8,
+  colframe=MidnightBlue,
+  fonttitle=\bfseries,
+  title=#1
+}
+\newtcolorbox{boiteresultat}[1]{
+  colback=green!5,
+  colframe=green!50!black,
+  fonttitle=\bfseries,
+  title=#1
+}
+\newtcolorbox{boiteattn}[1]{
+  colback=red!5,
+  colframe=red!60!black,
+  fonttitle=\bfseries,
+  title=#1
+}
+\newtcolorbox{boiteex}[1]{
+  colback=gold!10,
+  colframe=gold!80!black,
+  fonttitle=\bfseries,
+  title=#1
+}
+
+% --- Divers -------------------------------------------------
+\usepackage{tikz}
+\usepackage{microtype}
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=MidnightBlue,
+  urlcolor=RoyalBlue
+}

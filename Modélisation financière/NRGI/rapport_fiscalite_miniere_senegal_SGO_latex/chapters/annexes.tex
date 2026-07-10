@@ -1,0 +1,61 @@
+\chapter{Paramètres techniques complémentaires des régimes fiscaux comparés}
+\label{annexe:a}
+
+Le tableau~\ref{tab:regimes} (chapitre~\ref{chap:methodo}) présentait, pour les onze régimes comparés dans ce rapport, les paramètres relatifs à la redevance, à l'impôt sur les bénéfices, à la participation gratuite de l'État et aux droits de douane. Le tableau~\ref{tab:regimes-tech} ci-dessous complète cette présentation par les paramètres techniques relatifs au report des pertes, au régime d'amortissement et à la retenue à la source sur le revenu des valeurs mobilières (IRVM), ainsi que par les particularités propres à certains régimes.
+
+\begin{table}[H]
+\centering
+\caption{Paramètres techniques complémentaires, par régime fiscal}
+\label{tab:regimes-tech}
+\footnotesize
+\begin{tabular}{lcccp{4.7cm}}
+\toprule
+Régime & \makecell{Report des\\pertes (durée /\\limite annuelle)} & \makecell{Régime\\d'amortissement\\(années)} & IRVM & Particularités \\
+\midrule
+RDC -- 2002              & 5 ans / 100\,\% & 2  & 10,0\,\% & Amortissement accéléré (option activée) \\
+RDC -- amendée (2018)    & 5 ans / 100\,\% & 5  & 10,0\,\% & Impôt sur les profits excédentaires~: 50\,\% au-delà d'un \TRI{} réel de 25\,\% \\
+Chili                     & 100 ans / 100\,\% & 10 & 35,0\,\% & Taxe sur la marge opérationnelle (système~3) \\
+Pérou                     & 4 ans / 100\,\%  & 10 & 6,8\,\%  & Taxe sur la marge opérationnelle (système~2) \\
+Australie-Occidentale     & 100 ans / 100\,\% & 20 & 30,0\,\% & -- \\
+Tanzanie                  & 100 ans / 100\,\% & 1  & 10,0\,\% & -- \\
+Ghana                     & 5 ans / 100\,\%  & 5  & 8,0\,\%  & -- \\
+Zambie -- 2016            & 10 ans / 50\,\%  & 4  & 10,0\,\% & -- \\
+RDC -- redevance variable & 5 ans / 100\,\% & 5  & 10,0\,\% & Redevance à taux variable indexée sur le prix (système~4) \\
+RDC -- taxe sur la rente  & 5 ans / 100\,\% & 5  & 10,0\,\% & Taxe sur la rente~: 7,5\,\% au-delà d'un seuil de \TRI{} réel de 25\,\% \\
+\textbf{Sénégal (SGO)}    & 5 ans / 100\,\% & 5  & 10,0\,\% & Paramètres techniques non précisés par le PFS, repris du régime RDC amendée (voir section~\ref{sec:scenario-senegal}) \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.2cm}
+\footnotesize Source~: paramétrage d'origine de l'outil NRGI pour les dix premiers régimes~; régime « Sénégal » construit par les auteurs.
+\end{table}
+
+\chapter{Traçabilité des données extraites du PFS de Sabodala-Massawa}
+\label{annexe:b}
+
+Le tableau~\ref{tab:tracabilite} récapitule, pour chacun des principaux paramètres insérés dans le modèle, la valeur retenue et la section ou le tableau du PFS \citep{lycopodium2020pfs} dont elle est issue, à des fins de traçabilité et de reproductibilité de l'exercice.
+
+\begin{table}[H]
+\centering
+\caption{Correspondance entre les paramètres du modèle et les sources du PFS}
+\label{tab:tracabilite}
+\footnotesize
+\begin{tabular}{p{4.3cm}p{2.6cm}p{6.8cm}}
+\toprule
+Paramètre du modèle & Valeur retenue & Source dans le PFS \\
+\midrule
+Réserves récupérables & 4\,284\,000 oz & Table~1.7 / Table~22.1 -- \emph{LOM Cash Flow Summary}, production totale récupérée \\
+Calendrier de production (2020-2036) & cf. tableau~\ref{tab:profil-production} & Table~1.7 / Table~22.1, ligne \emph{Gold Produced} \\
+\CAPEX{} de développement & 407~millions \$US (cumul) & Table~1.10 / Table~22.1, ligne \emph{Total Development} \\
+Capital de maintien (\emph{sustaining}) & 253~millions \$US (cumul) & Table~22.1, ligne \emph{Sustaining Capex} \\
+Coût opérationnel unitaire & cf. tableau~\ref{tab:profil-production} & Table~1.11 (synthèse des coûts d'exploitation) et Table~22.1 (administration régionale), agrégés selon l'équation de la section~\ref{sec:donnees-pfs} \\
+Prix de l'or (cas central) & 1\,600~\$US/once & Table~1.12 / Table~22.1, hypothèse de prix retenue pour l'analyse économique \\
+Prix de référence des réserves & 1\,250~\$US/once & Section~1.7, \emph{Mineral Reserves} \\
+Coût de fermeture et réhabilitation & 5~millions \$US (en 2036) & Section~22.4.5, \emph{Closure} \\
+Taux de redevance (régime Sénégal) & 5,0\,\% (assiette brute) & Section~22.3.1, \emph{Royalties} \\
+Taux d'impôt sur les sociétés (régime Sénégal) & 25,0\,\% & Section~22.3.2, \emph{Corporate Income Tax} \\
+Participation gratuite de l'État (régime Sénégal) & 10,0\,\% & Section~22.4.7, \emph{Minority Interest} \\
+Droits de douane (régime Sénégal) & 0,0\,\% & Section~22.4.8, statut d'entreprise franche d'exportation \\
+\bottomrule
+\end{tabular}
+\end{table}

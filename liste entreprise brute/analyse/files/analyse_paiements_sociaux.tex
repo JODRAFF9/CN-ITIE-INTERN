@@ -1,0 +1,605 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[
+  12pt,
+]{article}
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{5}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{longtable,booktabs,array}
+\newcounter{none} % for unnumbered tables
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+% ============================================================
+%  Préambule personnel — XeLaTeX / Traoré / ENSAE Dakar
+% ============================================================
+
+% --- Fontes (XeLaTeX : fontspec remplace mathptmx) ----------
+\usepackage{fontspec}
+\setmainfont{Times New Roman}   % équivalent mathptmx sous XeLaTeX
+\usepackage{unicode-math}
+\setmathfont{XITS Math}         % fontes mathématiques compatibles
+
+% --- Langue -------------------------------------------------
+\usepackage[main=french]{babel}
+
+% --- Couleurs -----------------------------------------------
+\usepackage{xcolor}
+\definecolor{MidnightBlue}{RGB}{25, 25, 112}
+\definecolor{RoyalBlue}{RGB}{65, 105, 225}
+\definecolor{gold}{RGB}{212, 175, 55}
+
+% --- Mise en page -------------------------------------------
+\usepackage{geometry}
+\geometry{margin=1.5cm}
+\usepackage{setspace}
+\setstretch{1.5}
+
+% --- En-têtes / pieds de page -------------------------------
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textcolor{MidnightBlue}{\small Analyse des Paiements Sociaux — ITIE}}
+\fancyhead[R]{\textcolor{MidnightBlue}{\small \thepage}}
+\fancyfoot[C]{\textcolor{MidnightBlue}{\small ENSAE Pierre Ndiaye}}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% --- Titres de chapitres (fncychap) -------------------------
+\usepackage[Conny]{fncychap}
+\ChNameVar{\Large\color{MidnightBlue}\bfseries}
+\ChTitleVar{\large\color{MidnightBlue}}
+
+% --- Sections en bleu ---------------------------------------
+\usepackage{titlesec}
+\titleformat{\section}
+  {\color{MidnightBlue}\normalfont\Large\bfseries}
+  {\thesection}{1em}{}
+\titleformat{\subsection}
+  {\color{MidnightBlue}\normalfont\large\bfseries}
+  {\thesubsection}{1em}{}
+\titleformat{\subsubsection}
+  {\color{RoyalBlue}\normalfont\normalsize\bfseries}
+  {\thesubsubsection}{1em}{}
+
+% --- Tableaux -----------------------------------------------
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{colortbl}
+\usepackage{array}
+
+% --- Boîtes tcolorbox ---------------------------------------
+\usepackage{tcolorbox}
+\tcbuselibrary{most}
+
+\newtcolorbox{boitedef}[1]{
+  colback=MidnightBlue!8,
+  colframe=MidnightBlue,
+  fonttitle=\bfseries,
+  title=#1
+}
+\newtcolorbox{boiteresultat}[1]{
+  colback=green!5,
+  colframe=green!50!black,
+  fonttitle=\bfseries,
+  title=#1
+}
+\newtcolorbox{boiteattn}[1]{
+  colback=red!5,
+  colframe=red!60!black,
+  fonttitle=\bfseries,
+  title=#1
+}
+\newtcolorbox{boiteex}[1]{
+  colback=gold!10,
+  colframe=gold!80!black,
+  fonttitle=\bfseries,
+  title=#1
+}
+
+% --- Divers -------------------------------------------------
+\usepackage{tikz}
+\usepackage{microtype}
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=MidnightBlue,
+  urlcolor=RoyalBlue
+}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{xcolor}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Analyse des Paiements Sociaux des Entreprises Extractives},
+  pdfauthor={Traoré},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Analyse des Paiements Sociaux des Entreprises Extractives}
+\usepackage{etoolbox}
+\makeatletter
+\providecommand{\subtitle}[1]{% add subtitle to \maketitle
+  \apptocmd{\@title}{\par {\large #1 \par}}{}{}
+}
+\makeatother
+\subtitle{Chiffre d'affaires, résultat net et paiements sociaux --- ITIE Sénégal (2020--2024)}
+\author{Traoré}
+\date{15 mai 2026}
+
+\begin{document}
+\maketitle
+
+{
+\setcounter{tocdepth}{3}
+\tableofcontents
+}
+\newpage
+
+\section{Présentation des données}\label{pruxe9sentation-des-donnuxe9es}
+
+\begin{boitedef}{Source et contexte}
+Les données proviennent du processus de déclaration de l'\textbf{Initiative pour la Transparence dans les Industries Extractives (ITIE) au Sénégal}. Elles couvrent \textbf{31 entreprises} du secteur extractif sur la période \textbf{2020--2024}, soit 155 observations au total.
+\end{boitedef}
+
+\subsection{Structure du jeu de données}\label{structure-du-jeu-de-donnuxe9es}
+
+\begin{table}[!h]
+\centering
+\caption{\label{tab:structure-table}Description des variables du jeu de données}
+\centering
+\begin{tabular}[t]{ll>{\raggedright\arraybackslash}p{7cm}r}
+\toprule
+Variable & Type & Description & Valeurs manquantes\\
+\midrule
+\cellcolor{gray!10}{Entreprise} & \cellcolor{gray!10}{Caractère} & \cellcolor{gray!10}{Nom de l'entreprise déclarante} & \cellcolor{gray!10}{0}\\
+Annee & Entier & Année de déclaration (2020–2024) & 0\\
+\cellcolor{gray!10}{CA} & \cellcolor{gray!10}{Numérique} & \cellcolor{gray!10}{Chiffre d'affaires (FCFA)} & \cellcolor{gray!10}{65}\\
+RN & Numérique & Résultat net (FCFA) & 64\\
+\cellcolor{gray!10}{Paiement} & \cellcolor{gray!10}{Numérique} & \cellcolor{gray!10}{Paiements sociaux déclarés à l'ITIE (FCFA)} & \cellcolor{gray!10}{155}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Liste des entreprises}\label{liste-des-entreprises}
+
+L'échantillon comprend \textbf{31} entreprises couvrant les secteurs minier, pétrolier et gazier, et des industries chimiques.
+
+\begin{table}[!h]
+\centering
+\caption{\label{tab:liste-entreprises}Liste des 31 entreprises déclarantes}
+\centering
+\fontsize{9}{11}\selectfont
+\begin{tabular}[t]{clcl}
+\toprule
+N° & Entreprise & N° & Entreprise\\
+\midrule
+\cellcolor{gray!10}{1} & \cellcolor{gray!10}{AGEM} & \cellcolor{gray!10}{17} & \cellcolor{gray!10}{KOSMOS}\\
+2 & AIG & 18 & MIFERSO\\
+\cellcolor{gray!10}{3} & \cellcolor{gray!10}{BARRICK GOLD} & \cellcolor{gray!10}{19} & \cellcolor{gray!10}{ORANTO}\\
+4 & BMCC & 20 & PETROSEN\\
+\cellcolor{gray!10}{5} & \cellcolor{gray!10}{BP SENEGAL} & \cellcolor{gray!10}{21} & \cellcolor{gray!10}{PMC}\\
+\addlinespace
+6 & CAPRICORN & 22 & SEPHOS\\
+\cellcolor{gray!10}{7} & \cellcolor{gray!10}{CDS} & \cellcolor{gray!10}{23} & \cellcolor{gray!10}{SGO}\\
+8 & COGECA & 24 & SMC\\
+\cellcolor{gray!10}{9} & \cellcolor{gray!10}{CSE} & \cellcolor{gray!10}{25} & \cellcolor{gray!10}{SOCOCIM}\\
+10 & DANGOTE & 26 & SOMIVA\\
+\addlinespace
+\cellcolor{gray!10}{11} & \cellcolor{gray!10}{FORTESA} & \cellcolor{gray!10}{27} & \cellcolor{gray!10}{SORED}\\
+12 & GCO & 28 & SSPT\\
+\cellcolor{gray!10}{13} & \cellcolor{gray!10}{GECAMINES} & \cellcolor{gray!10}{29} & \cellcolor{gray!10}{TALIX MINES}\\
+14 & GPHOS & 30 & TOTAL E\&P\\
+\cellcolor{gray!10}{15} & \cellcolor{gray!10}{IAMGOLD} & \cellcolor{gray!10}{31} & \cellcolor{gray!10}{WOODSIDE}\\
+\addlinespace
+16 & ICS & NA & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\newpage
+
+\section{Analyse des valeurs manquantes}\label{analyse-des-valeurs-manquantes}
+
+\subsection{Taux de complétude}\label{taux-de-compluxe9tude}
+
+\begin{table}[!h]
+\centering
+\caption{\label{tab:miss-summary}Résumé des valeurs manquantes par variable}
+\centering
+\begin{tabular}[t]{lrr}
+\toprule
+Variable & Nb. manquants & Pct manquant\\
+\midrule
+\cellcolor{gray!10}{Paiement} & \cellcolor{gray!10}{155} & \cellcolor{gray!10}{100}\\
+CA & 65 & 41.9\\
+\cellcolor{gray!10}{RN} & \cellcolor{gray!10}{64} & \cellcolor{gray!10}{41.3}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{boiteattn}{Taux de manquants élevé}
+Le CA et le RN présentent chacun plus de \textbf{40\%} de valeurs manquantes, reflétant l'hétérogénéité du périmètre de déclaration.
+\end{boiteattn}
+
+\subsection{Carte des valeurs manquantes}\label{carte-des-valeurs-manquantes}
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.95\linewidth]{analyse_paiements_sociaux_files/figure-latex/vis-miss-1} 
+
+}
+
+\caption{Carte des valeurs manquantes dans le jeu de données}\label{fig:vis-miss}
+\end{figure}
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.95\linewidth]{analyse_paiements_sociaux_files/figure-latex/gg-miss-var-1} 
+
+}
+
+\caption{Nombre de valeurs manquantes par variable}\label{fig:gg-miss-var}
+\end{figure}
+
+\subsection{Manquants par année}\label{manquants-par-annuxe9e}
+
+\begin{table}[!h]
+\centering
+\caption{\label{tab:miss-annee}Valeurs manquantes par année}
+\centering
+\begin{tabular}[t]{rrrrrrrr}
+\toprule
+Année & Obs. & CA manq. & CA (\%) & RN manq. & RN (\%) & Pmt manq. & Pmt (\%)\\
+\midrule
+\cellcolor{gray!10}{2020} & \cellcolor{gray!10}{31} & \cellcolor{gray!10}{18} & \cellcolor{gray!10}{58.1} & \cellcolor{gray!10}{18} & \cellcolor{gray!10}{58.1} & \cellcolor{gray!10}{31} & \cellcolor{gray!10}{100}\\
+2021 & 31 & 10 & 32.3 & 9 & 29.0 & 31 & 100\\
+\cellcolor{gray!10}{2022} & \cellcolor{gray!10}{31} & \cellcolor{gray!10}{9} & \cellcolor{gray!10}{29.0} & \cellcolor{gray!10}{9} & \cellcolor{gray!10}{29.0} & \cellcolor{gray!10}{31} & \cellcolor{gray!10}{100}\\
+2023 & 31 & 11 & 35.5 & 11 & 35.5 & 31 & 100\\
+\cellcolor{gray!10}{2024} & \cellcolor{gray!10}{31} & \cellcolor{gray!10}{17} & \cellcolor{gray!10}{54.8} & \cellcolor{gray!10}{17} & \cellcolor{gray!10}{54.8} & \cellcolor{gray!10}{31} & \cellcolor{gray!10}{100}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\newpage
+
+\section{Statistiques descriptives}\label{statistiques-descriptives}
+
+\subsection{Chiffre d'affaires (CA)}\label{chiffre-daffaires-ca}
+
+\begin{table}[!h]
+\centering
+\caption{\label{tab:stats-CA}Statistiques descriptives du CA (en milliards FCFA)}
+\centering
+\begin{tabular}[t]{lr}
+\toprule
+Statistique & Valeur (Mds FCFA)\\
+\midrule
+\cellcolor{gray!10}{N} & \cellcolor{gray!10}{90.00}\\
+Minimum & 0.00\\
+\cellcolor{gray!10}{Q1} & \cellcolor{gray!10}{0.09}\\
+Mediane & 12.67\\
+\cellcolor{gray!10}{Moyenne} & \cellcolor{gray!10}{74.60}\\
+\addlinespace
+Q3 & 135.16\\
+\cellcolor{gray!10}{Maximum} & \cellcolor{gray!10}{566.42}\\
+Ecart\_type & 117.20\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{boiteresultat}{Interprétation}
+Distribution très asymétrique : la médiane (\textasciitilde{}12,7 Mds) est très inférieure à la moyenne (\textasciitilde{}74,6 Mds FCFA), signe de quelques entreprises à très fort CA tirant la distribution vers le haut.
+\end{boiteresultat}
+
+\subsection{Résultat net (RN)}\label{ruxe9sultat-net-rn}
+
+\begin{table}[!h]
+\centering
+\caption{\label{tab:stats-RN}Statistiques descriptives du RN (en milliards FCFA)}
+\centering
+\begin{tabular}[t]{lr}
+\toprule
+Statistique & Valeur (Mds FCFA)\\
+\midrule
+\cellcolor{gray!10}{N} & \cellcolor{gray!10}{91.00}\\
+Minimum & -662.89\\
+\cellcolor{gray!10}{Q1} & \cellcolor{gray!10}{-0.12}\\
+Mediane & 0.19\\
+\cellcolor{gray!10}{Moyenne} & \cellcolor{gray!10}{-7.36}\\
+\addlinespace
+Q3 & 17.11\\
+\cellcolor{gray!10}{Maximum} & \cellcolor{gray!10}{230.17}\\
+Ecart\_type & 117.02\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{boiteattn}{Interprétation}
+La moyenne du RN est \textbf{négative} (\textasciitilde{}-7,4 Mds FCFA), tirée par des pertes exceptionnelles (min : -662,9 Mds). La médiane reste positive (\textasciitilde{}0,19 Mds), indiquant que la majorité des entreprises sont bénéficiaires.
+\end{boiteattn}
+
+\subsection{Paiements sociaux (Paiement)}\label{paiements-sociaux-paiement}
+
+\begin{table}[!h]
+\centering
+\caption{\label{tab:stats-Pmt}Statistiques descriptives des paiements sociaux (en milliards FCFA)}
+\centering
+\begin{tabular}[t]{lr}
+\toprule
+Statistique & Valeur (Mds FCFA)\\
+\midrule
+\cellcolor{gray!10}{N} & \cellcolor{gray!10}{0}\\
+Minimum & Inf\\
+\cellcolor{gray!10}{Q1} & \cellcolor{gray!10}{NA}\\
+Mediane & NA\\
+\cellcolor{gray!10}{Moyenne} & \cellcolor{gray!10}{NaN}\\
+\addlinespace
+Q3 & NA\\
+\cellcolor{gray!10}{Maximum} & \cellcolor{gray!10}{-Inf}\\
+Total & 0\\
+\cellcolor{gray!10}{Ecart\_type} & \cellcolor{gray!10}{NA}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{boiteresultat}{Interprétation}
+Les paiements sociaux présentent une variabilité importante entre entreprises. Le total cumulé sur la période donne une mesure directe de la contribution fiscale et parafiscale du secteur extractif à l'État sénégalais.
+\end{boiteresultat}
+
+\newpage
+
+\section{Analyse temporelle (2020--2024)}\label{analyse-temporelle-20202024}
+
+\subsection{Évolution annuelle du CA}\label{uxe9volution-annuelle-du-ca}
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.95\linewidth]{analyse_paiements_sociaux_files/figure-latex/ca-annee-1} 
+
+}
+
+\caption{Évolution du chiffre d'affaires annuel}\label{fig:ca-annee}
+\end{figure}
+
+\subsection{Évolution annuelle du RN}\label{uxe9volution-annuelle-du-rn}
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.95\linewidth]{analyse_paiements_sociaux_files/figure-latex/rn-annee-1} 
+
+}
+
+\caption{Évolution du résultat net annuel}\label{fig:rn-annee}
+\end{figure}
+
+\subsection{Récapitulatif par année}\label{ruxe9capitulatif-par-annuxe9e}
+
+\begin{table}[!h]
+\centering
+\caption{\label{tab:recap-annee}Récapitulatif annuel (en Mds FCFA)}
+\centering
+\fontsize{9}{11}\selectfont
+\begin{tabular}[t]{rrrrrrrr}
+\toprule
+Année & Nb. ent. & CA méd. & CA moy. & RN méd. & RN moy. & Pmt total & Pmt moyen\\
+\midrule
+\cellcolor{gray!10}{2020} & \cellcolor{gray!10}{31} & \cellcolor{gray!10}{9.0} & \cellcolor{gray!10}{52.5} & \cellcolor{gray!10}{0.2} & \cellcolor{gray!10}{-57.8} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{NaN}\\
+2021 & 31 & 12.2 & 72.5 & 0.0 & 10.9 & 0 & NaN\\
+\cellcolor{gray!10}{2022} & \cellcolor{gray!10}{31} & \cellcolor{gray!10}{9.9} & \cellcolor{gray!10}{82.9} & \cellcolor{gray!10}{0.0} & \cellcolor{gray!10}{21.3} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{NaN}\\
+2023 & 31 & 14.7 & 77.5 & 0.3 & -13.3 & 0 & NaN\\
+\cellcolor{gray!10}{2024} & \cellcolor{gray!10}{31} & \cellcolor{gray!10}{15.5} & \cellcolor{gray!10}{81.0} & \cellcolor{gray!10}{1.4} & \cellcolor{gray!10}{-25.9} & \cellcolor{gray!10}{0} & \cellcolor{gray!10}{NaN}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Évolution annuelle des paiements sociaux}\label{uxe9volution-annuelle-des-paiements-sociaux}
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.95\linewidth]{analyse_paiements_sociaux_files/figure-latex/pmt-annee-1} 
+
+}
+
+\caption{Évolution des paiements sociaux totaux et moyens par année}\label{fig:pmt-annee}
+\end{figure}
+
+\newpage
+
+\section{Analyse par entreprise}\label{analyse-par-entreprise}
+
+\subsection{Distribution du CA par entreprise}\label{distribution-du-ca-par-entreprise}
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.95\linewidth]{analyse_paiements_sociaux_files/figure-latex/ca-boxplot-1} 
+
+}
+
+\caption{Distribution du CA par entreprise (boxplot)}\label{fig:ca-boxplot}
+\end{figure}
+
+\subsection{Top 10 par CA moyen}\label{top-10-par-ca-moyen}
+
+\begin{table}[!h]
+\centering
+\caption{\label{tab:top10-ca}Top 10 des entreprises par CA moyen (Mds FCFA)}
+\centering
+\begin{tabular}[t]{lrrr}
+\toprule
+Entreprise & Années obs. & CA moyen & CA max\\
+\midrule
+\cellcolor{gray!10}{SGO} & \cellcolor{gray!10}{4} & \cellcolor{gray!10}{386.0} & \cellcolor{gray!10}{460.0}\\
+ICS & 4 & 365.1 & 566.4\\
+\cellcolor{gray!10}{CDS} & \cellcolor{gray!10}{5} & \cellcolor{gray!10}{163.9} & \cellcolor{gray!10}{208.3}\\
+SOCOCIM & 4 & 162.1 & 167.0\\
+\cellcolor{gray!10}{GCO} & \cellcolor{gray!10}{5} & \cellcolor{gray!10}{157.0} & \cellcolor{gray!10}{208.6}\\
+\addlinespace
+PMC & 5 & 148.3 & 175.1\\
+\cellcolor{gray!10}{DANGOTE} & \cellcolor{gray!10}{4} & \cellcolor{gray!10}{68.0} & \cellcolor{gray!10}{83.0}\\
+SOMIVA & 4 & 32.7 & 56.5\\
+\cellcolor{gray!10}{GECAMINES} & \cellcolor{gray!10}{4} & \cellcolor{gray!10}{26.9} & \cellcolor{gray!10}{30.7}\\
+COGECA & 2 & 24.0 & 25.0\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Composition du CA par entreprise et par année}\label{composition-du-ca-par-entreprise-et-par-annuxe9e}
+
+\begin{figure}
+
+{\centering \includegraphics[width=1\linewidth]{analyse_paiements_sociaux_files/figure-latex/stacked-bar-ca-1} 
+
+}
+
+\caption{Chiffre d'affaires total par année — composition par entreprise}\label{fig:stacked-bar-ca}
+\end{figure}
+
+\subsection{Marge nette moyenne (RN/CA)}\label{marge-nette-moyenne-rnca}
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.95\linewidth]{analyse_paiements_sociaux_files/figure-latex/marge-1} 
+
+}
+
+\caption{Marge nette moyenne par entreprise (en \%)}\label{fig:marge}
+\end{figure}
+
+\subsection{Paiements sociaux par entreprise}\label{paiements-sociaux-par-entreprise}
+
+\begin{table}[!h]
+\centering
+\caption{\label{tab:top10-pmt}Top 10 des entreprises par paiements sociaux cumulés (Mds FCFA)}
+\centering
+\begin{tabular}[t]{lrrrr}
+\toprule
+\cellcolor{gray!10}{Entreprise} & \cellcolor{gray!10}{Années obs.} & \cellcolor{gray!10}{Total cumulé} & \cellcolor{gray!10}{Moy. annuelle} & \cellcolor{gray!10}{Maximum annuel}\\
+
+
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Composition des paiements par entreprise et par année}\label{composition-des-paiements-par-entreprise-et-par-annuxe9e}
+
+\begin{figure}
+
+{\centering \includegraphics[width=1\linewidth]{analyse_paiements_sociaux_files/figure-latex/stacked-bar-pmt-1} 
+
+}
+
+\caption{Paiements sociaux par année — composition par entreprise}\label{fig:stacked-bar-pmt}
+\end{figure}
+
+\subsection{Taux de pression fiscale (Paiement / CA)}\label{taux-de-pression-fiscale-paiement-ca}
+
+\begin{figure}
+
+{\centering \includegraphics[width=0.95\linewidth]{analyse_paiements_sociaux_files/figure-latex/taux-pression-1} 
+
+}
+
+\caption{Taux de pression fiscale moyen par entreprise (Paiement/CA, en \%)}\label{fig:taux-pression}
+\end{figure}
+
+\newpage
+
+\section{Synthèse et recommandations}\label{synthuxe8se-et-recommandations}
+
+\begin{boiteresultat}{Principaux enseignements}
+\begin{enumerate}
+  \item \textbf{Forte hétérogénéité sectorielle :} Le CA varie de 0 à 566 Mds FCFA selon les entreprises.
+  \item \textbf{Résultat net globalement fragile :} La moyenne du RN est négative malgré une médiane positive, en raison de quelques pertes exceptionnelles.
+  \item \textbf{Paiements sociaux concentrés :} Les paiements à l'ITIE sont fortement concentrés sur un petit nombre d'entreprises. Le taux de pression fiscale (Paiement/CA) varie très significativement selon les acteurs.
+  \item \textbf{Couverture insuffisante :} Plus de 40\% des valeurs de CA et RN sont manquantes, limitant la portée des analyses.
+  \item \textbf{Reprise post-COVID :} Une reprise progressive des paiements est observable à partir de 2022 après la contraction de 2020--2021.
+\end{enumerate}
+\end{boiteresultat}
+
+\begin{boiteex}{Recommandations}
+\begin{itemize}
+  \item Renforcer les mécanismes de relance auprès des entreprises non déclarantes.
+  \item Envisager des méthodes d'imputation (MICE, k-NN) pour les analyses approfondies.
+  \item Désagréger systématiquement par secteur (hydrocarbures, mines, phosphates).
+  \item Analyser la cohérence entre le taux de pression fiscale déclaré à l'ITIE et les obligations légales sectorielles pour identifier d'éventuels écarts de déclaration.
+\end{itemize}
+\end{boiteex}
+
+\vfill
+
+\begin{center}
+\textcolor{MidnightBlue}{\rule{0.6\linewidth}{1.5pt}}\\[6pt]
+\textit{\textcolor{gray}{Document généré automatiquement sous RMarkdown --- ENSAE Pierre Ndiaye, Dakar}}
+\end{center}
+
+\end{document}

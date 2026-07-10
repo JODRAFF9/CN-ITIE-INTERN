@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OpenRBE | ITIE Sénégal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<!-- SheetJS pour lecture Excel -->
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<!-- Librairies visualisation -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<!-- Styles ITIE -->
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- ══ LOADING ══════════════════════════════════════════════ -->
+<div id="ld">
+  <div class="sp"></div>
+  <div id="ld-msg">Initialisation...</div>
+  <div id="ld-bar-wrap"><div id="ld-bar"></div></div>
+  <div id="ld-err"></div>
+</div>
+
+<!-- ══ HEADER ═══════════════════════════════════════════════ -->
+<div id="hdr">
+  <div class="hi">
+    <img src="img/logo_itie.png" alt="ITIE Sénégal">
+    <div class="hi-sep"></div>
+    <div class="hi-t">
+      <div class="brand"><span>Open</span>RBE</div>
+      <div class="sub">Open Registre des Bénéficiaires Effectifs</div>
+      <div class="tag">Plateforme nationale de consultation des bénéficiaires effectifs du secteur extractif sénégalais</div>
+    </div>
+    <div class="badge"><i class="fas fa-shield-halved"></i> Données officielles ITIE</div>
+  </div>
+  <nav class="nav-bar"><ul>
+    <li><a href="#" class="active" data-page="dashboard"><i class="fas fa-gauge-high"></i> Tableau de bord</a></li>
+    <li><a href="#" data-page="database"><i class="fas fa-database"></i> Base complète</a></li>
+    <li><a href="#" data-page="search"><i class="fas fa-magnifying-glass"></i> Recherche entreprise</a></li>
+    <li><a href="#" data-page="ppe"><i class="fas fa-user-shield"></i> Analyse PPE</a></li>
+    <li><a href="#" data-page="network"><i class="fas fa-diagram-project"></i> Réseaux</a></li>
+    <li><a href="#" data-page="map"><i class="fas fa-map-location-dot"></i> Cartographie</a></li>
+  </ul></nav>
+</div>
+
+<!-- ══ APP ══════════════════════════════════════════════════ -->
+<div id="app">
+
+  <!-- SIDEBAR -->
+  <div id="sb">
+    <div class="sb-ttl"><i class="fas fa-filter"></i> Filtres globaux</div>
+
+    <div class="fb"><label class="fl">Région</label><select id="fr" multiple></select></div>
+    <div class="fb"><label class="fl">Nationalité</label><select id="fn" multiple></select></div>
+    <div class="fb"><label class="fl">Pays de résidence</label><select id="fp" multiple></select></div>
+    <div class="fb"><label class="fl">Greffe</label><select id="fg"><option value="">Tous</option></select></div>
+
+    <div class="fb">
+      <label class="fl">Statut PPE</label>
+      <div class="sw-row">PPE uniquement
+        <label class="tog"><input type="checkbox" id="fppe"><span class="ts"></span></label>
+      </div>
+    </div>
+
+    <div class="fb">
+      <label class="fl">% Action Direct</label>
+      <input type="range" id="fpmin" min="0" max="100" value="0" step="5">
+      <input type="range" id="fpmax" min="0" max="100" value="100" step="5" style="margin-top:3px">
+      <div class="rr"><span id="lpmin">0%</span><span id="lpmax">100%</span></div>
+    </div>
+
+    <button class="btn-rst" onclick="resetFilters()">
+      <i class="fas fa-rotate-left"></i> Réinitialiser
+    </button>
+
+    <div class="sc">
+      <div class="sc-v" id="scn">—</div>
+      <div class="sc-l">bénéficiaires affichés</div>
+      <div class="sc-p" id="scp"></div>
+    </div>
+
+    <!-- Rechargement fichier Excel -->
+    <div class="reload-bar">
+      <button class="reload-btn" onclick="reloadExcel()">
+        <i class="fas fa-file-excel"></i> Recharger le fichier Excel
+      </button>
+      <div class="file-info" id="file-info-txt">Chargement en cours...</div>
+    </div>
+  </div>
+
+  <!-- CONTENU -->
+  <div id="ct">
+
+    <!-- ═══ TABLEAU DE BORD ═══ -->
+    <div class="page active" id="page-dashboard">
+      <div class="kr">
+        <div class="kpi" style="border-top-color:var(--g)"><div class="ki" style="color:var(--g)"><i class="fas fa-building"></i></div><div><div class="kv" id="k-co">—</div><div class="kl">Entreprises</div></div></div>
+        <div class="kpi" style="border-top-color:var(--b)"><div class="ki" style="color:var(--b)"><i class="fas fa-users"></i></div><div><div class="kv" id="k-be">—</div><div class="kl">Bénéficiaires</div></div></div>
+        <div class="kpi" style="border-top-color:var(--gd)"><div class="ki" style="color:var(--gd)"><i class="fas fa-calculator"></i></div><div><div class="kv" id="k-av">—</div><div class="kl">Moy./entreprise</div></div></div>
+        <div class="kpi" style="border-top-color:var(--r)"><div class="ki" style="color:var(--r)"><i class="fas fa-user-shield"></i></div><div><div class="kv" id="k-pp">—</div><div class="kl">PPE</div></div></div>
+        <div class="kpi" style="border-top-color:var(--yd)"><div class="ki" style="color:var(--yd)"><i class="fas fa-flag"></i></div><div><div class="kv" id="k-na">—</div><div class="kl">Nationalités</div></div></div>
+        <div class="kpi" style="border-top-color:var(--b)"><div class="ki" style="color:var(--b)"><i class="fas fa-globe"></i></div><div><div class="kv" id="k-pa">—</div><div class="kl">Pays résidence</div></div></div>
+      </div>
+      <div class="g2">
+        <div class="card"><div class="ct"><i class="fas fa-globe-africa"></i> Répartition par nationalité (Top 15)</div><div class="cw"><canvas id="ch-nat"></canvas></div></div>
+        <div class="card"><div class="ct"><i class="fas fa-user-tie"></i> Statut PPE</div><div class="cw"><canvas id="ch-ppe"></canvas></div></div>
+      </div>
+      <div class="g2">
+        <div class="card"><div class="ct"><i class="fas fa-map-marker-alt"></i> Répartition régionale</div><div class="cw"><canvas id="ch-reg"></canvas></div></div>
+        <div class="card"><div class="ct"><i class="fas fa-chart-bar"></i> Distribution des participations (%)</div><div class="cw"><canvas id="ch-pct"></canvas></div></div>
+      </div>
+      <div class="card">
+        <div class="ct"><i class="fas fa-building"></i> Top 30 entreprises par nombre de bénéficiaires</div>
+        <div class="eb">
+          <button class="be bxl" onclick="exportXLSX(getTopData(),'top_entreprises')"><i class="fas fa-file-excel"></i> Excel</button>
+          <button class="be bcsv" onclick="exportCSV(getTopData(),'top_entreprises')"><i class="fas fa-file-csv"></i> CSV</button>
+        </div>
+        <div class="tw"><table id="tbl-top">
+          <thead><tr><th>Entreprise</th><th>Région</th><th>Greffe</th><th>Bénéficiaires</th><th>Part. moy.</th><th>PPE</th></tr></thead>
+          <tbody></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ═══ BASE COMPLÈTE ═══ -->
+    <div class="page" id="page-database">
+      <div class="card">
+        <div class="ct">
+          <i class="fas fa-database"></i> Base complète des bénéficiaires effectifs
+          <span style="margin-left:auto;font-size:.77rem;color:var(--gray);font-weight:400" id="db-count-lbl"></span>
+        </div>
+        <div class="eb">
+          <button class="be bxl" onclick="exportXLSX(getDBData(),'base_rbe_complete')"><i class="fas fa-file-excel"></i> Exporter (Excel/CSV)</button>
+          <button class="be bcsv" onclick="exportCSV(getDBData(),'base_rbe_complete')"><i class="fas fa-file-csv"></i> CSV</button>
+        </div>
+        <div class="db-toolbar">
+          <input type="text" id="db-search" placeholder="🔍  Rechercher dans toute la base (entreprise, bénéficiaire, nationalité, région...)">
+        </div>
+        <div class="db-info" id="db-info"></div>
+        <div class="db-scroll">
+          <table id="tbl-db">
+            <thead><tr>
+              <th style="width:40px">#</th>
+              <th>Dénomination Sociale</th>
+              <th>Bénéficiaire</th>
+              <th>Région</th>
+              <th>Nationalité</th>
+              <th>Pays résidence</th>
+              <th>% Action</th>
+              <th>% Voix</th>
+              <th>PPE</th>
+              <th>Fonction PPE</th>
+              <th>Nom PPE lié</th>
+              <th>Greffe</th>
+              <th>Date acquisition</th>
+              <th>Année</th>
+            </tr></thead>
+            <tbody id="db-tbody"></tbody>
+          </table>
+        </div>
+        <div class="pg-bar">
+          <button class="pg-btn" id="pg-prev" onclick="dbPageNav(-1)"><i class="fas fa-chevron-left"></i></button>
+          <div id="pg-pages" style="display:flex;gap:4px;flex-wrap:wrap"></div>
+          <button class="pg-btn" id="pg-next" onclick="dbPageNav(1)"><i class="fas fa-chevron-right"></i></button>
+          <span class="pg-info" id="pg-info"></span>
+          <select class="pg-sz" id="pg-sz" onchange="dbPageSize()">
+            <option value="25">25/page</option>
+            <option value="50" selected>50/page</option>
+            <option value="100">100/page</option>
+            <option value="9999">Tout afficher</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ RECHERCHE ═══ -->
+    <div class="page" id="page-search">
+      <div class="shero">
+        <h3><i class="fas fa-search"></i> Recherche d'entreprise</h3>
+        <p>Tapez les premiers caractères — seules les entreprises présentes dans la base RBE sont proposées.</p>
+        <div class="sw">
+          <input type="text" id="si" placeholder="Rechercher une entreprise enregistrée...">
+          <div id="sdd"></div>
+        </div>
+      </div>
+      <div id="ccw"></div>
+    </div>
+
+    <!-- ═══ PPE ═══ -->
+    <div class="page" id="page-ppe">
+      <div class="pkr" id="ppe-kpis"></div>
+      <div class="g2">
+        <div class="card"><div class="ct"><i class="fas fa-flag"></i> PPE par nationalité</div><div class="cwsm"><canvas id="ch-pn"></canvas></div></div>
+        <div class="card"><div class="ct"><i class="fas fa-map-marker-alt"></i> PPE par région</div><div class="cwsm"><canvas id="ch-pr"></canvas></div></div>
+      </div>
+      <div class="card">
+        <div class="ct"><i class="fas fa-user-tie"></i> Liste complète des Personnes Politiquement Exposées (PPE)</div>
+        <div class="eb">
+          <button class="be bxl" onclick="exportXLSX(getPPEData(),'ppe_openrbe')"><i class="fas fa-file-excel"></i> Excel</button>
+          <button class="be bcsv" onclick="exportCSV(getPPEData(),'ppe_openrbe')"><i class="fas fa-file-csv"></i> CSV</button>
+        </div>
+        <div class="tw"><table id="tbl-ppe">
+          <thead><tr>
+            <th>Bénéficiaire</th><th>Entreprise</th><th>Région</th><th>Nationalité</th>
+            <th>Pays résidence</th><th>% Action</th><th>% Voix</th><th>Fonction PPE</th><th>Nom PPE lié</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ═══ RÉSEAU ═══ -->
+    <div class="page" id="page-network">
+      <div class="card">
+        <div class="ct"><i class="fas fa-diagram-project"></i> Réseau de propriété effective</div>
+        <div class="nc">
+          <div class="nsg">
+            <label class="gl"><span class="ld-dot lg" style="display:inline-block;margin-right:3px"></span> Choisir une Entreprise</label>
+            <select id="ns-co" class="gs" onchange="focusNode(this.value,'co')"><option value="">— Toutes —</option></select>
+          </div>
+          <div class="nsg">
+            <label class="yl"><span class="ld-dot ly" style="display:inline-block;margin-right:3px"></span> Choisir un Bénéficiaire</label>
+            <select id="ns-be" class="ys" onchange="focusNode(this.value,'be')"><option value="">— Tous —</option></select>
+          </div>
+          <div class="nsg" style="max-width:155px">
+            <label style="color:var(--gray)">Nb max entreprises</label>
+            <select id="nmx" onchange="buildNet()"><option value="10">10</option><option value="20" selected>20</option><option value="30">30</option><option value="50">50</option></select>
+          </div>
+          <button class="nb gn" onclick="buildNet()"><i class="fas fa-sync"></i> Rafraîchir</button>
+          <button class="nb bl" onclick="expNetPNG()"><i class="fas fa-image"></i> PNG</button>
+        </div>
+        <div class="nleg">
+          <span class="ld-dot lg"></span> Entreprise &nbsp;
+          <span class="ld-dot ly"></span> Bénéficiaire
+        </div>
+        <div id="nib" style="display:none" class="nib"></div>
+        <div id="nwrap"><svg id="nsvg"></svg></div>
+        <div class="ntip"><i class="fas fa-info-circle"></i> Utilisez les listes ou cliquez un noeud pour zoomer. Molette pour zoomer. Glisser pour déplacer.</div>
+      </div>
+    </div>
+
+    <!-- ═══ CARTE ═══ -->
+    <div class="page" id="page-map">
+      <div class="card">
+        <div class="ct"><i class="fas fa-map"></i> Cartographie des entreprises extractives au Sénégal</div>
+        <div style="margin-bottom:10px;display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+          <label style="font-size:.8rem;font-weight:600;color:var(--gray)">Indicateur :</label>
+          <label style="font-size:.81rem"><input type="radio" name="mm" value="nb" checked> Bénéficiaires</label>
+          <label style="font-size:.81rem"><input type="radio" name="mm" value="ne"> Entreprises</label>
+          <label style="font-size:.81rem"><input type="radio" name="mm" value="np"> PPE</label>
+        </div>
+        <div id="map"></div>
+        <div class="ntip" style="margin-top:7px"><i class="fas fa-info-circle"></i> Carte verrouillée sur le Sénégal. Cliquez un cercle pour le détail.</div>
+      </div>
+      <div class="card">
+        <div class="ct"><i class="fas fa-table"></i> Récapitulatif par région</div>
+        <div class="tw"><table id="tbl-reg">
+          <thead><tr><th>Région</th><th>Entreprises</th><th>Bénéficiaires</th><th>dont PPE</th></tr></thead>
+          <tbody></tbody>
+        </table></div>
+      </div>
+    </div>
+
+  </div><!-- /ct -->
+</div><!-- /app -->
+
+<footer>
+  <span class="fb">OpenRBE</span> — Open Registre des Bénéficiaires Effectifs |
+  © ITIE Sénégal 2025 | Initiative pour la Transparence dans les Industries Extractives
+  <br><span style="opacity:.35">Version 3.0 | HTML · CSS · JavaScript · SheetJS · D3 · Leaflet · Chart.js | Source : <em>data/RBE-2021-A-2025.xlsx</em></span>
+</footer>
+
+<!-- Scripts applicatifs (après le DOM) -->
+<script src="js/loader.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,737 @@
+/* =============================================================================
+   OpenRBE - Feuille de style principale
+   ITIE Sénégal - www/css/styles.css
+   ============================================================================= */
+
+/* ── Variables ITIE ─────────────────────────────────────────────────────────── */
+:root {
+  --itie-green:       #008C45;
+  --itie-green-dark:  #005A2E;
+  --itie-green-light: #E8F5EE;
+  --itie-yellow:      #F4C300;
+  --itie-yellow-dark: #B89300;
+  --itie-red:         #D62D20;
+  --itie-red-light:   #FDE8E6;
+  --itie-black:       #1A1A1A;
+  --itie-gray:        #6C757D;
+  --itie-light:       #F8F9FA;
+  --itie-white:       #FFFFFF;
+  --shadow-sm:        0 2px 8px rgba(0,0,0,0.08);
+  --shadow-md:        0 4px 16px rgba(0,0,0,0.12);
+  --shadow-lg:        0 8px 32px rgba(0,0,0,0.16);
+  --radius:           10px;
+  --radius-sm:        6px;
+  --font-main:        'Inter', 'Segoe UI', Arial, sans-serif;
+  --transition:       all 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ── Reset & Base ───────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  font-family:     var(--font-main);
+  background:      #EEF2F7;
+  color:           var(--itie-black);
+  margin:          0;
+  padding:         0;
+  font-size:       14px;
+  line-height:     1.6;
+}
+
+/* ── Scrollbar élégante ─────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track  { background: var(--itie-light); }
+::-webkit-scrollbar-thumb  { background: var(--itie-green); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--itie-green-dark); }
+
+/* ── Header ─────────────────────────────────────────────────────────────────── */
+.main-header {
+  background: linear-gradient(135deg, var(--itie-green) 0%, var(--itie-green-dark) 100%);
+  color: var(--itie-white);
+  padding: 0;
+  box-shadow: var(--shadow-md);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  padding: 14px 28px;
+  gap: 20px;
+}
+
+.header-logo img {
+  height: 56px;
+  width: auto;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+  transition: var(--transition);
+}
+.header-logo img:hover { transform: scale(1.03); }
+
+.header-divider {
+  width: 2px;
+  height: 52px;
+  background: rgba(255,255,255,0.35);
+  border-radius: 1px;
+}
+
+.header-text { flex: 1; }
+
+.header-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin: 0;
+  line-height: 1.1;
+}
+.header-title .title-open   { color: var(--itie-yellow); }
+.header-title .title-rbe    { color: var(--itie-white); }
+
+.header-subtitle {
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.82);
+  margin: 3px 0 0;
+  font-style: italic;
+  letter-spacing: 0.3px;
+}
+
+.header-tagline {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.65);
+  margin: 2px 0 0;
+}
+
+.header-badge {
+  background: var(--itie-yellow);
+  color: var(--itie-black);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+/* ── Onglets tabsetPanel Shiny natifs ────────────────────────────────────────── */
+.nav-tabs {
+  border-bottom: 3px solid var(--itie-green) !important;
+  background: transparent;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  margin-bottom: 0 !important;
+}
+.nav-tabs .nav-link {
+  color: var(--itie-black) !important;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 10px 18px !important;
+  border: none !important;
+  border-bottom: 3px solid transparent !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+.nav-tabs .nav-link:hover {
+  color: var(--itie-green) !important;
+  background: var(--itie-green-light) !important;
+  border-bottom-color: var(--itie-green) !important;
+}
+.nav-tabs .nav-link.active,
+.nav-tabs .nav-item.show .nav-link {
+  color: var(--itie-green) !important;
+  background: var(--itie-white) !important;
+  border-bottom: 3px solid var(--itie-green) !important;
+  font-weight: 700;
+}
+.nav-tabs .nav-link i,
+.nav-tabs .nav-link .fas,
+.nav-tabs .nav-link .fa { margin-right: 6px; color: inherit; }
+.tab-content { padding-top: 0 !important; }
+.tab-pane { animation: fadeIn 0.3s ease; }
+
+/* ── Sidebar ─────────────────────────────────────────────────────────────────── */
+.sidebar-panel {
+  background: var(--itie-white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 20px 16px;
+  border-top: 4px solid var(--itie-green);
+  height: 100%;
+}
+
+.sidebar-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--itie-green);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sidebar-title::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--itie-green-light);
+}
+
+.filter-section {
+  margin-bottom: 18px;
+}
+.filter-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--itie-gray);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 5px;
+}
+.filter-reset-btn {
+  width: 100%;
+  background: var(--itie-red-light);
+  color: var(--itie-red);
+  border: 1px solid var(--itie-red);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  margin-top: 8px;
+}
+.filter-reset-btn:hover {
+  background: var(--itie-red);
+  color: white;
+}
+
+/* ── KPI Cards ───────────────────────────────────────────────────────────────── */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.kpi-card {
+  background: var(--itie-white);
+  border-radius: var(--radius);
+  padding: 20px 16px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: var(--transition);
+  border-top: 4px solid #008C45;
+  animation: fadeInUp 0.5s ease both;
+}
+.kpi-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.kpi-icon {
+  font-size: 1.6rem;
+  opacity: 0.9;
+  flex-shrink: 0;
+  width: 40px;
+  text-align: center;
+}
+
+.kpi-content { flex: 1; min-width: 0; }
+
+.kpi-value {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--itie-black);
+  line-height: 1;
+  letter-spacing: -0.5px;
+}
+
+.kpi-label {
+  font-size: 0.75rem;
+  color: var(--itie-gray);
+  font-weight: 500;
+  margin-top: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.kpi-sublabel {
+  font-size: 0.7rem;
+  color: var(--itie-green);
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Cartes graphiques ──────────────────────────────────────────────────────── */
+.chart-card {
+  background: var(--itie-white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 20px;
+  margin-bottom: 20px;
+  transition: var(--transition);
+  animation: fadeIn 0.4s ease;
+}
+.chart-card:hover { box-shadow: var(--shadow-md); }
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.chart-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--itie-black);
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--itie-green-light);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.chart-title i { color: var(--itie-green); }
+
+/* ── Boutons export ──────────────────────────────────────────────────────────── */
+.table-export-btns {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-export {
+  font-size: 0.78rem !important;
+  padding: 5px 12px !important;
+  border-radius: var(--radius-sm) !important;
+  font-weight: 600 !important;
+  border: none !important;
+  cursor: pointer;
+  transition: var(--transition) !important;
+}
+.btn-excel {
+  background: #1D6F42 !important;
+  color: white !important;
+}
+.btn-excel:hover { background: #155232 !important; }
+
+.btn-csv {
+  background: #3D7AB5 !important;
+  color: white !important;
+}
+.btn-csv:hover { background: #2A5A8C !important; }
+
+.btn-pdf {
+  background: #C0392B !important;
+  color: white !important;
+}
+.btn-pdf:hover { background: #922B21 !important; }
+
+.btn-itie {
+  background: var(--itie-green) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: var(--radius-sm) !important;
+  font-weight: 600 !important;
+  padding: 6px 14px !important;
+  transition: var(--transition) !important;
+}
+.btn-itie:hover { background: var(--itie-green-dark) !important; }
+
+/* ── Recherche entreprise ────────────────────────────────────────────────────── */
+.search-hero {
+  background: linear-gradient(135deg, var(--itie-green) 0%, var(--itie-green-dark) 100%);
+  border-radius: var(--radius);
+  padding: 36px 28px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-md);
+}
+
+.search-hero-inner { max-width: 700px; margin: 0 auto; }
+
+.search-title {
+  color: white;
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.search-title i { color: var(--itie-yellow); }
+
+.search-subtitle {
+  color: rgba(255,255,255,0.8);
+  font-size: 0.88rem;
+  margin-bottom: 20px;
+}
+
+.search-option {
+  padding: 6px 10px;
+  font-size: 0.88rem;
+  border-bottom: 1px solid var(--itie-light);
+}
+.search-option:hover { background: var(--itie-green-light); }
+
+/* ── Fiche entreprise ────────────────────────────────────────────────────────── */
+.company-card {
+  background: var(--itie-white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 0;
+  margin-bottom: 20px;
+  overflow: hidden;
+  border: 1px solid var(--itie-green-light);
+  animation: slideIn 0.35s ease;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-10px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.company-card-header {
+  background: var(--itie-green-light);
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid rgba(0,140,69,0.15);
+}
+
+.company-card-icon {
+  width: 50px;
+  height: 50px;
+  background: var(--itie-green);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.company-card-title h4 {
+  color: var(--itie-green-dark);
+  font-weight: 800;
+  font-size: 1.1rem;
+  margin: 0 0 5px;
+}
+
+.badge-region {
+  background: var(--itie-green);
+  color: white;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-right: 6px;
+}
+
+.badge-greffe {
+  background: var(--itie-light);
+  color: var(--itie-gray);
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  border: 1px solid #dee2e6;
+}
+
+.company-stats {
+  display: flex;
+  padding: 16px 24px;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.company-stat { text-align: center; }
+.company-stat-value {
+  display: block;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--itie-green);
+  line-height: 1;
+}
+.company-stat-value.ppe-alert { color: var(--itie-red); }
+.company-stat-label {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--itie-gray);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 3px;
+}
+
+/* ── Badges ──────────────────────────────────────────────────────────────────── */
+.badge-ppe {
+  background: var(--itie-red);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+.badge-nonppe {
+  background: var(--itie-light);
+  color: var(--itie-gray);
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.72rem;
+}
+
+/* ── Réseau visNetwork ───────────────────────────────────────────────────────── */
+.network-controls {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.network-filters {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.network-legend {
+  font-size: 0.82rem;
+  color: var(--itie-gray);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-dot {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(0,0,0,0.3);
+}
+.legend-company { background: var(--itie-green); }
+.legend-ben     { background: var(--itie-yellow); }
+
+.network-info {
+  margin-top: 10px;
+  font-size: 0.78rem;
+  color: var(--itie-gray);
+  background: var(--itie-light);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+}
+.network-info i { color: var(--itie-green); }
+
+/* ── Carte Leaflet ───────────────────────────────────────────────────────────── */
+.map-controls {
+  margin-bottom: 12px;
+}
+.map-note {
+  margin-top: 10px;
+  font-size: 0.78rem;
+  color: var(--itie-gray);
+  background: var(--itie-light);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+}
+
+/* ── Tableaux DT ─────────────────────────────────────────────────────────────── */
+.dataTables_wrapper {
+  font-family: var(--font-main) !important;
+  font-size: 0.85rem;
+}
+.dataTables_filter input {
+  border: 1px solid #dee2e6;
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  font-size: 0.83rem;
+}
+.dataTables_filter input:focus {
+  outline: none;
+  border-color: var(--itie-green);
+  box-shadow: 0 0 0 2px rgba(0,140,69,0.15);
+}
+table.dataTable thead th {
+  background: var(--itie-light);
+  color: var(--itie-black);
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  border-bottom: 2px solid var(--itie-green);
+  padding: 10px 12px !important;
+}
+table.dataTable tbody tr:hover {
+  background: var(--itie-green-light) !important;
+}
+.paginate_button.current {
+  background: var(--itie-green) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: var(--radius-sm) !important;
+}
+
+/* ── Selectize (dropdowns) ───────────────────────────────────────────────────── */
+.selectize-input {
+  border: 1px solid #dee2e6 !important;
+  border-radius: var(--radius-sm) !important;
+  font-size: 0.88rem !important;
+  padding: 8px 12px !important;
+  transition: var(--transition) !important;
+}
+.selectize-input.focus {
+  border-color: var(--itie-green) !important;
+  box-shadow: 0 0 0 3px rgba(0,140,69,0.15) !important;
+}
+.selectize-dropdown-content .option:hover,
+.selectize-dropdown-content .option.active {
+  background: var(--itie-green-light) !important;
+  color: var(--itie-green-dark) !important;
+}
+
+/* ── Slider ──────────────────────────────────────────────────────────────────── */
+.irs--shiny .irs-bar        { background: var(--itie-green) !important; }
+.irs--shiny .irs-handle     { background: white !important;
+                               border: 2px solid var(--itie-green) !important; }
+.irs--shiny .irs-from,
+.irs--shiny .irs-to,
+.irs--shiny .irs-single     { background: var(--itie-green) !important; }
+
+/* ── Footer ──────────────────────────────────────────────────────────────────── */
+.app-footer {
+  background: var(--itie-black);
+  color: rgba(255,255,255,0.7);
+  text-align: center;
+  padding: 18px 24px;
+  font-size: 0.78rem;
+  margin-top: 32px;
+}
+.app-footer .footer-brand {
+  color: var(--itie-yellow);
+  font-weight: 700;
+}
+.app-footer .footer-version {
+  color: rgba(255,255,255,0.4);
+  font-size: 0.72rem;
+  margin-top: 2px;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────────── */
+@media (max-width: 992px) {
+  .kpi-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .header-inner { padding: 10px 16px; }
+  .header-title { font-size: 1.4rem; }
+}
+
+@media (max-width: 768px) {
+  .kpi-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .kpi-value { font-size: 1.5rem; }
+  .header-tagline { display: none; }
+  .company-stats { gap: 16px; }
+  .network-controls { flex-direction: column; }
+}
+
+@media (max-width: 480px) {
+  .kpi-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .header-title { font-size: 1.2rem; }
+  .header-subtitle { font-size: 0.72rem; }
+  .header-badge { display: none; }
+  .chart-card { padding: 14px; }
+}
+
+/* ── Accessibilité ───────────────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 3px solid var(--itie-yellow);
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  border: 0;
+}
+
+/* ── Loading spinner ─────────────────────────────────────────────────────────── */
+.shiny-busy-indicator-container { display: none; }
+
+.loading-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(255,255,255,0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.spinner {
+  width: 42px;
+  height: 42px;
+  border: 4px solid var(--itie-green-light);
+  border-top-color: var(--itie-green);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Contenu principal ───────────────────────────────────────────────────────── */
+.main-content {
+  padding: 24px;
+}
+
+/* Shiny container fixes */
+.container-fluid { padding: 0 !important; }
+.tab-content { padding: 0; }
+
+/* ── Fiche entreprise — détails complémentaires v1.2 ─────────────────────── */
+.company-card .detail-grid {
+  padding: 12px 24px 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 24px;
+  font-size: 13px;
+  border-top: 1px solid #e9ecef;
+}
+
+/* ── Panneau info nœud réseau ─────────────────────────────────────────────── */
+.node-info-panel {
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  animation: slideIn 0.25s ease;
+}
+
+/* ── Valeur non renseignée (em italic gris) ───────────────────────────────── */
+em.na-val { color: #aaa; font-size: 0.88em; font-style: italic; }
+
+/* ── Carte Leaflet — pas de zoom hors bounds ──────────────────────────────── */
+.leaflet-container { background: #e8f4f0 !important; }

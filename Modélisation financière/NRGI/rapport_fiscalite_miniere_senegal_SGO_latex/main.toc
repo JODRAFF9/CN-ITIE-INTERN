@@ -1,0 +1,44 @@
+\babel@toc {french}{}\relax 
+\contentsline {chapter}{Remerciements}{i}{chapter*.1}%
+\contentsline {chapter}{Résumé}{ii}{chapter*.2}%
+\contentsline {chapter}{\bbl@ensure@french {Liste des tableaux}}{vi}{chapter*.4}%
+\contentsline {chapter}{\bbl@ensure@french {Table des figures}}{vii}{chapter*.5}%
+\contentsline {chapter}{Liste des abréviations, sigles et acronymes}{viii}{chapter*.6}%
+\contentsline {chapter}{Introduction}{1}{chapter*.7}%
+\contentsline {paragraph}{Question de recherche.}{2}{section*.8}%
+\contentsline {paragraph}{Démarche.}{2}{section*.9}%
+\contentsline {paragraph}{Organisation du rapport.}{2}{section*.10}%
+\contentsline {chapter}{\numberline {1}Fiscalité minière et modèles d'analyse fiscale~: cadre conceptuel}{3}{chapter.1}%
+\contentsline {section}{\numberline {1.1}La fiscalité minière dans les économies riches en ressources}{3}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Typologie des instruments fiscaux applicables aux projets miniers}{4}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Approches d'évaluation de la rentabilité et de la performance fiscale}{5}{section.1.3}%
+\contentsline {section}{\numberline {1.4}Le modèle FARI et son adaptation par NRGI}{6}{section.1.4}%
+\contentsline {subsection}{\numberline {1.4.1}Principes généraux}{6}{subsection.1.4.1}%
+\contentsline {subsection}{\numberline {1.4.2}Formalisation}{6}{subsection.1.4.2}%
+\contentsline {chapter}{\numberline {2}Le secteur aurifère sénégalais et le projet Sabodala-Massawa}{8}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Le cadre légal et fiscal du secteur minier sénégalais}{8}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Le projet Sabodala-Massawa}{9}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}Présentation générale}{9}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}Ressources et réserves}{9}{subsection.2.2.2}%
+\contentsline {subsection}{\numberline {2.2.3}Calendrier de production}{9}{subsection.2.2.3}%
+\contentsline {subsection}{\numberline {2.2.4}Dépenses d'investissement et coûts d'exploitation}{10}{subsection.2.2.4}%
+\contentsline {subsection}{\numberline {2.2.5}Hypothèses économiques retenues}{10}{subsection.2.2.5}%
+\contentsline {section}{\numberline {2.3}Le régime fiscal applicable au projet Sabodala-Massawa}{10}{section.2.3}%
+\contentsline {chapter}{\numberline {3}Méthodologie~: adaptation du modèle NRGI au projet Sabodala-Massawa}{13}{chapter.3}%
+\contentsline {section}{\numberline {3.1}L'outil de modélisation utilisé}{13}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Extraction et insertion des données du projet}{14}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}Calendrier de production}{14}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}Dépenses d'investissement}{16}{subsection.3.2.2}%
+\contentsline {subsection}{\numberline {3.2.3}Coûts d'exploitation}{16}{subsection.3.2.3}%
+\contentsline {subsection}{\numberline {3.2.4}Prix de l'or et coûts de fermeture}{17}{subsection.3.2.4}%
+\contentsline {section}{\numberline {3.3}Construction du scénario fiscal « Sénégal »}{17}{section.3.3}%
+\contentsline {section}{\numberline {3.4}Hypothèses économiques et financières générales, et limites}{18}{section.3.4}%
+\contentsline {chapter}{\numberline {4}Résultats et analyse}{20}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Flux de trésorerie du projet et partage entre l'État et l'investisseur}{20}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Structure des recettes publiques par instrument fiscal}{21}{section.4.2}%
+\contentsline {section}{\numberline {4.3}Le \textsc {temi}{} sénégalais dans la comparaison internationale}{22}{section.4.3}%
+\contentsline {section}{\numberline {4.4}Limites de l'approche pour un projet d'extension de mine}{24}{section.4.4}%
+\contentsline {chapter}{Conclusion}{26}{chapter*.20}%
+\contentsline {chapter}{\bbl@ensure@french {Bibliographie}}{28}{chapter*.21}%
+\contentsline {chapter}{\numberline {A}Paramètres techniques complémentaires des régimes fiscaux comparés}{30}{chapter.A}%
+\contentsline {chapter}{\numberline {B}Traçabilité des données extraites du PFS de Sabodala-Massawa}{32}{chapter.B}%
