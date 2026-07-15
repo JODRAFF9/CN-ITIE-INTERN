@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OpenRBE | ITIE Sénégal</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>:root{
+  --g:#008C45;--gd:#005A2E;--gl:#E8F5EE;
+  --y:#F4C300;--yd:#B89300;--yl:#FFF8E1;
+  --r:#D62D20;--rl:#FDE8E6;
+  --b:#005A8E;--bd:#003D61;
+  --bk:#1A1A1A;--bg:#EEF2F7;--wh:#FFFFFF;
+  --gray:#6C757D;--brd:#DDE3EA;
+  --sh-s:0 2px 8px rgba(0,0,0,.07);
+  --sh-m:0 4px 20px rgba(0,0,0,.10);
+  --sh-l:0 8px 40px rgba(0,0,0,.15);
+  --font:"DM Sans",system-ui,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--bk);font-size:14px;line-height:1.6}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:var(--g);border-radius:3px}
+
+/* HEADER */
+#hdr{background:linear-gradient(135deg,var(--g) 0%,var(--gd) 100%);box-shadow:var(--sh-m);position:sticky;top:0;z-index:1000}
+.hi{display:flex;align-items:center;gap:16px;padding:12px 24px;max-width:1900px;margin:0 auto}
+.hi img{height:52px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.25))}
+.hi-sep{width:2px;height:48px;background:rgba(255,255,255,.28);border-radius:1px;flex-shrink:0}
+.hi-t{flex:1}
+.brand{font-size:1.7rem;font-weight:700;letter-spacing:-.5px;color:#fff;line-height:1.1}
+.brand span{color:var(--y)}
+.sub{font-size:.79rem;color:rgba(255,255,255,.78);font-style:italic;margin-top:2px}
+.tag{font-size:.7rem;color:rgba(255,255,255,.48);margin-top:1px}
+.badge{background:var(--y);color:var(--bk);padding:4px 14px;border-radius:20px;font-size:.71rem;font-weight:700;flex-shrink:0}
+.nav-bar{background:rgba(0,0,0,.18);border-top:1px solid rgba(255,255,255,.12)}
+.nav-bar ul{display:flex;list-style:none;padding:0 24px;max-width:1900px;margin:0 auto;overflow-x:auto}
+.nav-bar li a{display:flex;align-items:center;gap:7px;color:rgba(255,255,255,.78);font-size:.83rem;font-weight:500;padding:10px 15px;text-decoration:none;border-bottom:3px solid transparent;transition:.2s;white-space:nowrap}
+.nav-bar li a:hover{color:#fff;background:rgba(255,255,255,.08)}
+.nav-bar li a.active{color:#fff;border-bottom-color:var(--y);font-weight:700}
+
+/* LAYOUT */
+#app{display:flex;min-height:calc(100vh - 108px);max-width:1900px;margin:0 auto}
+
+/* SIDEBAR */
+#sb{width:235px;flex-shrink:0;background:var(--wh);border-right:1px solid var(--brd);padding:16px 13px;position:sticky;top:108px;height:calc(100vh - 108px);overflow-y:auto}
+.sb-ttl{font-size:.77rem;font-weight:700;color:var(--g);text-transform:uppercase;letter-spacing:.8px;margin-bottom:13px;padding-bottom:7px;border-bottom:2px solid var(--gl);display:flex;align-items:center;gap:6px}
+.fb{margin-bottom:11px}
+.fl{font-size:.71rem;font-weight:600;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;display:block}
+select{width:100%;padding:5px 7px;border:1px solid var(--brd);border-radius:4px;font-family:var(--font);font-size:.81rem;background:var(--wh);color:var(--bk);cursor:pointer}
+select:focus{outline:none;border-color:var(--g);box-shadow:0 0 0 2px rgba(0,140,69,.15)}
+select[multiple]{height:72px}
+.rr{display:flex;justify-content:space-between;font-size:.69rem;color:var(--gray);margin-top:2px}
+input[type=range]{width:100%;accent-color:var(--g)}
+.sw-row{display:flex;align-items:center;justify-content:space-between;font-size:.81rem}
+.tog{position:relative;display:inline-block;width:36px;height:20px}
+.tog input{opacity:0;width:0;height:0}
+.ts{position:absolute;inset:0;background:#ccc;border-radius:20px;transition:.3s;cursor:pointer}
+.ts:before{content:"";position:absolute;height:14px;width:14px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s}
+.tog input:checked+.ts{background:var(--r)}
+.tog input:checked+.ts:before{transform:translateX(16px)}
+.btn-rst{width:100%;margin-top:9px;padding:7px;background:var(--rl);color:var(--r);border:1px solid var(--r);border-radius:4px;font-family:var(--font);font-size:.79rem;font-weight:600;cursor:pointer;transition:.2s}
+.btn-rst:hover{background:var(--r);color:#fff}
+.sc{text-align:center;margin-top:12px;padding-top:11px;border-top:1px solid var(--brd)}
+.sc-v{font-size:1.75rem;font-weight:700;color:var(--g);line-height:1}
+.sc-l{font-size:.67rem;color:var(--gray);text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
+.sc-p{font-size:.67rem;color:#aaa;margin-top:2px}
+
+/* CONTENT */
+#ct{flex:1;padding:18px;min-width:0;overflow:hidden}
+.page{display:none;animation:fu .3s ease}
+.page.active{display:block}
+@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* KPI */
+.kr{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--wh);border-radius:8px;box-shadow:var(--sh-s);padding:13px 12px;display:flex;align-items:center;gap:10px;border-top:4px solid var(--g);transition:.22s;cursor:default}
+.kpi:hover{transform:translateY(-2px);box-shadow:var(--sh-m)}
+.ki{font-size:1.4rem;width:32px;text-align:center;flex-shrink:0}
+.kv{font-size:1.6rem;font-weight:700;line-height:1;letter-spacing:-.4px}
+.kl{font-size:.67rem;color:var(--gray);text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
+
+/* CARDS */
+.card{background:var(--wh);border-radius:8px;box-shadow:var(--sh-s);padding:15px;margin-bottom:15px;transition:.22s}
+.card:hover{box-shadow:var(--sh-m)}
+.ct{font-size:.89rem;font-weight:700;margin-bottom:11px;padding-bottom:8px;border-bottom:2px solid var(--gl);display:flex;align-items:center;gap:7px}
+.ct i{color:var(--g)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:15px}
+@media(max-width:860px){.g2{grid-template-columns:1fr}}
+.cw{position:relative;height:285px}.cw canvas{max-height:285px}
+.cwsm{position:relative;height:210px}.cwsm canvas{max-height:210px}
+
+/* TABLE */
+.tw{overflow-x:auto;margin-top:6px}
+table{width:100%;border-collapse:collapse;font-size:.81rem}
+thead th{background:var(--bg);font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.4px;padding:8px 10px;border-bottom:2px solid var(--g);white-space:nowrap;position:sticky;top:0;z-index:1}
+tbody tr{border-bottom:1px solid var(--brd);transition:.12s}
+tbody tr:hover{background:var(--gl)}
+tbody td{padding:6px 10px;vertical-align:middle}
+.nr{color:#bbb;font-style:italic;font-size:.83em}
+.br{background:var(--r);color:#fff;padding:2px 7px;border-radius:10px;font-size:.7rem;font-weight:700;white-space:nowrap}
+.bg{background:var(--g);color:#fff;padding:2px 9px;border-radius:12px;font-size:.7rem;font-weight:600;white-space:nowrap}
+.bgr{background:var(--bg);color:var(--gray);padding:2px 9px;border-radius:12px;font-size:.7rem;border:1px solid var(--brd)}
+
+/* EXPORT */
+.eb{display:flex;gap:7px;margin-bottom:9px;flex-wrap:wrap;align-items:center}
+.be{padding:5px 11px;border:none;border-radius:4px;font-family:var(--font);font-size:.76rem;font-weight:600;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:4px}
+.bxl{background:#1D6F42;color:#fff}.bxl:hover{background:#155232}
+.bcsv{background:var(--b);color:#fff}.bcsv:hover{background:var(--bd)}
+
+/* DATABASE PAGE */
+.db-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:9px;flex-wrap:wrap}
+#db-search{flex:1;min-width:220px;padding:7px 11px;border:1px solid var(--brd);border-radius:4px;font-family:var(--font);font-size:.83rem}
+#db-search:focus{outline:none;border-color:var(--g);box-shadow:0 0 0 2px rgba(0,140,69,.15)}
+.db-scroll{max-height:540px;overflow-y:auto;border:1px solid var(--brd);border-radius:4px}
+
+/* PAGINATION */
+.pg-bar{display:flex;align-items:center;gap:7px;margin-top:10px;flex-wrap:wrap;font-size:.79rem;color:var(--gray)}
+.pg-btn{padding:4px 9px;border:1px solid var(--brd);border-radius:4px;background:var(--wh);cursor:pointer;font-size:.77rem;font-family:var(--font);transition:.2s}
+.pg-btn:hover:not(:disabled){background:var(--gl);border-color:var(--g)}
+.pg-btn:disabled{opacity:.4;cursor:default}
+.pg-btn.on{background:var(--g);color:#fff;border-color:var(--g)}
+.pg-info{margin-left:auto;font-size:.75rem}
+.pg-sz{padding:3px 6px;border:1px solid var(--brd);border-radius:4px;font-family:var(--font);font-size:.75rem}
+.db-info{font-size:.75rem;color:var(--gray);margin-bottom:6px;min-height:18px}
+
+/* SEARCH PAGE */
+.shero{background:linear-gradient(135deg,var(--g),var(--gd));border-radius:8px;padding:24px 20px;margin-bottom:15px}
+.shero h3{color:#fff;font-size:1.1rem;font-weight:700;margin-bottom:5px}
+.shero p{color:rgba(255,255,255,.75);font-size:.83rem;margin-bottom:12px}
+.sw{position:relative}
+#si{width:100%;padding:10px 14px;border:none;border-radius:4px;font-family:var(--font);font-size:.9rem;box-shadow:var(--sh-m)}
+#si:focus{outline:2px solid var(--y)}
+#sdd{position:absolute;top:100%;left:0;right:0;z-index:500;background:#fff;border-radius:0 0 4px 4px;box-shadow:var(--sh-l);max-height:250px;overflow-y:auto;display:none}
+.ddi{padding:8px 12px;cursor:pointer;font-size:.86rem;border-bottom:1px solid var(--brd);transition:.12s}
+.ddi:hover{background:var(--gl);color:var(--gd)}
+.ddi mark{background:var(--yl);color:var(--bk);border-radius:2px;padding:0 2px}
+
+/* COMPANY CARD */
+.cc{background:var(--wh);border-radius:8px;border:1px solid var(--gl);box-shadow:var(--sh-s);margin-bottom:15px;overflow:hidden;animation:fu .3s ease}
+.cch{background:var(--gl);padding:14px 18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(0,140,69,.15)}
+.cci{width:42px;height:42px;background:var(--g);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.1rem;color:#fff;flex-shrink:0}
+.ccn{font-size:1rem;font-weight:700;color:var(--gd);margin-bottom:3px}
+.ccs{display:flex;gap:22px;padding:11px 18px;flex-wrap:wrap}
+.csv{font-size:1.5rem;font-weight:700;color:var(--g);line-height:1;display:block}
+.csv.red{color:var(--r)}
+.csl{font-size:.67rem;color:var(--gray);text-transform:uppercase;letter-spacing:.4px;display:block;margin-top:1px}
+.ccd{display:grid;grid-template-columns:1fr 1fr;gap:8px 20px;padding:10px 18px 14px;font-size:.81rem;border-top:1px solid var(--brd)}
+.cdl{font-weight:600;color:var(--gray);display:flex;align-items:center;gap:4px;margin-bottom:1px}
+.cdl i{color:var(--g)}
+
+/* MAP */
+#map{height:480px;border-radius:8px;margin-bottom:10px;z-index:1}
+
+/* NETWORK */
+.nc{display:flex;gap:9px;align-items:flex-end;flex-wrap:wrap;margin-bottom:9px}
+.nsg{flex:1;min-width:170px}
+.nsg label{display:block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.nsg label.gl{color:var(--g)}.nsg label.yl{color:var(--yd)}
+.nsg select{width:100%;padding:6px 8px;border:1px solid var(--brd);border-radius:4px;font-size:.83rem;font-family:var(--font)}
+.nsg select.gs{border-color:var(--g)}.nsg select.ys{border-color:var(--yd)}
+.nb{padding:7px 12px;border:none;border-radius:4px;font-family:var(--font);font-size:.8rem;font-weight:600;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:5px;align-self:flex-end;color:#fff}
+.nb.gn{background:var(--g)}.nb.gn:hover{background:var(--gd)}
+.nb.bl{background:var(--b)}.nb.bl:hover{background:var(--bd)}
+.nleg{display:flex;gap:13px;font-size:.78rem;color:var(--gray);margin-bottom:7px;align-items:center}
+.ld{width:11px;height:11px;border-radius:50%;display:inline-block}
+.lg{background:var(--g)}.ly{background:var(--y)}
+#nwrap{border:1px solid var(--brd);border-radius:8px;background:#FAFCFB;height:500px;overflow:hidden}
+#nsvg{width:100%;height:100%}
+.nib{background:#fff;border:1px solid var(--brd);border-radius:8px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;gap:10px;box-shadow:var(--sh-s);animation:fu .25s ease}
+.niico{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;flex-shrink:0}
+.ntip{font-size:.74rem;color:var(--gray);margin-top:7px}
+.ntip i{color:var(--g)}
+
+/* PPE KPI */
+.pkr{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:10px;margin-bottom:14px}
+
+/* FOOTER */
+footer{background:var(--bk);color:rgba(255,255,255,.5);text-align:center;padding:14px;font-size:.74rem;margin-top:24px}
+footer .fb{color:var(--y);font-weight:700}
+
+/* LOADING */
+#ld{position:fixed;inset:0;background:rgba(255,255,255,.9);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:14px}
+.sp{width:40px;height:40px;border:4px solid var(--gl);border-top-color:var(--g);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#ld p{color:var(--g);font-weight:600;font-size:.9rem}
+</style>
+</head>
+<body>
+<div id="ld"><div class="sp"></div><p>Chargement OpenRBE...</p></div>
+<div id="hdr">
+  <div class="hi">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOYAAACNCAMAAACUh/YQAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAAJeUExURR8XBg2TLw2UMA2UMAuTMA2UMA+UMQAAAAAAAAAAAA2UMAyUMA2TLQAAAAuTMAAAAAAAAAAAABCULwySLxuYKQECAf/dDf/eDv7cDf/dDvakGP/fDQAAAK4lIv/iDP7cDfrZDv/iAJ++UBCVLxeQzQ2UMAAAAAAAABqSzQAAAAAAAAAAAAAAAAAAAAAAAAoIARqSzQAAAAAAABqSzQAAAAAAAAAAAA2UMAAAABmRzQAAAP/dDYJfeuY6K+UwLPBtH+hJKOQuLeQwLQAAAO1aJeQrLQAAAOUvLeUwLAAAAOUxLAAAAOUxLAAAADw0A/zbDQAAAP/dDiwmAv/cDvxoFMRoGVZLBf/dDvGEHg2TMBEPAREPAREPAPvEEv3PD/7lDuY3K+UvLeQuLQAAAA2bMgCMMyOZLNTSFCucK9rTEv7jDP/pDf/oAAuTIwKTKDejKOvZBQlmIQloIgt4JxGUYNPPRbnFSL7IQwyJLAI0EwuUHhWSlBuS1xqRzBGP1BKV0w2L7wQ4Eg6UOBuUxyKXxiGVqxGSchCTUQORMUWkKACG6QGJ4qjBaXuxfIi2cYi4a3GuhCdCDiaVw+TYJGdaBt/TKc/MNmFVBfGAHtDKEtwzM+knMLfHGKC/HOPWEeIbMBiXLsfMFTOeK/XZEPB4IOotKaXCGpO8HQCEN3u5H1qqJYu6HpzBG9HVNNSINvIbI7hGUPAmJSSLxbtFTvEqJO90IRkNAOvXEYC3IOvLDffhDOwsJ2qwI8Y1RQ2Y1yiLwtA6PvLoDgWc3TwzBFJ4okN+rUl8qFR2n/N9Hf///39Clw4AAABkdFJOUwBH1saro+wUK0N2/v0jZ0w6M5H06ArDK/7nbpwcYN5N8P7qPERZU/7147vqtdrz/quL01Njy6oza4Ob1SL9RZ3ymP6UL/57uelcY6TNw8v4ckD0b/XX9K1RKJumsWA0yatL9IODPZ+kAAAAAWJLR0TJar1nXAAAAAd0SU1FB+kKHBArGaPd5rUAAAI1elRYdFJhdyBwcm9maWxlIHR5cGUgeG1wAAA4jZVVXdLaMAx81yl6BEe/znECjt8608cevyv7AwKhXymZIUaStauVbOj3z1/0Iz9RC8lVetQovrj4xS2Ui7Obh6++S2Pe++Vy6cywr65psRDTJkVbFBXEVl9Ja2yBjSax6W7qeCOhCDYxS5edi1yjyhbVsdFbgvnCJX/71feQ9FEigI16Tx6yTcc9fDB5pIHtkjv0voOLVW1WiJNcj2ES412EG/gUWQSognphW0TFcg3bFVYefuaO9/x24jbCthG4ISS4vDz8VR6DBWKMVdVfSmMaziyvhuIpsqGcHuPDeyCK98E4gLzIms+dCeO7TQAwCgn0JxWJirKAkP5nFqCAVqER7OtQaoVCiLj5fSEI1gPCJqsp7LEXKfCZ7wDbHy3CWgjLhlIq+JQkD2nLrVevKbVhev6Slp7zvk+LhO1Ncgm1HN2hMf2b9PvkOdwBvRDTMx2FDI0YG2zmT6kndqbXFNiQRLN3lgDdr6ehLGCEgAySsSo5oCYYw8LVxnnLcMyC8PoAGGptmt2W7LdDIzDRVUfXZhDKWcfx3DA3oobDqZqzvIqqIZJz6mFPa3qxECOYOJPCVCUdi8oJOUuQsDyBOXEnYMwVnZF1+Q75PbDsNC+JJ3Qb8+tAxw+ss2vl0OzND9rcpKEPtIlPGNJJmyPyB9rcgOmAXP9fG/66QbnT9+f7FvZ8F92thwuY5pU6XW/+BiwHcpTD8wanP+fWa9RJlP6WAAAVRElEQVR42u2d/5/b9H3HX4E0kuMTkkg/ieHkHJTN78qyJGws4XkT9Gxw4hk1AtoVLke3zDYB6dKsW7Z1cEe6EraDrmyjLaMRhC9pwkq7rmVwXdMvg27d+mftB90X+yz57PtWwuPel0suvovsp1/v9/vz/rw/n48C7Nme7dmeXV+274Ybbty/f//+/Z+44YYbbrjhxgP7uY8VH8enDh48uD+9Yp3oj4n0Af66ZRJuuummgwdFSeY4Tt637+DN+/cfONTppAetc6hzaN/1irm/00kf6nQ6nc6hTqeTTqeXv07HgaavV05xlazTOZRe76eDoJ2brkvMT0a6LeuY3sgm0ul97PqjTB3aGG29oAevP8wDnY3cdNC6N19vlPKh9Nhqdh8/ffjI9Zdmx6V84kk/c8ut19WY2dmMln4mEwSTyvWDeXBszO7jp30/k8n4wS3Z6zABjeyxp/1MJpPJZILrR1C+tyAYR8tMJpPxg+Do1HUxhB4cD3Ki+8STK5ArgvIfvzzbffz0XKbPguC2j36Nyw70lKqD1iPjmTNnzpz50tk/m7u93+bm5ubkjzqm1IPy5S//eb99+S86E6t17Llz586dO/epv/yrQfvrT92xbxT7nd/lwFLiOstJAFgqJ27VcmKimPvWKL9CA/Y3K2/CxFNPz88vzC/MLzxz/pl+O3/+/Pz8/PxXR7FPM3DqwLPkAXAabd0KiWp+YlXNTgzm365888zXnp1fiGx+YeGZhdXP6Nf8/Pz8hRE+ZIDTY19dDP3YZiTGTmrNZztfMWMwO+l0Oj0xcea5Fco4e3Ykxgvzd2JHMYuj1Abxakbff+rc+WGYCwsjMM5f+DQHgCvtFKbKJUbmobXaoNM1E5x2YmLiueGUy848/HP+LuyomuXE7t2BTq/TJqr51N/Nb4y5oT0NtpOYVmI1dnPvwJgcmz35Z9M2f+GrUYKIx2Rbx0wcTeS+AihBzYn0xJmnz29dy4U7lz1oh2LTTu509ZV58Wqm0+mn/n4bIJ+dF4AdjE0jsbC+6dChEdRMp888vQ2BuXAX21HMxMFEWTfRTIrNM+e2I/98eiXb7wxm4mCC/etmJglqnpl4bjsw717N7jsSm5WReyMJ4+aXtmEwmZ+/c20Q24lMayU2ugZ6I/FqfulrF7ZBzGf5Hkxz+9VMJWHeODCZjo3Nxeef++oLyRZD9PUXXnjhha9f6A/MO7GBmlvDtJMLg8H1griJ2NnT//CNF5PsH7/x7CDmP7344oufOHjnXXfe9XurdldPguBKI6uZr9qjWdJgsi9uWSRGzX8+HcwNscxLz6yDfObCN+fmgkkAYKvFF+stw8ZQU9rqckJc/ydOzW8FQSbZ5r49iLnwsh8EweHktubuYQoH0iOq+S9DMW//9kvnB9R8+fZMJgiO8uNhxmba1Ba7XLELffGYmeGYMWrenslkMsHv/0HChGGM2Nwa5v6kxXYaX83B2HzZj7qatyi/VaflP3kgvjMbF5tjq3l+4eWV7u3Ru7eKmVMEZeRfQm+5J9+cuJawqdgcUPPZyGkzQfCKc88WMcezVe3Zwf2dTmcxYdF2qJqnv9PD6w912hXKi6Fzr7Kl2NxkiXBo6P6JuJp2BTN4deLV1eWhzGuXNkpBQfDK66HjhJ+ZZlvItJucbx7Yt2//EMyvJKcg/1L6jTcjTv/0829d9oerGQTffT2shbUrjsPvktPWe8ZLxiAfSI8VmyuO+nx34qqfyfj+2+l//Z6fPG4uvHx7Jgheeb1Wq9Wc0Anv2x1MQxiYTW9CzYz/Trebvhr4p9/pdie+4w+NTT/47uv312q1Wq0WOlm2K7FZjNs4Mraavv/9bnpx8eoPJroT3ef9oeXBXPDKCqUTOtldUVNjI81ONlbz6uLixOLi4uJEunt1eKadW6Ws1WrhQA7aEcxGXBNoE7Hpv/nGYnpiYjGdXnz88lDMf+uhdEJnejcybZyYYDd3xlcz80R3ebn6bX9YFXThh/++pmWt5hwbjM3tV7OSsHRyYMxx0/evvrEY/dji23ND1Jx/5kc/7oEMw+O74LR60hwl1emMo6b/5DvdxZV168W3VzaSxMw3z7/7ox/3qBk64TFpPea2Z9pmYgF/4+AWkUQ1ff/qG921H1zsvpPxk0v3/3ivj9IJ3//DHVYzeY0IMXIuPh6H6Wf8J5/vdif6dpOcjfY/bYjp1EInDJ1j3I7GpjhkPjYgZ/fsd5bi1PSvprvdxW63213Wstvtdid+4CfEZh9mJKfTN3hue6a1hk0793XW71D7SSZ+Ivba91+7evX73/veO+l0Or34xNmzZ996o7v4nwlqvtuH6VwMndAJp3fSacUR9wNFWl4Kfhofm4Hv+74fzF1+o5tOd9+8dvnypSefPP3mZT+upj0/oOZFJ+wbVcbA1Eax1kYbL/v3xwbxmGvTTP/5brr7vO/7Gd/3fT9RzZ/V+swJndCRN1PTajwbwTZolvSW8N23LvmZJDVXMX/eXVy86m/UJOlTM4Lsq2xHV1PblvNL+3u0vORnEjDXsPxXF7uP/2QjzGf7MZfT0PSmMIVt2eLeT7mxmpff6P7c36jl9e56zItO6IQPsE1kWnVbMPHJaFGs+9alqOf4041aXu90X90Qc2FAzZoTOhe5TYyb2vZs1N23uKxlhLKRmhn/avonG2HOL/zovfWQoRM63GacNieNa4ljyoqW8Zh9ayj+6dc2XEM5/+4vBtS8WNvYabdlMxu58at/q3GZgGl+durI1NS9k7eM3o5+6eKVmBR0D3YFM75Nr3S6T1zyh2BSNVLhyNRhfzTMX/7XxZ+tD83a8ewu9GmJqJo0ppy9tPbyYzFXVyhvPTqamoOYtVDahT4tERlJq43SpWA0TADc5Al/44W/GMywf5Fh55zWSyxsp3q35g/HBKYOr1/G/ebGajqh099B2DFMPXn8YVNTRx588MHU3fdNSXff89AG3s5Nrubd2w4fPhzc/sN3R4lNJ+xt1u7Yftrc8EXd1d/ZoJrry/97I90nHz4CcA9/7hfvbuy0Thg6DrfzahZGLRe4JWPD3DV17YR/y63L84LpUTBrtdoma9rxbOQzP5yxYYpmUKbWDkuNhhn2L6XsUKatj1z8caY56kgUMX/+4gBmXGyGThh+wAB2x86Nm2NM2gaPgph/9IWjk5OTj9zxaNyQxL83sppOOA1MO8eUnXJaD2OoacTUtJHddnRyYG3rkfc+eHd+tNgMnTB79/uhc5zfGczSGDOWmNj8VhBkMn4QBNdOfBgcnXx0bbI6Nf3599/74KURnHbZbd93Qid0jjPsBOY4W2u4mInYh9FIee3atWvXgiCYnIoSWva7jnMlfO+D87/6Zb/9aiEGs1arhbUwrNVCJ5yGasZNLGLe4x0YTAAAMydPzj703z320OdX1lBOXLt8LQiCIPjwC5OT09OfC69cca6894v/+fX/9tuv/29ghrIs6MWwVnNCx2kWLbffrCIAzl7/8Mhm5Ye3GfjHJrP7vvhI9HHHo/dl77hv8mjvRPrDD6+tfHn52uUTfiYIrgXBK59xnNAJa7VaLFG8OaETxejxhAIFO3Wol/vjIMb8jB9klj9WJ2kZ/3K0buIHwSth1K2r1Wq1Kz+70mO1K1euXBkGGuWiXT66+Vgf3twyZIKtHhr/zev31zZnoRNeDJ0w3OUzykeDjJ8Zz/zg/c1SOuFFJ1L0T3b1zDk7emJMyEzgb5pyRdCLTujcs5uc3NHLY2v5m61RLsfnqd1U89Gh2w7jtAy2qOXK+vWuhubUb4MydnPJRwkz8N9//f6tY9ZqteyupqB7dzf7rAVndpfVHEvObaGMGn27qubkhpTB5K0PHjly5NapL2b3ZbPZU6dOncrek81l78nmstnsPdGf09np6enpY8c/umpuUB0cnmIMbPkTwMDa8Eq3jDEG7tSxEUEdcTcpueEp6NqH947rW6ceGGk82WU1HxuKeXgTd1Phpu8fxW0f2NXYPLoO80RvUG7yHZeO1WrHjz1wfHgZtKtyrpW0tx2efHjqQfnu7COTh287kbltUtr8+y3LHCCcyvZG6sU/Xf7i+HT21Kns9H27KedkJpPJZG6ZfGxKWUkuDOAUeTvuzsWYkj0Wpd8r0xyXzU5PT09P82BgOzeBTijdM5MPP8jYzt1Wl8mnstnsb/vmbdwu3PZw4/1Je7Zne7Y+NMW1CkCaWe5DNfqPOigz4x8V9WbW2qZCTkylcqntjk+lPvqaiWieXGtELzXBSUfAPbS01sVNMTSXTo79GpbMVM91l5aWzKXt7uWlEnfxx2HaqwU4kxjaSzlAllceEh4qAZCGDqIs7oG8Ka1+S27USfMqKw1nNuRfc4kXHXxIILf3cmxYO1skG+KsZ6kzQPmklFsy1SI3MwPhs+pDs4zppqkL8skm784As7MKZqxSAwCU2fbM0iwPcCeX9AbgzaZQns2hOFNReQCuKbNZbWlWWHtFqdmm5fElVZ3hIM1W3KUZBm5GVRuottpqqQk0dE2vAHa9oXOol0oNoN5qaKUmgIau1cHZpVJ0QiFX0guUZ3JJU6sMUr5i6VUGvqCpuXjMFiqm6ZpmBVWzImqkthXTBF9o181ZzjVNS2jSSWYugTeXcHKpfXKpDIBfWsrPLpUYLPOktTSDk2YFddNDiZY0IcLkrHbRjA4USGQBnmmaTclq2OZJiOaSq5keqtSyK9BJtYlkFFsNlUQYRCrXokaLyiiRZhFxaJFaKDNL80okAZANKmhUQMpq2FRFk8gyqMxKVLTFJKctUwEi2ShSGXVKQTEMQKm0TAJHLlA2W2iRXDFFwbT4plkCIJgaYJmytGQDmsm1zSbaVEHebAMALFMCV2mZJg8AkmkBTbIEQGnMkgrJdJEiG5ZZZ4BFKXhUB1JFi+ookQeJLLlJJbiUQoFEhXQGlKkqeVQF0KYGUuQCSqNAOlJUgEhVzki6yYxILTSpDsmMMKtmE4phIKeZlmYygSygTC2I1CoYKJOmGcuYOlA1c03TAyySG5RDwyzDXd7l4JIsqWZJi27uJ0WXKQIVw7BMHRJVIZsuZJ0MDxbxEMlGgfQIU4FHmmZQCS5JqFIqRS0AVdIMg6oAWiRCoDwqhmGRjhRVIVEBTY1UMSk2m1SN1DTLaFEZiqGhRDxUYjzpESZTDcOGSLrM83ykJoNlyhLZgEGsTR5sKsMleVlNIW/K0HvULFMdnGECpEEiGxLlATSJ4JKIBjUkcpGjOnTikVt+JpcktEgUSGWARzbP88KymjkqcAYBpCJFVaSoALB2/FGNHOVRoQJEclGlBjyiokImWmS5RBzTSBWaVADqRCmwPFl1NwWA18iyyAXy5KrURo5IJ/KgLw8kKvFFsvIUUadIBTyyAZfyFhFSlEeKLNhuiyzkSXXJ4HiigkEtGCSBFciquiJ0SiFPTbTIcBtciQqtPA+AN8hVyWUuFUpkQKQCRCooVqEQvyFEtitI2RXwtoemnQKrlopctQXF1ltFW0HO1RXZrgCyXWUAK+q6JUZOa+t1BeDqquUBaJfcpi2ibUe5tW0rXEttFaO/8nYbkOwyIOf1YrUKwfYg2B7qut4SYJFtuSmgYllFu4K6raw+U9vmUbElsHZJb0Oxdd3lASDnliqtBvjocrxdAW9XuIJeqm9rFSKQun0XK9FH9VbF/HZtQo8wpY8oJmvmtu9iYmWn/7McyWoPhGu7v1Kvu4ku1SoMnD+teI1Ge5RDFWVrSNuQFdw+8lyr4HEAWKHQ+7ioD5zaLLqp2Ew7sM+ksW7r24BLKZWVK6kGNxCzRGSujl2pRixEuQwUhx1fY0S9b1WdKMrZjb5/xPTSgBvkY8+ritQCwEXXlAQA8KgIBnA8ADCBKxC/VhHzPEPRbAAMUJggAGCR2DIfYWo8L0etJcYUIgYAnAIuujiYrECkEsDJy1flACawlYtHT6qopETTiai6KHGcBABNMXpMECLX4RiiV8qw/AyF2C21ItlA0TBKPCQ92vXmURGeWieyGXiLNJUUQS1A0PJQXDLbTSKzhJJdMAS7pMAzNE2E4EZbGJczcNFowDZyOpEpylrDaDSJqMABbSIrRUTEeSW5oTUgaQWUNc3Igcsvb90VddIMjYlaGym1BUAiXQIAZut6gcFyC2R4gKiWtApQMci1XFSIqMBgJ6pZpHLKyHM6lcvyMmabjKJKOejUbhBxPFngqQSbimWJdylfgUZU5zRiKSpKuqG0qFFOARAMUlWd4wxqUx4NMopC0yQrJXlii+ookuWlhBapbVYlUaISGtSUqCVbBlenYlMEwBnk1UljZapCjE6V2ER5EXCNVJNa0MktEnE8FaQCCTwZFZtKED2xRUXYCWpWmUZeRSXZpSq/4rQNasCjikIlwCWOJxcCuWiRKwEe5QCVUoBmCDa1KxalipSXEFVHrusKkKOj66QBZcoDyOV1ykMjBYBMBaBKTegkF4jZVK8UKNemKHuUqQBoBmtSHWKUOlhFJ5IEUiseGbBIgEt8kaplmyoN8iBQCSx6hiTMokCGrpZUTimsOW2bKqhQhacCUCCOpzwUssCqRC20qQxoxAGaIVukq7ouodXntFAMcgElwmyD5cmuUx5kRE+aB1rURIPaVEd0CZFVo/v9VKgOphJrUhHSaoYsUl0iTVf1AkokoEC8Taqu67k6NSFQiRWoVR+CWWU6iYqicAxl0lbV9FAhj5GmKBopCmlchSwwyAaxBhUZNBIAjZQ6eZzCcwokgzhAIE3mZYY85akIhYhHmYrgSYVEeehUBpCiEkOVmhDIoBRa1OAUgXGQNFIAiUqQSWMiuawYbcwsc6xBdUaaxAkKSsSjQLxHdY7jUSaXVajAkQaJCgmxmaM8cgZZWpFpqk5FAG2qok5ttKmOIpk6EY8SkUEq8mRRHhJRCUQ8QMQEjXQ9D9cokQ2Aj24o4VGLI0qhQCSK1ALTSTNIhWiQpnNMI1Kq5AEuaQy8SrruMtuwKM8AFMhQiThOI9LIAiAREek8GkSW5sEgGTqJzCK1pHGsQKSRxUqkGqTDjb1JtuCJgFS06yIqrVYZAGRPguzJkD0JqFTLkqdAKNalXBO5qu1xQLPqoelxQNnjILTtegW5qu0xAFzZazQaUtMTIHopKMWqoHgSINSrOa8JyPVWm0Gu15nk8YDsiQCUtl2vMLFqN6JFnEZVFD0GuV6Xy00AXLna8jgAubrdTqHpcchVBLBGq+VxQLOZIwtCvZqrNCF6Aj6WVlGYHXt3mY+VMZ2IbA57tmd7tmd7tmd7tmdD7f8BQSIspPqPNUsAAAAldEVYdGRhdGU6Y3JlYXRlADIwMjUtMTAtMjdUMTY6MDg6MzIrMDA6MDA8mqpTAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDI1LTEwLTI0VDExOjM4OjU4KzAwOjAw4oGQjQAAACh0RVh0ZGF0ZTp0aW1lc3RhbXAAMjAyNS0xMC0yOFQxNjo0MzoyNCswMDowMHN76dsAAAAZdEVYdFNvZnR3YXJlAEFkb2JlIEltYWdlUmVhZHlxyWU8AAAAAElFTkSuQmCC" alt="ITIE Sénégal">
+    <div class="hi-sep"></div>
+    <div class="hi-t">
+      <div class="brand"><span>Open</span>RBE</div>
+      <div class="sub">Open Registre des Bénéficiaires Effectifs</div>
+      <div class="tag">Plateforme nationale de consultation des bénéficiaires effectifs du secteur extractif sénégalais</div>
+    </div>
+    <div class="badge"><i class="fas fa-shield-halved"></i> Données officielles ITIE</div>
+  </div>
+  <nav class="nav-bar"><ul>
+    <li><a href="#" class="active" data-page="dashboard"><i class="fas fa-gauge-high"></i> Tableau de bord</a></li>
+    <li><a href="#" data-page="database"><i class="fas fa-database"></i> Base complète</a></li>
+    <li><a href="#" data-page="search"><i class="fas fa-magnifying-glass"></i> Recherche entreprise</a></li>
+    <li><a href="#" data-page="ppe"><i class="fas fa-user-shield"></i> Analyse PPE</a></li>
+    <li><a href="#" data-page="network"><i class="fas fa-diagram-project"></i> Réseaux</a></li>
+    <li><a href="#" data-page="map"><i class="fas fa-map-location-dot"></i> Cartographie</a></li>
+  </ul></nav>
+</div>
+<div id="app">
+<div id="sb">
+  <div class="sb-ttl"><i class="fas fa-filter"></i> Filtres globaux</div>
+  <div class="fb"><label class="fl">Région</label><select id="fr" multiple></select></div>
+  <div class="fb"><label class="fl">Nationalité</label><select id="fn" multiple></select></div>
+  <div class="fb"><label class="fl">Pays de résidence</label><select id="fp" multiple></select></div>
+  <div class="fb"><label class="fl">Greffe</label><select id="fg"><option value="">Tous</option></select></div>
+  <div class="fb"><label class="fl">Statut PPE</label>
+    <div class="sw-row">PPE uniquement <label class="tog"><input type="checkbox" id="fppe"><span class="ts"></span></label></div>
+  </div>
+  <div class="fb"><label class="fl">% Action Direct</label>
+    <input type="range" id="fpmin" min="0" max="100" value="0" step="5">
+    <input type="range" id="fpmax" min="0" max="100" value="100" step="5" style="margin-top:3px">
+    <div class="rr"><span id="lpmin">0%</span><span id="lpmax">100%</span></div>
+  </div>
+  <button class="btn-rst" onclick="resetF()"><i class="fas fa-rotate-left"></i> Réinitialiser</button>
+  <div class="sc">
+    <div class="sc-v" id="scn">628</div>
+    <div class="sc-l">bénéficiaires affichés</div>
+    <div class="sc-p" id="scp">100% du total</div>
+  </div>
+</div>
+<div id="ct">
+
+<!-- DASHBOARD -->
+<div class="page active" id="page-dashboard">
+  <div class="kr">
+    <div class="kpi" style="border-top-color:var(--g)"><div class="ki" style="color:var(--g)"><i class="fas fa-building"></i></div><div><div class="kv" id="k-co">317</div><div class="kl">Entreprises</div></div></div>
+    <div class="kpi" style="border-top-color:var(--b)"><div class="ki" style="color:var(--b)"><i class="fas fa-users"></i></div><div><div class="kv" id="k-be">628</div><div class="kl">Bénéficiaires</div></div></div>
+    <div class="kpi" style="border-top-color:var(--gd)"><div class="ki" style="color:var(--gd)"><i class="fas fa-calculator"></i></div><div><div class="kv" id="k-av">1.9</div><div class="kl">Moy./entreprise</div></div></div>
+    <div class="kpi" style="border-top-color:var(--r)"><div class="ki" style="color:var(--r)"><i class="fas fa-user-shield"></i></div><div><div class="kv" id="k-pp">20</div><div class="kl">PPE</div></div></div>
+    <div class="kpi" style="border-top-color:var(--yd)"><div class="ki" style="color:var(--yd)"><i class="fas fa-flag"></i></div><div><div class="kv" id="k-na">29</div><div class="kl">Nationalités</div></div></div>
+    <div class="kpi" style="border-top-color:var(--b)"><div class="ki" style="color:var(--b)"><i class="fas fa-globe"></i></div><div><div class="kv" id="k-pa">30</div><div class="kl">Pays résidence</div></div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct"><i class="fas fa-globe-africa"></i> Répartition par nationalité (Top 15)</div><div class="cw"><canvas id="ch-nat"></canvas></div></div>
+    <div class="card"><div class="ct"><i class="fas fa-user-tie"></i> Statut PPE</div><div class="cw"><canvas id="ch-ppe"></canvas></div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct"><i class="fas fa-map-marker-alt"></i> Répartition régionale</div><div class="cw"><canvas id="ch-reg"></canvas></div></div>
+    <div class="card"><div class="ct"><i class="fas fa-chart-bar"></i> Distribution des participations (%)</div><div class="cw"><canvas id="ch-pct"></canvas></div></div>
+  </div>
+  <div class="card">
+    <div class="ct"><i class="fas fa-building"></i> Top 30 entreprises par nombre de bénéficiaires</div>
+    <div class="eb">
+      <button class="be bxl" onclick="exportXLSX(getTopData(),'top_entreprises')"><i class="fas fa-file-excel"></i> Excel</button>
+      <button class="be bcsv" onclick="exportCSV(getTopData(),'top_entreprises')"><i class="fas fa-file-csv"></i> CSV</button>
+    </div>
+    <div class="tw"><table id="tbl-top"><thead><tr><th>Entreprise</th><th>Région</th><th>Greffe</th><th>Bénéficiaires</th><th>Part. moy.</th><th>PPE</th></tr></thead><tbody></tbody></table></div>
+  </div>
+</div>
+
+<!-- BASE COMPLÈTE -->
+<div class="page" id="page-database">
+  <div class="card">
+    <div class="ct">
+      <i class="fas fa-database"></i> Base complète des bénéficiaires effectifs
+      <span style="margin-left:auto;font-size:.77rem;color:var(--gray);font-weight:400" id="db-count-lbl"></span>
+    </div>
+    <div class="eb">
+      <button class="be bxl" onclick="exportXLSX(getDBData(),'base_rbe_complete')"><i class="fas fa-file-excel"></i> Exporter tout (Excel/CSV)</button>
+      <button class="be bcsv" onclick="exportCSV(getDBData(),'base_rbe_complete')"><i class="fas fa-file-csv"></i> CSV</button>
+    </div>
+    <div class="db-toolbar">
+      <input type="text" id="db-search" placeholder="🔍  Rechercher dans toute la base (entreprise, bénéficiaire, nationalité, région, pays...)">
+    </div>
+    <div class="db-info" id="db-info"></div>
+    <div class="db-scroll">
+      <table id="tbl-db">
+        <thead><tr>
+          <th style="width:40px">#</th>
+          <th>Dénomination Sociale</th>
+          <th>Bénéficiaire</th>
+          <th>Région</th>
+          <th>Nationalité</th>
+          <th>Pays résidence</th>
+          <th>% Action</th>
+          <th>% Voix</th>
+          <th>PPE</th>
+          <th>Fonction PPE</th>
+          <th>Nom PPE lié</th>
+          <th>Greffe</th>
+          <th>Date acquisition</th>
+          <th>Année</th>
+        </tr></thead>
+        <tbody id="db-tbody"></tbody>
+      </table>
+    </div>
+    <div class="pg-bar" id="db-pgbar">
+      <button class="pg-btn" id="pg-prev" onclick="dbPageNav(-1)"><i class="fas fa-chevron-left"></i></button>
+      <div id="pg-pages" style="display:flex;gap:4px;flex-wrap:wrap"></div>
+      <button class="pg-btn" id="pg-next" onclick="dbPageNav(1)"><i class="fas fa-chevron-right"></i></button>
+      <span class="pg-info" id="pg-info"></span>
+      <select class="pg-sz" id="pg-sz" onchange="dbPageSize()">
+        <option value="25">25/page</option>
+        <option value="50" selected>50/page</option>
+        <option value="100">100/page</option>
+        <option value="9999">Tout afficher</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- RECHERCHE -->
+<div class="page" id="page-search">
+  <div class="shero">
+    <h3><i class="fas fa-search"></i> Recherche d'entreprise</h3>
+    <p>Tapez les premiers caractères — seules les entreprises présentes dans la base RBE sont proposées.</p>
+    <div class="sw"><input type="text" id="si" placeholder="Rechercher une entreprise enregistrée..."><div id="sdd"></div></div>
+  </div>
+  <div id="ccw"></div>
+</div>
+
+<!-- PPE -->
+<div class="page" id="page-ppe">
+  <div class="pkr" id="ppe-kpis"></div>
+  <div class="g2">
+    <div class="card"><div class="ct"><i class="fas fa-flag"></i> PPE par nationalité</div><div class="cwsm"><canvas id="ch-pn"></canvas></div></div>
+    <div class="card"><div class="ct"><i class="fas fa-map-marker-alt"></i> PPE par région</div><div class="cwsm"><canvas id="ch-pr"></canvas></div></div>
+  </div>
+  <div class="card">
+    <div class="ct"><i class="fas fa-user-tie"></i> Liste complète des Personnes Politiquement Exposées (PPE)</div>
+    <div class="eb">
+      <button class="be bxl" onclick="exportXLSX(getPPEData(),'ppe_openrbe')"><i class="fas fa-file-excel"></i> Excel</button>
+      <button class="be bcsv" onclick="exportCSV(getPPEData(),'ppe_openrbe')"><i class="fas fa-file-csv"></i> CSV</button>
+    </div>
+    <div class="tw"><table id="tbl-ppe"><thead><tr>
+      <th>Bénéficiaire</th><th>Entreprise</th><th>Région</th><th>Nationalité</th>
+      <th>Pays résidence</th><th>% Action</th><th>% Voix</th><th>Fonction PPE</th><th>Nom PPE lié</th>
+    </tr></thead><tbody></tbody></table></div>
+  </div>
+</div>
+
+<!-- RÉSEAU -->
+<div class="page" id="page-network">
+  <div class="card">
+    <div class="ct"><i class="fas fa-diagram-project"></i> Réseau de propriété effective</div>
+    <div class="nc">
+      <div class="nsg"><label class="gl"><span class="ld lg" style="display:inline-block;margin-right:3px"></span> Choisir une Entreprise</label><select id="ns-co" class="gs" onchange="focusNode(this.value,'co')"><option value="">— Toutes —</option></select></div>
+      <div class="nsg"><label class="yl"><span class="ld ly" style="display:inline-block;margin-right:3px"></span> Choisir un Bénéficiaire</label><select id="ns-be" class="ys" onchange="focusNode(this.value,'be')"><option value="">— Tous —</option></select></div>
+      <div class="nsg" style="max-width:155px"><label style="color:var(--gray)">Nb max entreprises</label><select id="nmx" onchange="buildNet()"><option value="10">20</option><option value="20" selected>20</option><option value="30">30</option><option value="50">50</option></select></div>
+      <button class="nb gn" onclick="buildNet()"><i class="fas fa-sync"></i> Rafraîchir</button>
+      <button class="nb bl" onclick="expNetPNG()"><i class="fas fa-image"></i> PNG</button>
+    </div>
+    <div class="nleg"><span class="ld lg"></span> Entreprise &nbsp; <span class="ld ly"></span> Bénéficiaire</div>
+    <div id="nib" style="display:none" class="nib"></div>
+    <div id="nwrap"><svg id="nsvg"></svg></div>
+    <div class="ntip"><i class="fas fa-info-circle"></i> Utilisez les listes ou cliquez un noeud pour zoomer. Molette pour zoomer. Glisser pour déplacer.</div>
+  </div>
+</div>
+
+<!-- CARTE -->
+<div class="page" id="page-map">
+  <div class="card">
+    <div class="ct"><i class="fas fa-map"></i> Cartographie des entreprises extractives au Sénégal</div>
+    <div style="margin-bottom:10px;display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+      <label style="font-size:.8rem;font-weight:600;color:var(--gray)">Indicateur :</label>
+      <label style="font-size:.81rem"><input type="radio" name="mm" value="nb" checked> Bénéficiaires</label>
+      <label style="font-size:.81rem"><input type="radio" name="mm" value="ne"> Entreprises</label>
+      <label style="font-size:.81rem"><input type="radio" name="mm" value="np"> PPE</label>
+    </div>
+    <div id="map"></div>
+    <div class="ntip" style="margin-top:7px"><i class="fas fa-info-circle"></i> Carte verrouillée sur le Sénégal. Cliquez un cercle pour le détail.</div>
+  </div>
+  <div class="card">
+    <div class="ct"><i class="fas fa-table"></i> Récapitulatif par région</div>
+    <div class="tw"><table id="tbl-reg"><thead><tr><th>Région</th><th>Entreprises</th><th>Bénéficiaires</th><th>dont PPE</th></tr></thead><tbody></tbody></table></div>
+  </div>
+</div>
+
+</div></div>
+<footer>
+  <span class="fb">OpenRBE</span> — Open Registre des Bénéficiaires Effectifs |
+  © ITIE Sénégal 2025 | Initiative pour la Transparence dans les Industries Extractives
+  <br><span style="opacity:.35">Version 2.1 Web | HTML · CSS · JavaScript · D3 · Leaflet · Chart.js | Données : Registre 2021–2025</span>
+</footer>
+<script>
+const DB = [{"id":1,"rs":"Dakar","ds":"DANGOTE CEMENT SENEGAL","pn":"ALIKO DANGOTE","da":"28/06/2021","an":2021,"pa":99.99,"pv":99.99,"na":"NIGÉRIA","pr":"NIGÉRIA","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":2,"rs":"Dakar","ds":"LES GRANDES CARRIERES DU SENEGAL","pn":"LAMINE DIOP","da":"29/11/2021","an":2021,"pa":100.0,"pv":null,"na":"ZAMBIE","pr":"ZAMBIE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":3,"rs":"Dakar","ds":"ENTREPRISE GENERALE DE CONSTRUCTION ET D'AMENAGEMENT","pn":"MAMADOU DIOP","da":"23/11/2021","an":2021,"pa":100.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":4,"rs":"Dakar","ds":"GLOBAL IMMO SENEGAL","pn":"IBRAHIMA THIAM","da":"30/06/2021","an":2021,"pa":80.0,"pv":80.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":5,"rs":"Dakar","ds":"INTERNATIONAL MINING COMPANY","pn":"AMINATA KEBE","da":"31/12/2021","an":2021,"pa":25.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":6,"rs":"Dakar","ds":"MAMADOU DIAKHITE DIARRA","pn":"MAMADOU DIAKHITE DIARRA","da":"09/11/2021","an":2021,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":7,"rs":"Dakar","ds":"INTERNATIONAL MINING COMPANY","pn":"LAMINE DIACK DIOUF","da":"31/12/2021","an":2021,"pa":75.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":8,"rs":"Dakar","ds":"IRION TRANSFERS","pn":"FATOU KHADY SECK","da":"17/12/2021","an":2021,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":9,"rs":"Dakar","ds":"SUBSEA 7 SENEGAL","pn":"ALEXANDRE BRINGER","da":"13/10/2021","an":2021,"pa":null,"pv":null,"na":"FRANCE","pr":"FRANCE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":10,"rs":"Dakar","ds":"SOCOCIM INDUSTRIES","pn":"JACQUES MARIE MERCERON-VICAT","da":"01/07/2021","an":2021,"pa":99.9,"pv":99.9,"na":"FRANCE","pr":"FRANCE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":11,"rs":"Dakar","ds":"SOCOTRABAT","pn":"MOR AMINATA KEBE","da":"10/11/2021","an":2021,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":12,"rs":"Dakar","ds":"GLOBAL IMMO SENEGAL","pn":"YAYE DIOR SECK","da":"30/06/2021","an":2021,"pa":20.0,"pv":20.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":13,"rs":"Dakar","ds":"TOUS TRAVAUX SOUS MARINS (TTSM)","pn":"ALAIN CHISTOPHE CHARLES GERBER","da":"29/12/2021","an":2021,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":14,"rs":"Dakar","ds":"TOUS TRAVAUX SOUS MARINS (TTSM)","pn":"ANNE ELISE MADELEINE APPRILL","da":"29/12/2021","an":2021,"pa":null,"pv":null,"na":"FRANCE","pr":"FRANCE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":15,"rs":"Dakar","ds":"TOUS TRAVAUX SOUS MARINS (TTSM)","pn":"JEAN MARC GERBER","da":"29/12/2021","an":2021,"pa":null,"pv":null,"na":"FRANCE","pr":"FRANCE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":16,"rs":"Dakar","ds":"TOUS TRAVAUX SOUS MARINS (TTSM)","pn":"JEAN MICHEL ALBERT MARCEL MAES","da":"29/12/2021","an":2021,"pa":60.0,"pv":60.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":17,"rs":"Dakar","ds":"TOUS TRAVAUX SOUS MARINS (TTSM)","pn":"JEAN PIERRE GERBER","da":"29/12/2021","an":2021,"pa":null,"pv":null,"na":"FRANCE","pr":"FRANCE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":18,"rs":"Dakar","ds":"TRIYANGS INTERNATIONAL MINING GROUP","pn":"GUANG YANG","da":"02/07/2021","an":2021,"pa":25.0,"pv":25.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":19,"rs":"Dakar","ds":"TRIYANGS INTERNATIONAL MINING GROUP","pn":"JIEQI HUANG","da":"02/07/2021","an":2021,"pa":20.0,"pv":20.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":20,"rs":"Dakar","ds":"TRIYANGS INTERNATIONAL MINING GROUP","pn":"JUNMING YANG","da":"02/07/2021","an":2021,"pa":55.0,"pv":55.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":21,"rs":"Dakar","ds":"ENTREPRISE AICHA","pn":"ASTOU MBODJ","da":"30/06/2021","an":2021,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":22,"rs":"Dakar","ds":"NEW ENERGY INVESTMENT","pn":"FALL AMADOU","da":"30/06/2021","an":2021,"pa":10.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":23,"rs":"Dakar","ds":"TESORO SERVICES","pn":"MAME MALICK BA","da":"23/12/2021","an":2021,"pa":100.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":24,"rs":"Dakar","ds":"NEW ENERGY INVESTMENT","pn":"HUANG JIEQI","da":"30/06/2021","an":2021,"pa":15.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":25,"rs":"Dakar","ds":"BAMINE","pn":"ALPHA MOUSSA KANE","da":"15/12/2021","an":2021,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":26,"rs":"Dakar","ds":"BOKAMINE","pn":"LAMINE SY","da":"16/11/2021","an":2021,"pa":20.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":27,"rs":"Dakar","ds":"NEW ENERGY INVESTMENT","pn":"YANG GUANG","da":"30/06/2021","an":2021,"pa":15.0,"pv":null,"na":"CAMEROUN","pr":"CAMEROUN","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":28,"rs":"Dakar","ds":"SENEGALAISE DE SERVICES MINIERS ET DE GENIE CIVIL","pn":"DJIBRIL BADIANE","da":"27/01/2022","an":2022,"pa":33.0,"pv":33.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":29,"rs":"Dakar","ds":"SOCIETE INTERNATIONALE DE BIENS DE SERVICES","pn":"ABASS SOW","da":"08/12/2021","an":2021,"pa":30.0,"pv":30.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":30,"rs":"Dakar","ds":"SOCIETE INTERNATIONALE DE BIENS DE SERVICES","pn":"MOUHAMADOU SOW","da":"08/12/2021","an":2021,"pa":40.0,"pv":40.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":31,"rs":"Dakar","ds":"STAPEM OFFSHORE SENEGAL","pn":"JEAN MICHEL ALBERT MARCEL","da":"29/12/2021","an":2021,"pa":15.0,"pv":15.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":32,"rs":"Dakar","ds":"SOCIETE INTERNATIONALE DE BIENS DE SERVICES","pn":"SOULEYMANE SOW","da":"08/12/2021","an":2021,"pa":30.0,"pv":30.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":33,"rs":"Dakar","ds":"SENEGALAISE DES MINES ET GEOLOGIE","pn":"FATOU DIOUF","da":"15/11/2021","an":2021,"pa":48.0,"pv":48.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":34,"rs":"Dakar","ds":"SENEGALAISE DES MINES ET GEOLOGIE","pn":"IBRAHIMA KHALIL BALDE","da":"15/11/2021","an":2021,"pa":52.0,"pv":52.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":35,"rs":"Dakar","ds":"SENGOLD COMPANY","pn":"LAMINE DIACK DIOUF","da":"31/12/2021","an":2021,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":36,"rs":"Dakar","ds":"NEW ENERGY INVESTMENT","pn":"YANG JUNMING","da":"30/06/2021","an":2021,"pa":30.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":37,"rs":"Dakar","ds":"NEW ENERGY INVESTMENT","pn":"YONGQIANG QU","da":"30/06/2021","an":2021,"pa":30.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":38,"rs":"Thiès","ds":"\"AFIA SERVICES\"","pn":"BOUNA DIAKHOUMPA","da":"09/11/2021","an":2021,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":39,"rs":"Dakar","ds":"BOYA","pn":"JORGE ALBERTO GANOZA DURANT","da":"12/10/2021","an":2021,"pa":null,"pv":null,"na":"PÉROU","pr":"PÉROU","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":40,"rs":"Dakar","ds":"BP SENEGAL INVESTMENTS LIMITED","pn":"PAPE MASSAER BEN SALOUM CISSE","da":"20/10/2021","an":2021,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":41,"rs":"Dakar","ds":"BOKAMINE","pn":"SADIO KANDE","da":"16/11/2021","an":2021,"pa":20.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":42,"rs":"Dakar","ds":"BOKAMINE","pn":"IDRISSA BODIAN","da":"16/11/2021","an":2021,"pa":20.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":43,"rs":"Dakar","ds":"BAU","pn":"REZAT KTHUPI","da":"17/11/2021","an":2021,"pa":100.0,"pv":null,"na":"ALBANIE","pr":"ALBANIE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":44,"rs":"Thiès","ds":"ETS SERIGNE BABACAR SY","pn":"MAWDO NDIAYE","da":"14/10/2021","an":2021,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":true,"fp":NaN,"np":"AMY DIAKHATE","gr":"Greffe"},{"id":45,"rs":"Thiès","ds":"ETS SERIGNE BABACAR SY","pn":"MAWDO NDIAYE","da":"14/10/2021","an":2021,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":true,"fp":NaN,"np":"AMY DIAKHATE","gr":"Greffe"},{"id":46,"rs":"Thiès","ds":"\" LEBOUGUI DE DIENDER \"","pn":"NDOYE MASYLLA","da":"25/11/2021","an":2021,"pa":null,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":47,"rs":"Thiès","ds":"GIE CARAHMA","pn":"OUSMAN NDIAYE","da":"07/12/2021","an":2021,"pa":95.0,"pv":95.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":48,"rs":"Thiès","ds":"GIE CARAHMA","pn":"RAMATOULAYE NDIAYE","da":"07/12/2021","an":2021,"pa":5.0,"pv":5.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":49,"rs":"Thiès","ds":"LES CIMENTS DU SAHEL","pn":"LOTFALLA LAYOUSSE","da":"28/07/2021","an":2021,"pa":96.29,"pv":96.29,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":50,"rs":"Dakar","ds":"AFRICAN BUILDERS SARL","pn":"AMADOU DIANE","da":"24/12/2021","an":2021,"pa":25.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":51,"rs":"Dakar","ds":"AFRICAN BUILDERS SARL","pn":"DAME DIANE","da":"24/12/2021","an":2021,"pa":25.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":52,"rs":"Dakar","ds":"CARRISEN SARL","pn":"LAYTI NDIAYE","da":"21/12/2021","an":2021,"pa":30.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":53,"rs":"Dakar","ds":"CARRISEN SARL","pn":"SEKHOU SENE","da":"21/12/2021","an":2021,"pa":70.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":54,"rs":"Dakar","ds":"CASA BAMBA FAILIAL","pn":"FATOUMATA MBAYE","da":"13/12/2021","an":2021,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":true,"fp":NaN,"np":"CHEIKHOUNA THIOUNE","gr":"Greffe"},{"id":55,"rs":"Dakar","ds":"CASA BAMBA FAILIAL","pn":"FATOUMATA MBAYE","da":"13/12/2021","an":2021,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":true,"fp":NaN,"np":"CHEIKHOUNA THIOUNE","gr":"Greffe"},{"id":56,"rs":"Dakar","ds":"AFRICAN BUILDERS SARL","pn":"MAHMOUTH FALL","da":"24/12/2021","an":2021,"pa":25.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":57,"rs":"Dakar","ds":"AFRICAN BUILDERS SARL","pn":"MOUHAMADOU FALILOU FALL","da":"24/12/2021","an":2021,"pa":25.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":58,"rs":"Diourbel","ds":"Africa Traiding-Equipement et Transport (AF-TECO)","pn":"OUSSEYNOU WADE","da":"01/12/2021","an":2021,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":59,"rs":"Fatick","ds":"DIOUF BOUGAR","pn":"BOUGAR DIOUF","da":"26/11/2021","an":2021,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":60,"rs":"Dakar","ds":"GRANDE COTE OPERATIONS","pn":"ROBITAILLE BENOIT","da":"02/07/2021","an":2021,"pa":null,"pv":null,"na":"CANADA","pr":"CANADA","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":61,"rs":"Dakar","ds":"GOLDINA","pn":"NAFISSATOU GUEYE","da":"19/11/2021","an":2021,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":62,"rs":"Dakar","ds":"GROUPE SOCIETE SENEGALO SUISSE DES AFFAIRES","pn":"ELHADJI AMADOU DIAGNE","da":"21/02/2022","an":2022,"pa":100.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":63,"rs":"Dakar","ds":"GIE KA BUSINESS  COMPANY / KBC","pn":"ELHADJI FARY KA","da":"18/05/2022","an":2022,"pa":null,"pv":2.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":64,"rs":"Dakar","ds":"GOLD MINE BUSINESS","pn":"OUSMANE MANE","da":"11/11/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":65,"rs":"Diourbel","ds":"ENTREPRISE WAKEUR BOROM GAWANE","pn":"MBAYE NDIAYE","da":"03/10/2022","an":2022,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":66,"rs":"Dakar","ds":"ZEYNA TRANSPORTS-IMMO-CONSTRUCTIONS(Z.T.I.C)","pn":"AHMADOU KHADIM MBENGUE","da":"02/12/2022","an":2022,"pa":40.0,"pv":40.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":67,"rs":"Dakar","ds":"GIE KA BUSINESS  COMPANY / KBC","pn":"MAMADOU KA","da":"18/05/2022","an":2022,"pa":null,"pv":2.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":68,"rs":"Dakar","ds":"GLADIAMA SUARL","pn":"ABDOULAYE DRAME","da":"28/07/2022","an":2022,"pa":100.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":69,"rs":"Dakar","ds":"ZEYNA TRANSPORTS-IMMO-CONSTRUCTIONS(Z.T.I.C)","pn":"MOUSSA MBENGUE","da":"02/12/2022","an":2022,"pa":40.0,"pv":40.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":70,"rs":"Dakar","ds":"ZEYNA TRANSPORTS-IMMO-CONSTRUCTIONS(Z.T.I.C)","pn":"SEYNABOU MBENGUE","da":"02/12/2022","an":2022,"pa":30.0,"pv":30.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":71,"rs":"Fatick","ds":"Entreprise Mamour NDIAYE","pn":"Mamour NDIAYE","da":"11/01/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":72,"rs":"Kaolack","ds":"\"SENEGALAISE DE DISTRIBUTION DE PRODUITS PETROLIERS\" SDPP SARL","pn":"MAMADOU DIAW","da":"25/07/2022","an":2022,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":73,"rs":"Dakar","ds":"CSE GRANULATS","pn":"ARDO SADIO SOW","da":"30/09/2022","an":2022,"pa":24.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":74,"rs":"Dakar","ds":"CSE GRANULATS","pn":"HAMIDOU SOW","da":"30/09/2022","an":2022,"pa":5.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":75,"rs":"Dakar","ds":"CSE GRANULATS","pn":"MOHAMED ABABACAR SOW","da":"30/09/2022","an":2022,"pa":11.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":76,"rs":"Dakar","ds":"CSE GRANULATS","pn":"OUMAR SOW","da":"30/09/2022","an":2022,"pa":23.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":77,"rs":"Dakar","ds":"CSE GRANULATS","pn":"SOW ABDOUL AZIZ","da":"30/09/2022","an":2022,"pa":11.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":78,"rs":"Dakar","ds":"CSE GRANULATS","pn":"SOW ABDOUL KARIM","da":"30/09/2022","an":2022,"pa":11.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":79,"rs":"Kaolack","ds":"SDPP","pn":"MAMADOU DIAW","da":"26/07/2022","an":2022,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":80,"rs":"Dakar","ds":"AGEM SENEGAL EXPLORATION","pn":"MARYSE BELANGER","da":"30/09/2022","an":2022,"pa":null,"pv":null,"na":"CANADA","pr":"CANADA","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":81,"rs":"Thiès","ds":"GUEYE & FRERES THIORO TRANSPORT\" G.F.2T","pn":"THIORO MBAYE","da":"25/10/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":true,"fp":NaN,"np":"SALIOU MBAYE","gr":"Greffe"},{"id":82,"rs":"Thiès","ds":"ETS\"  SERIGNE MANSOUR SY BOROOM DARADJI \"","pn":"DAME DIAKHATE","da":"26/08/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":83,"rs":"Thiès","ds":"\" EMEEF CONSULTING \"","pn":"MAMADOU LOUM","da":"28/06/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":84,"rs":"Kédougou","ds":"KEDOUGOU BUSINESS ET MINING SERVICES","pn":"EL HADJI BOUBACAR SIDIKI DIARRA","da":"03/03/2022","an":2022,"pa":5.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":85,"rs":"Dakar","ds":"INTERNATIONAL CONSULTING GROUP (I.C.G)","pn":"BABACAR CISSE","da":"17/11/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":86,"rs":"Dakar","ds":"JAMOMINING","pn":"HE XIUYUN","da":"12/01/2022","an":2022,"pa":30.0,"pv":30.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":87,"rs":"Dakar","ds":"JAMOMINING","pn":"SERIGNE BAMBA DIOP","da":"12/01/2022","an":2022,"pa":30.0,"pv":30.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":88,"rs":"Kédougou","ds":"KEDOUGOU BUSINESS ET MINING SERVICES","pn":"LAURENT DIARRA","da":"03/03/2022","an":2022,"pa":55.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":89,"rs":"Kédougou","ds":"KEDOUGOU BUSINESS ET MINING SERVICES","pn":"MOHAMMED EL ASSALI","da":"03/03/2022","an":2022,"pa":40.0,"pv":null,"na":"MAROC","pr":"MAROC","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":90,"rs":"Thiès","ds":"GIE \" CAYOR SILEX CORPORATION \"","pn":"PAPA MASSE SEYE DIOP","da":"13/09/2022","an":2022,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":91,"rs":"Thiès","ds":"GIE \" FARLOU \"","pn":"KANTE ALASSANE","da":"31/10/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":92,"rs":"Dakar","ds":"BOLLO BAKH","pn":"AMADOU YERO DIALLO","da":"24/05/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":93,"rs":"Dakar","ds":"BB FIRST COMMODITY HOLDING LTD","pn":"WOLFGANG ENGELBERG BEDORF","da":"05/10/2022","an":2022,"pa":null,"pv":null,"na":"ALLEMAGNE","pr":"ALLEMAGNE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":94,"rs":"Dakar","ds":"BHAIRAVA AGRICOLE","pn":"SIBHARAM ARUN AGGARWAL","da":"08/08/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":95,"rs":"Dakar","ds":"BIRIMA GOLD RESSOURCES","pn":"SERIGNE DIENG","da":"19/01/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":96,"rs":"Thiès","ds":"GUEYE & FRERES THIORO TRANSPORT\" G.F.2T","pn":"THIORO MBAYE","da":"25/10/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":true,"fp":NaN,"np":"SALIOU MBAYE","gr":"Greffe"},{"id":97,"rs":"Thiès","ds":"\"BOOK JOM ANDE LIGUEY MECKHE \"","pn":"ELHADJI DIAGNE","da":"21/09/2022","an":2022,"pa":80.0,"pv":80.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":98,"rs":"Thiès","ds":"\"BOOK JOM ANDE LIGUEY MECKHE \"","pn":"MBAYE WADE","da":"21/09/2022","an":2022,"pa":20.0,"pv":20.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":99,"rs":"Thiès","ds":"\"PS - SENECAT \" SUARL","pn":"SARR PAPA THIONE","da":"17/06/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":100,"rs":"Thiès","ds":"\"SALIOU MINES INDUSTRIES ET TECHNIQUES\" (S.M.I.T)","pn":"SALIOU MBAYE","da":"06/04/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":true,"fp":NaN,"np":"AUGUSTIN TINE","gr":"Greffe"},{"id":101,"rs":"Thiès","ds":"\"SALIOU MINES INDUSTRIES ET TECHNIQUES\" (S.M.I.T)","pn":"SALIOU MBAYE","da":"06/04/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":true,"fp":NaN,"np":"AUGUSTIN TINE","gr":"Greffe"},{"id":102,"rs":"Thiès","ds":"\" INCA \" SARL","pn":"Bruno","da":"25/08/2022","an":2022,"pa":72.0,"pv":72.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":103,"rs":"Dakar","ds":"IAMGOLD BOTO","pn":"MARYSE BELANGER","da":"08/09/2022","an":2022,"pa":null,"pv":null,"na":"CANADA","pr":"CANADA","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":104,"rs":"Thiès","ds":"\" INCA \" SARL","pn":"LUIGI CAIAZZO","da":"25/08/2022","an":2022,"pa":5.0,"pv":5.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":105,"rs":"Thiès","ds":"\" INCA \" SARL","pn":"ROMUALDO LAMPITELLI","da":"25/08/2022","an":2022,"pa":23.0,"pv":23.0,"na":"ITALIE","pr":"ITALIE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":106,"rs":"Thiès","ds":"\" SALAME ENTREPRISE \" SARL","pn":"BABACAR MASSAR MBENGUE","da":"08/07/2022","an":2022,"pa":15.0,"pv":15.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":107,"rs":"Thiès","ds":"\" SALAME ENTREPRISE \" SARL","pn":"PAPA SAMBA MBENGUE","da":"08/07/2022","an":2022,"pa":15.0,"pv":15.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":108,"rs":"Dakar","ds":"DESK OFFICE","pn":"MAMADOU MOUSTAPHA LO","da":"08/07/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":109,"rs":"Dakar","ds":"DIAMBAR IMMOBILIER","pn":"MOUHAMED TINE","da":"15/03/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":110,"rs":"Dakar","ds":"DIENG & CO ENGINEERING","pn":"LATYR TANOR DIENG","da":"21/04/2022","an":2022,"pa":80.0,"pv":80.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":111,"rs":"Dakar","ds":"DIENG & CO ENGINEERING","pn":"MAME DIARRA DIOP","da":"21/04/2022","an":2022,"pa":20.0,"pv":20.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":112,"rs":"Dakar","ds":"ECAMM'S","pn":"ABDOU KHADIR MBACKE","da":"06/09/2022","an":2022,"pa":5.0,"pv":5.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":113,"rs":"Dakar","ds":"ECAMM'S","pn":"CHEIKH ABO MADIYANA MBACKE","da":"06/09/2022","an":2022,"pa":65.0,"pv":65.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":114,"rs":"Dakar","ds":"ECAMM'S","pn":"MBALLO KEBE","da":"06/09/2022","an":2022,"pa":30.0,"pv":30.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":115,"rs":"Dakar","ds":"EMERGENCE MINES & INVESTISSEMENTS","pn":"AUGUSTIN MANE","da":"05/04/2022","an":2022,"pa":20.0,"pv":20.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":116,"rs":"Dakar","ds":"EMERGENCE MINES & INVESTISSEMENTS","pn":"MOHAMED DICKO","da":"05/04/2022","an":2022,"pa":40.0,"pv":40.0,"na":"MAURITANIE","pr":"MAURITANIE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":117,"rs":"Dakar","ds":"EMERGENCE MINES & INVESTISSEMENTS","pn":"MOUHAMED EL MOKHTAR BOULEBAT","da":"05/04/2022","an":2022,"pa":40.0,"pv":40.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":118,"rs":"Thiès","ds":"\" SEN & UK FARMING \"","pn":"GUEYE GALAYE","da":"06/07/2022","an":2022,"pa":30.0,"pv":30.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":119,"rs":"Thiès","ds":"\" SOCIETE DE TRAVAUX GENERAL ET DE COMMERCE \" SARL","pn":"BABACAR MASSAR MBENGUE","da":"05/08/2022","an":2022,"pa":15.0,"pv":15.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":true,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":120,"rs":"Dakar","ds":"AREZKI-SA","pn":"AHMED AREZKI","da":"06/05/2022","an":2022,"pa":25.0,"pv":25.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":121,"rs":"Dakar","ds":"AREZKI-SA","pn":"TARECK AREZKI","da":"06/05/2022","an":2022,"pa":30.0,"pv":30.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":122,"rs":"Dakar","ds":"AREZKI-SA","pn":"YOUSR AREZKI","da":"06/05/2022","an":2022,"pa":15.0,"pv":15.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":123,"rs":"Dakar","ds":"AREZKI-SA","pn":"ZIAD AREZKI","da":"06/05/2022","an":2022,"pa":30.0,"pv":30.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":124,"rs":"Thiès","ds":"\" SOCIETE DE TRAVAUX GENERAL ET DE COMMERCE \" SARL","pn":"BABACAR MASSAR MBENGUE","da":"05/08/2022","an":2022,"pa":15.0,"pv":15.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":true,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":125,"rs":"Thiès","ds":"\" SOCIETE DE TRAVAUX GENERAL ET DE COMMERCE \" SARL","pn":"ELHADJI DIOP","da":"05/08/2022","an":2022,"pa":15.0,"pv":15.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":true,"fp":NaN,"np":"OMAR BADIANE","gr":"Greffe"},{"id":126,"rs":"Thiès","ds":"\" SOCIETE DE TRAVAUX GENERAL ET DE COMMERCE \" SARL","pn":"ELHADJI DIOP","da":"05/08/2022","an":2022,"pa":15.0,"pv":15.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":true,"fp":NaN,"np":"OMAR BADIANE","gr":"Greffe"},{"id":127,"rs":"Thiès","ds":"ALPHA OMEGA","pn":"MARIE JOSEPHINE THERERSE DIONE","da":"20/09/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":128,"rs":"Thiès","ds":"KEUR MAME M'BASLA NDIAYE","pn":"PAPA OUSMANE NDIAYE","da":"29/07/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":129,"rs":"Thiès","ds":"MOUSTAPHA NDIAYE","pn":"MOUSTAPHA NDIAYE","da":"05/07/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":130,"rs":"Thiès","ds":"OUSMANE SOW","pn":"OUSMANE SOW","da":"27/04/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":131,"rs":"Dakar","ds":"ADJAF UNIVERSEL","pn":"AIDA DIOP","da":"12/09/2022","an":2022,"pa":100.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":132,"rs":"Dakar","ds":"AMATH NDIAYE INTERNATIONAL PRESTIGE (ANIP)","pn":"AMATH NDIAYE","da":"17/01/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":133,"rs":"Dakar","ds":"COMPAGNIE SENEGALAISE DE TRANSPORT MINIER ET AGRICOLE (CSTMA)","pn":"AHMETH MEDOUNE FALL","da":"28/04/2022","an":2022,"pa":5.0,"pv":5.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":134,"rs":"Dakar","ds":"COMPAGNIE SENEGALAISE DE TRANSPORT MINIER ET AGRICOLE (CSTMA)","pn":"ALIOU NDIAYE","da":"28/04/2022","an":2022,"pa":10.0,"pv":10.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":135,"rs":"Dakar","ds":"COMPAGNIE SENEGALAISE DE TRANSPORT MINIER ET AGRICOLE (CSTMA)","pn":"MOUSSA TRAORE","da":"28/04/2022","an":2022,"pa":8.0,"pv":8.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":136,"rs":"Dakar","ds":"COMPAGNIE SENEGALAISE DE TRANSPORT MINIER ET AGRICOLE (CSTMA)","pn":"SEYDOU GASSAMA","da":"28/04/2022","an":2022,"pa":77.0,"pv":77.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":137,"rs":"Dakar","ds":"COMPTOIR COMMERCIAL BALLA AICHA SUARL","pn":"IBRAHIMA MBACKE","da":"12/09/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":138,"rs":"Dakar","ds":"ABANDOUR GEOLINK","pn":"NDEYE ANTHIA BA","da":"20/06/2022","an":2022,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":139,"rs":"Dakar","ds":"ABANDOUR GEOLINK","pn":"OUSSEYNOU NDOUR","da":"20/06/2022","an":2022,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":140,"rs":"Dakar","ds":"GACH MINING COMPANY LIMITED SENEGAL","pn":"ABOUBAKRY JAWARA","da":"05/04/2022","an":2022,"pa":48.0,"pv":48.0,"na":"GAMBIE","pr":"GAMBIE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":141,"rs":"Dakar","ds":"ENTREPRISE LE GANDIOL GROUPE","pn":"OUMAR SALL","da":"21/06/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":142,"rs":"Dakar","ds":"GACH MINING COMPANY LIMITED SENEGAL","pn":"AUGUSTIN MANE","da":"05/04/2022","an":2022,"pa":5.0,"pv":5.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":143,"rs":"Dakar","ds":"GACH MINING COMPANY LIMITED SENEGAL","pn":"MOHAMED DICKO","da":"05/04/2022","an":2022,"pa":23.0,"pv":23.0,"na":"MAURITANIE","pr":"MAURITANIE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":144,"rs":"Dakar","ds":"GACH MINING COMPANY LIMITED SENEGAL","pn":"MOUHAMED EL MOKHTAR BOULEBAT","da":"05/04/2022","an":2022,"pa":24.0,"pv":24.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":145,"rs":"Dakar","ds":"SENEGAL SILEX","pn":"MARK PHILIPP GOSSEL","da":"09/02/2022","an":2022,"pa":100.0,"pv":100.0,"na":"ALLEMAGNE","pr":"ALLEMAGNE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":146,"rs":"Dakar","ds":"MEDY INDUSTRIES MODERNES SARL","pn":"AMINATA BAIDY SOW","da":"12/09/2022","an":2022,"pa":10.0,"pv":10.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":147,"rs":"Dakar","ds":"MEDY INDUSTRIES MODERNES SARL","pn":"IBRAHIMA SOW","da":"12/09/2022","an":2022,"pa":65.0,"pv":65.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":148,"rs":"Dakar","ds":"MEDY INDUSTRIES MODERNES SARL","pn":"YAYA IBRAHIMA SOW","da":"12/09/2022","an":2022,"pa":25.0,"pv":25.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":149,"rs":"Dakar","ds":"MFC INTERNATIONAL","pn":"MOUHAMED FALL","da":"16/11/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":150,"rs":"Dakar","ds":"MINES PROFESSIONAL HOLDING","pn":"ALFRED SYMPA","da":"09/12/2022","an":2022,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":151,"rs":"Dakar","ds":"MINES PROFESSIONAL HOLDING","pn":"AMADOU APITHY","da":"09/12/2022","an":2022,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":152,"rs":"Dakar","ds":"NDATTE YALLAH COMPAGNIE","pn":"ELHADJI BOUBACAR CISSE","da":"18/05/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":153,"rs":"Dakar","ds":"NEGOS FIABLE SENEGAL / NEFIS","pn":"FUKUDA KOTARO","da":"10/10/2022","an":2022,"pa":30.0,"pv":30.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":154,"rs":"Dakar","ds":"NEGOS FIABLE SENEGAL / NEFIS","pn":"SEYDINA DIOP","da":"10/10/2022","an":2022,"pa":10.0,"pv":10.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":155,"rs":"Dakar","ds":"NEGOS FIABLE SENEGAL / NEFIS","pn":"YAMAGISHI CHISA","da":"10/10/2022","an":2022,"pa":60.0,"pv":60.0,"na":"JAPON","pr":"JAPON","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":156,"rs":"Dakar","ds":"SENEGALAISE DE SERVICES MINIERS ET DE GENIE CIVIL","pn":"BABOU SENE","da":"27/01/2022","an":2022,"pa":67.0,"pv":67.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":157,"rs":"Dakar","ds":"SEN-STONES","pn":"SYLLA","da":"31/01/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":158,"rs":"Dakar","ds":"SINTRADE","pn":"WANG WEI","da":"12/10/2022","an":2022,"pa":100.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":159,"rs":"Dakar","ds":"SKDT NEW NERGY TECHNOLOGY","pn":"HEQIANG YU","da":"27/12/2022","an":2022,"pa":55.0,"pv":55.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":160,"rs":"Dakar","ds":"SKDT NEW NERGY TECHNOLOGY","pn":"KARASSE KANE","da":"27/12/2022","an":2022,"pa":45.0,"pv":45.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":161,"rs":"Dakar","ds":"SOCABEG MINING","pn":"MOMAR SOKHNA DIOP","da":"29/08/2022","an":2022,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":162,"rs":"Dakar","ds":"SOCIETE DE CONCASSAGE ET DE BETON","pn":"HAYATI BAYRAM","da":"07/09/2022","an":2022,"pa":33.0,"pv":33.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":163,"rs":"Dakar","ds":"SOCIETE DE CONCASSAGE ET DE BETON","pn":"MEHMET FERHAT","da":"07/09/2022","an":2022,"pa":33.0,"pv":null,"na":"TURQUIE","pr":"TURQUIE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":164,"rs":"Dakar","ds":"SOCIETE DE CONCASSAGE ET DE BETON","pn":"PAPA MAYELAD FALL","da":"07/09/2022","an":2022,"pa":12.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":165,"rs":"Dakar","ds":"SOYA GOLD","pn":"SOULEYMANE NIANG","da":"04/01/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":166,"rs":"Dakar","ds":"SYFARO MINING COMPANY","pn":"NDEYE FATIM SY","da":"13/07/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":167,"rs":"Dakar","ds":"TOP BUSINESS CONCEPT","pn":"MOUSSA SAMB","da":"07/04/2022","an":2022,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":168,"rs":"Dakar","ds":"TOP BUSINESS CONCEPT","pn":"SAMBA NDAO NDIR","da":"07/04/2022","an":2022,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":169,"rs":"Dakar","ds":"TOUBA AMEUBLEMENT","pn":"MAMOUNE GAYE","da":"08/09/2022","an":2022,"pa":100.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":170,"rs":"Dakar","ds":"TOULAYE AFRIQUE SARL","pn":"MAMADOU MOUSTAPHA MBACKE","da":"12/09/2022","an":2022,"pa":60.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":171,"rs":"Dakar","ds":"TOULAYE AFRIQUE SARL","pn":"MARIAMA BAKHOUM","da":"12/09/2022","an":2022,"pa":40.0,"pv":40.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":172,"rs":"Dakar","ds":"WEST AFRICA MINES (WAM)","pn":"JEAN SERGE HOUNKANLIN DOSSOU","da":"02/12/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":173,"rs":"Dakar","ds":"WOODSIDE ENERGY SENEGAL BV","pn":"ANDREAS PHILIP DEMETRIOU","da":"30/06/2022","an":2022,"pa":null,"pv":25.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":174,"rs":"Dakar","ds":"MANDINGA RESOURCES","pn":"DUSKO LJUBOJEVIC","da":"27/04/2022","an":2022,"pa":5.0,"pv":5.0,"na":"SERBIE","pr":"SERBIE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":175,"rs":"Dakar","ds":"MANDINGA RESOURCES","pn":"FALDI ISMAIL","da":"27/04/2022","an":2022,"pa":5.0,"pv":5.0,"na":"AUSTRALIE","pr":"AUSTRALIE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":176,"rs":"Dakar","ds":"MANDINGA RESOURCES","pn":"GEORGES NICHOLAS MICHAELIDES","da":"27/04/2022","an":2022,"pa":5.0,"pv":5.0,"na":"AFRIQUE DU SUD","pr":"AFRIQUE DU SUD","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":177,"rs":"Dakar","ds":"SAMAGOLD SARL","pn":"MAMADY TOURE","da":"19/12/2022","an":2022,"pa":40.0,"pv":40.0,"na":"PAKISTAN","pr":"PAKISTAN","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":178,"rs":"Dakar","ds":"SAMAGOLD SARL","pn":"OUSMANE DIAGNE","da":"19/12/2022","an":2022,"pa":60.0,"pv":60.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":179,"rs":"Dakar","ds":"TCHILMA BUILDING","pn":"NDEYE FALL DIOP","da":"09/02/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":180,"rs":"Dakar","ds":"THIAM SENEGAL GOLD FAMILY","pn":"CHEIKH AHMED TIDIANY THIAM","da":"19/12/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":181,"rs":"Dakar","ds":"SAMSAM GOLD","pn":"ADAMA DIALLO","da":"30/09/2022","an":2022,"pa":12.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":182,"rs":"Dakar","ds":"SAMSAM GOLD","pn":"CHEIKH TIDIANE DIOP","da":"30/09/2022","an":2022,"pa":12.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":183,"rs":"Dakar","ds":"SAMSAM GOLD","pn":"CHERIF AMEDINE BA","da":"30/09/2022","an":2022,"pa":12.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":184,"rs":"Dakar","ds":"SAMSAM GOLD","pn":"MADY CAMARA","da":"30/09/2022","an":2022,"pa":12.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":185,"rs":"Dakar","ds":"SAMSAM GOLD","pn":"NDEYE MATY THIOUNE","da":"30/09/2022","an":2022,"pa":80.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":186,"rs":"Dakar","ds":"SARAYA ENERGY","pn":"MOUSSA SYLLA","da":"04/07/2022","an":2022,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":187,"rs":"Dakar","ds":"LINGO D'OR SENEGAL","pn":"SEYDINA GUEYE","da":"20/04/2022","an":2022,"pa":30.0,"pv":30.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":188,"rs":"Dakar","ds":"MANDINGA RESOURCES","pn":"HADJI PAPA MACOUMBA DIOP","da":"27/04/2022","an":2022,"pa":5.0,"pv":5.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":189,"rs":"Dakar","ds":"MANDINGA RESOURCES","pn":"MARTIN JOACHIM PAWLISCHEK","da":"27/04/2022","an":2022,"pa":5.0,"pv":5.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":190,"rs":"Dakar","ds":"MANDINGA RESOURCES","pn":"MICHAEL JOHN DAVY","da":"27/04/2022","an":2022,"pa":70.0,"pv":70.0,"na":"AUSTRALIE","pr":"AUSTRALIE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":191,"rs":"Dakar","ds":"MANDINGA RESOURCES","pn":"MOHAMED NIARE","da":"27/04/2022","an":2022,"pa":5.0,"pv":5.0,"na":"MALI","pr":"MALI","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":192,"rs":"Dakar","ds":"MANSA GOLD CORPORATION","pn":"LAMINE DIACK DIOUF","da":"18/05/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":193,"rs":"Dakar","ds":"WOODSIDE ENERGY SENEGAL BV","pn":"JENNIFER ALICE ELISABETH HUVERS DE VRIES","da":"30/06/2022","an":2022,"pa":null,"pv":25.0,"na":"PAYS-BAS","pr":"PAYS-BAS","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":194,"rs":"Dakar","ds":"WOODSIDE ENERGY SENEGAL BV","pn":"LOUISE HORNBY","da":"30/06/2022","an":2022,"pa":null,"pv":25.0,"na":"ROYAUME-UNI","pr":"ROYAUME-UNI","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":195,"rs":"Dakar","ds":"WOODSIDE ENERGY SENEGAL BV","pn":"SHAUN MARTIN GREGORY","da":"30/06/2022","an":2022,"pa":null,"pv":25.0,"na":"AUSTRALIE","pr":"AUSTRALIE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":196,"rs":"Dakar","ds":"XINJIN ZIRCONIUM INDUSTRY","pn":"JIEQI HUANG","da":"19/01/2022","an":2022,"pa":20.0,"pv":20.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":197,"rs":"Dakar","ds":"XINJIN ZIRCONIUM INDUSTRY","pn":"JUNMING YANG","da":"19/01/2022","an":2022,"pa":20.0,"pv":20.0,"na":"CHINE","pr":"CHINE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":198,"rs":"Dakar","ds":"XINJIN ZIRCONIUM INDUSTRY","pn":"YONGQIANG QU","da":"19/01/2022","an":2022,"pa":60.0,"pv":60.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":199,"rs":"Dakar","ds":"SYPROM","pn":"MANSOUR SY","da":"30/10/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":200,"rs":"Dakar","ds":"SOCIETE DE CONCASSAGE ET DE BETON","pn":"VAHAP KANITOGLU","da":"07/09/2022","an":2022,"pa":33.0,"pv":33.0,"na":"TURQUIE","pr":"TURQUIE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":201,"rs":"Dakar","ds":"SOCIETE DES MINES DU SENEGAL (SODEMINES)","pn":"SOULEYMANE SOW","da":"11/04/2022","an":2022,"pa":null,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":202,"rs":"Dakar","ds":"SOCIETE GENERALE DE CARRIERES,D'AGRICULTURE ET DES MINIES (GECAMINES - SA)","pn":"JEAN-BRICE SAINT-MARTIN","da":"26/07/2022","an":2022,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":203,"rs":"Dakar","ds":"RACKY PRESTATIONS TECHNIQUES (RPT)","pn":"RACKY ABDOUL WANE","da":"17/01/2022","an":2022,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":204,"rs":"Dakar","ds":"RASSOUL MINING OIL GAZ & ENERGY","pn":"EL HADJI AMADOU DIAGNE","da":"14/02/2022","an":2022,"pa":100.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":205,"rs":"Dakar","ds":"RESEAU NATIONAL DES BIJOUTIERS DU SENEGAL","pn":"ALLE THIAM","da":"20/04/2022","an":2022,"pa":5.0,"pv":5.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":206,"rs":"Dakar","ds":"RESEAU NATIONAL DES BIJOUTIERS DU SENEGAL","pn":"AMADOU THIAM","da":"20/04/2022","an":2022,"pa":5.0,"pv":5.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":207,"rs":"Dakar","ds":"RESEAU NATIONAL DES BIJOUTIERS DU SENEGAL","pn":"ELHADJI MAMADOU GUEYE","da":"20/04/2022","an":2022,"pa":10.0,"pv":10.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":208,"rs":"Dakar","ds":"RESEAU NATIONAL DES BIJOUTIERS DU SENEGAL","pn":"MAMADOU SECK","da":"20/04/2022","an":2022,"pa":10.0,"pv":10.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":209,"rs":"Dakar","ds":"RESEAU NATIONAL DES BIJOUTIERS DU SENEGAL","pn":"MOR SAMBA GUEYE","da":"20/04/2022","an":2022,"pa":5.0,"pv":5.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":210,"rs":"Dakar","ds":"RESEAU NATIONAL DES BIJOUTIERS DU SENEGAL","pn":"MOUSTAPHA NIANG","da":"20/04/2022","an":2022,"pa":10.0,"pv":10.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":211,"rs":"Dakar","ds":"RESEAU NATIONAL DES BIJOUTIERS DU SENEGAL","pn":"SEYDINA GUEYE","da":"20/04/2022","an":2022,"pa":55.0,"pv":55.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":212,"rs":"Dakar","ds":"SABODALA GOLD OPERATIONS","pn":"DAVID JACQUES MIMRAN","da":"26/01/2022","an":2022,"pa":null,"pv":null,"na":"SUISSE","pr":"SUISSE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":213,"rs":"Dakar","ds":"SABODALA GOLD OPERATIONS","pn":"YOUSRIYA NASSIF LOZA","da":"26/01/2022","an":2022,"pa":null,"pv":null,"na":"ÉGYPTE","pr":"ÉGYPTE","pp":true,"fp":NaN,"np":"NAGUIB ONSI SAWIRIS","gr":"Greffe"},{"id":214,"rs":"Dakar","ds":"SABODALA GOLD OPERATIONS","pn":"YOUSRIYA NASSIF LOZA","da":"26/01/2022","an":2022,"pa":null,"pv":null,"na":"ÉGYPTE","pr":"ÉGYPTE","pp":true,"fp":NaN,"np":"NAGUIB ONSI SAWIRIS","gr":"Greffe"},{"id":215,"rs":"Dakar","ds":"SOCIETE IMMOBILIERE DE CONSTRUCTION ET DE GERANCE 'SICOGER)","pn":"ADAMA DIOUF","da":"30/10/2022","an":2022,"pa":25.0,"pv":25.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":216,"rs":"Dakar","ds":"SOCIETE IMMOBILIERE DE CONSTRUCTION ET DE GERANCE 'SICOGER)","pn":"ALIOUNEDIOP FAYE","da":"30/10/2022","an":2022,"pa":30.0,"pv":30.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":217,"rs":"Dakar","ds":"SOCIETE IMMOBILIERE DE CONSTRUCTION ET DE GERANCE 'SICOGER)","pn":"COUMBA FAYE","da":"30/10/2022","an":2022,"pa":15.0,"pv":15.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":218,"rs":"Dakar","ds":"SOCIETE IMMOBILIERE DE CONSTRUCTION ET DE GERANCE 'SICOGER)","pn":"MOUSTAPHA FAYE","da":"30/10/2022","an":2022,"pa":30.0,"pv":30.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":219,"rs":"Dakar","ds":"2S GOLD","pn":"SALIOU SENE","da":"11/11/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":220,"rs":"Dakar","ds":"LINGO D'OR SENEGAL","pn":"ABDOURAHMANE DIALLO","da":"20/04/2022","an":2022,"pa":15.0,"pv":15.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":221,"rs":"Dakar","ds":"LINGO D'OR SENEGAL","pn":"MOR GUEYE","da":"20/04/2022","an":2022,"pa":55.0,"pv":55.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":222,"rs":"Dakar","ds":"KHELKOM'S LION","pn":"AMINATA CISSE","da":"30/09/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":223,"rs":"Dakar","ds":"L'AFRICAINE DES MINES (AFRIK'MINES)","pn":"JEAN SERGE HOUNKANLIN DOSSOU","da":"02/12/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":224,"rs":"Dakar","ds":"KHEWEUL DIAMA","pn":"BARA SARR","da":"28/04/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":225,"rs":"Dakar","ds":"KONKOUTOU GOLD OPERATION","pn":"LAMINE DIACK DIOUF","da":"15/07/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":226,"rs":"Dakar","ds":"KOUNDA GROUP","pn":"DIAGNE YANDE","da":"25/07/2022","an":2022,"pa":25.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":227,"rs":"Dakar","ds":"KOUNDA GROUP","pn":"MODOU FALL","da":"25/07/2022","an":2022,"pa":15.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":228,"rs":"Dakar","ds":"KOUNDA GROUP","pn":"SALIOU NDAW","da":"25/07/2022","an":2022,"pa":60.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":229,"rs":"Dakar","ds":"ABA SERVICES","pn":"BABACAR SEYE","da":"21/07/2022","an":2022,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":230,"rs":"Dakar","ds":"AFRICA A WAY","pn":"KHADIM DIOUF","da":"06/03/2023","an":2023,"pa":67.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":231,"rs":"Dakar","ds":"AFRICA A WAY","pn":"NDIAYE IBRAHIMA","da":"06/03/2023","an":2023,"pa":33.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":232,"rs":"Dakar","ds":"AFRICA CONSULTING BUSINESS (ACB)","pn":"OUMOU DIA","da":"26/12/2023","an":2023,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":233,"rs":"Dakar","ds":"ABABACAR DIOP TRANSPORTS SARL","pn":"ABABACAR DIOP","da":"13/03/2023","an":2023,"pa":100.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":234,"rs":"Dakar","ds":"AFRICA GLOBAL GEOINGENIERIE (A2G)","pn":"DORO NIANG","da":"15/06/2023","an":2023,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":235,"rs":"Dakar","ds":"AFRICA GLOBAL GEOINGENIERIE (A2G)","pn":"MALICK FAYE","da":"15/06/2023","an":2023,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":236,"rs":"Dakar","ds":"AFRICA TRADE AND INVESTMENT CONSULTING (ATIC-SARL)","pn":"BOUBACAR THIAW","da":"15/05/2023","an":2023,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":237,"rs":"Dakar","ds":"AGRO SENEGAL EXPORTS","pn":"HENRY STANLY","da":"03/02/2023","an":2023,"pa":60.0,"pv":60.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":238,"rs":"Dakar","ds":"AGRO SENEGAL EXPORTS","pn":"PRAKAHS PUTHENVILA SATHYAN","da":"03/02/2023","an":2023,"pa":40.0,"pv":40.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":239,"rs":"Dakar","ds":"AL MAKHTOUM GENERAL TRADING","pn":"MAMADOU MBAYE","da":"31/05/2023","an":2023,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":240,"rs":"Thiès","ds":"BAKHOUM BUSINESS COMPANY","pn":"BAKHOUME PAPA ABDOULAYE","da":"01/02/2023","an":2023,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":241,"rs":"Dakar","ds":"ARC EN CIEL","pn":"MOUSTAPHA DIAGNE","da":"02/03/2023","an":2023,"pa":100.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":242,"rs":"Dakar","ds":"ARDIMINES SARL","pn":"ARFANG BOUBACAR DAFFE","da":"12/06/2023","an":2023,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":243,"rs":"Dakar","ds":"ARDIMINES SARL","pn":"DIADIE DIT AMADOU SANKARE","da":"12/06/2023","an":2023,"pa":50.0,"pv":50.0,"na":"MALI","pr":"MALI","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":244,"rs":"Dakar","ds":"AWA PRESTA SERVICES","pn":"AWA DIOP","da":"13/10/2023","an":2023,"pa":100.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":245,"rs":"Dakar","ds":"AWAHABA GROUP","pn":"ABDOUL WAHAB AIDARA","da":"20/03/2023","an":2023,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":246,"rs":"Dakar","ds":"BINOME SARL","pn":"OLIVIER GOUDIABY","da":"06/11/2023","an":2023,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":247,"rs":"Dakar","ds":"BINOME SARL","pn":"OUSMANE THIAM","da":"06/11/2023","an":2023,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":248,"rs":"Dakar","ds":"BAMBADJI SA","pn":"MOUHAMED DAVID MBAYE","da":"16/05/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":249,"rs":"Dakar","ds":"BAMBOUK EXPLORATION SUARL","pn":"IMAD TOUMI","da":"20/07/2023","an":2023,"pa":null,"pv":null,"na":"MAROC","pr":"MAROC","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":250,"rs":"Dakar","ds":"BAMBUK MINERALS SENEGAL","pn":"TERENCE NEIL","da":"02/02/2023","an":2023,"pa":null,"pv":null,"na":"HONGRIE","pr":"HONGRIE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":251,"rs":"Dakar","ds":"BAOBAB MINING","pn":"JINSONG WEN","da":"13/06/2023","an":2023,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":252,"rs":"Dakar","ds":"BAOBAB MINING","pn":"YIYIRAN XIA","da":"13/06/2023","an":2023,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":253,"rs":"Dakar","ds":"CAMMACH-SN","pn":"MAME LEYE MBAYE","da":"27/06/2023","an":2023,"pa":33.0,"pv":33.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":254,"rs":"Dakar","ds":"CAMMACH-SN","pn":"SALIOU SECK","da":"27/06/2023","an":2023,"pa":33.0,"pv":33.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":255,"rs":"Dakar","ds":"CAMMACH-SN","pn":"WILLIAM KEITH BARCLAY","da":"27/06/2023","an":2023,"pa":34.0,"pv":34.0,"na":"ROYAUME-UNI","pr":"ROYAUME-UNI","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":256,"rs":"Dakar","ds":"CHEHUMA","pn":"AUGUSTIN MANE","da":"27/11/2023","an":2023,"pa":10.0,"pv":10.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":257,"rs":"Dakar","ds":"CHEHUMA","pn":"CHEN FANG","da":"27/11/2023","an":2023,"pa":35.0,"pv":35.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":258,"rs":"Dakar","ds":"CHEHUMA","pn":"EMMANUEL DIOH","da":"27/11/2023","an":2023,"pa":5.0,"pv":5.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":259,"rs":"Dakar","ds":"CHEHUMA","pn":"HUANG PING","da":"27/11/2023","an":2023,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":260,"rs":"Dakar","ds":"COMPAGNIE GENERALE DE CONSTRUCTION ET D'EXPLOITATION MINIERE","pn":"PAPE MAMOUR SOKHNA","da":"13/01/2023","an":2023,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":261,"rs":"Dakar","ds":"DANTILA MINE D'OR","pn":"AMETH DIAMANKA","da":"20/07/2023","an":2023,"pa":30.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":262,"rs":"Dakar","ds":"DANTILA MINE D'OR","pn":"BAYE FALLOU DIOP","da":"20/07/2023","an":2023,"pa":40.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":263,"rs":"Dakar","ds":"DANTILA MINE D'OR","pn":"MADY SOUMARE","da":"20/07/2023","an":2023,"pa":30.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":264,"rs":"Dakar","ds":"ENTREPRISE DJOLOF TRANSPORT ET SERVICES","pn":"KA ABOU BAKRY","da":"03/02/2023","an":2023,"pa":100.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":265,"rs":"Dakar","ds":"ENTREPRISE QUINCAILLERIE CISSE ET FRERES","pn":"OUSMANE CISSE","da":"19/05/2023","an":2023,"pa":100.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":266,"rs":"Dakar","ds":"FAKMOZ","pn":"MAMADOU GUEYE","da":"23/05/2023","an":2023,"pa":90.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":267,"rs":"Dakar","ds":"FAKMOZ","pn":"YOUSSOUPH DIAITE","da":"23/05/2023","an":2023,"pa":10.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":268,"rs":"Dakar","ds":"ETE MINING","pn":"YANG QINHAI","da":"12/07/2023","an":2023,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":269,"rs":"Dakar","ds":"ETE MINING","pn":"YIYIRAN XIA","da":"12/07/2023","an":2023,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":270,"rs":"Dakar","ds":"G3DI","pn":"ABDOULAYE DIAGNE","da":"03/11/2023","an":2023,"pa":20.0,"pv":20.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":271,"rs":"Dakar","ds":"G3DI","pn":"ALIOU DIOUF","da":"03/11/2023","an":2023,"pa":40.0,"pv":40.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":272,"rs":"Dakar","ds":"G3DI","pn":"CHEIKH NA DIOP","da":"03/11/2023","an":2023,"pa":40.0,"pv":40.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":273,"rs":"Dakar","ds":"EUROPEAN RAIL ROAD ESTABLISHED SERVICES (ERES)","pn":"FREDERIC EMILE ROYER","da":"20/11/2023","an":2023,"pa":null,"pv":null,"na":"AFRIQUE DU SUD","pr":"AFRIQUE DU SUD","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":274,"rs":"Dakar","ds":"EUROPEAN RAIL ROAD ESTABLISHED SERVICES (ERES)","pn":"GUILLAUME NICOLAS RAYMOND MARTIN","da":"20/11/2023","an":2023,"pa":null,"pv":null,"na":"FRANCE","pr":"FRANCE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":275,"rs":"Dakar","ds":"GEOSERVICES ENGINEERING (GSE)","pn":"ELHADJI ABDOULAYE CAMARA","da":"06/07/2023","an":2023,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":276,"rs":"Dakar","ds":"GEOSERVICES ENGINEERING (GSE)","pn":"PAPA DEMBA SATHIE","da":"06/07/2023","an":2023,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":277,"rs":"Dakar","ds":"GLOBAL GEOSERVICES GROUP (3G-SARL)","pn":"BIRAMA NDOYE","da":"06/07/2023","an":2023,"pa":20.0,"pv":20.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":278,"rs":"Dakar","ds":"GLOBAL GEOSERVICES GROUP (3G-SARL)","pn":"ELHADJI ABDOULAYE CAMARA","da":"06/07/2023","an":2023,"pa":20.0,"pv":20.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":279,"rs":"Dakar","ds":"GLOBAL GEOSERVICES GROUP (3G-SARL)","pn":"OUSSEYNOU SARR","da":"06/07/2023","an":2023,"pa":20.0,"pv":20.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":280,"rs":"Dakar","ds":"GLOBAL GEOSERVICES GROUP (3G-SARL)","pn":"PAPA DEMBA SATHIE","da":"06/07/2023","an":2023,"pa":20.0,"pv":20.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":281,"rs":"Dakar","ds":"GLOBAL GEOSERVICES GROUP (3G-SARL)","pn":"SERIGNE OMAR DIOP","da":"06/07/2023","an":2023,"pa":20.0,"pv":20.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":282,"rs":"Dakar","ds":"GUENE MINING SUARL","pn":"GUENE MODOU DIOP","da":"14/12/2023","an":2023,"pa":100.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":283,"rs":"Dakar","ds":"GLOBAL MINING OPERATIONS","pn":"MAMADY TOURE","da":"22/08/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":284,"rs":"Dakar","ds":"HALWAR MULTISERVICES","pn":"CHEIKH AHMED TIDIANE THIAM","da":"13/03/2023","an":2023,"pa":15.0,"pv":15.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":285,"rs":"Dakar","ds":"HALWAR MULTISERVICES","pn":"DIYNABA THIAM","da":"13/03/2023","an":2023,"pa":15.0,"pv":15.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":286,"rs":"Dakar","ds":"HLNT SENEGAL","pn":"HAILIAN WANG","da":"03/05/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":287,"rs":"Dakar","ds":"HALWAR MULTISERVICES","pn":"EL HADJI BABACAR THIAM","da":"13/03/2023","an":2023,"pa":15.0,"pv":15.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":288,"rs":"Dakar","ds":"I M GOLD","pn":"AUGUSTIN MANE","da":"20/10/2023","an":2023,"pa":5.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":289,"rs":"Dakar","ds":"I M GOLD","pn":"FANG CHEN","da":"20/10/2023","an":2023,"pa":5.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":290,"rs":"Dakar","ds":"I M GOLD","pn":"QIN MINGFU","da":"20/10/2023","an":2023,"pa":90.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":291,"rs":"Dakar","ds":"IMPERATOR RESOURCE","pn":"JAMAI USAGE BICHAT-JAMAI MAEVA MAHBOUBA VERONIQUE","da":"22/02/2023","an":2023,"pa":50.0,"pv":50.0,"na":"SUISSE","pr":"SUISSE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":292,"rs":"Dakar","ds":"IMPERATOR RESOURCE","pn":"LUCAS CHARLES ENZO PEREZ","da":"22/02/2023","an":2023,"pa":50.0,"pv":50.0,"na":"SUISSE","pr":"SUISSE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":293,"rs":"Dakar","ds":"IMPROVE SENEGAL (IMPSEN)","pn":"ASSANE FALL","da":"22/05/2023","an":2023,"pa":30.0,"pv":30.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":294,"rs":"Dakar","ds":"IMPROVE SENEGAL (IMPSEN)","pn":"BAYO CHARLOTTE","da":"22/05/2023","an":2023,"pa":70.0,"pv":70.0,"na":"CAMEROUN","pr":"CAMEROUN","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":295,"rs":"Dakar","ds":"SABODALA MINING COMPANY SARL","pn":"DAVID JACQUES MIMRAN","da":"27/01/2023","an":2023,"pa":null,"pv":null,"na":"SUISSE","pr":"SUISSE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":296,"rs":"Dakar","ds":"SABODALA MINING COMPANY SARL","pn":"YOUSRIYA NASSIF LOZA","da":"27/01/2023","an":2023,"pa":null,"pv":null,"na":"ÉGYPTE","pr":"ÉGYPTE","pp":true,"fp":NaN,"np":"NAGUIB ONSI SAWIRIS","gr":"Greffe"},{"id":297,"rs":"Dakar","ds":"SABODALA MINING COMPANY SARL","pn":"YOUSRIYA NASSIF LOZA","da":"27/01/2023","an":2023,"pa":null,"pv":null,"na":"ÉGYPTE","pr":"ÉGYPTE","pp":true,"fp":NaN,"np":"NAGUIB ONSI SAWIRIS","gr":"Greffe"},{"id":298,"rs":"Dakar","ds":"INNOVA INVESTMENT","pn":"MOHAMED NIANG","da":"24/05/2023","an":2023,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":299,"rs":"Dakar","ds":"HALWAR MULTISERVICES","pn":"KHADIDIATOU THIAM","da":"13/03/2023","an":2023,"pa":15.0,"pv":15.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":300,"rs":"Dakar","ds":"HALWAR MULTISERVICES","pn":"MARIAMA KANE","da":"13/03/2023","an":2023,"pa":40.0,"pv":40.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":301,"rs":"Dakar","ds":"MOULT INVEST - SUARL","pn":"MOUHAMADOU LAMINE TOURE","da":"07/06/2023","an":2023,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":302,"rs":"Dakar","ds":"NEW ERA INTERNATIONAL MINING DEVELOPMENT","pn":"HUANG QILIU","da":"20/07/2023","an":2023,"pa":20.0,"pv":20.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":303,"rs":"Dakar","ds":"NEW ERA INTERNATIONAL MINING DEVELOPMENT","pn":"HUANG XIANZI","da":"20/07/2023","an":2023,"pa":30.0,"pv":30.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":304,"rs":"Dakar","ds":"NEW ERA INTERNATIONAL MINING DEVELOPMENT","pn":"JIEQI HUANG","da":"20/07/2023","an":2023,"pa":20.0,"pv":20.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":305,"rs":"Dakar","ds":"NEW ERA INTERNATIONAL MINING DEVELOPMENT","pn":"YU YANLIANG","da":"20/07/2023","an":2023,"pa":30.0,"pv":30.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":306,"rs":"Dakar","ds":"NIANY TRANSIT","pn":"ADNANE BA","da":"23/03/2023","an":2023,"pa":15.0,"pv":15.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":307,"rs":"Dakar","ds":"NIANY TRANSIT","pn":"AMINATA BASSE","da":"23/03/2023","an":2023,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":308,"rs":"Dakar","ds":"NIANY TRANSIT","pn":"FATIMATA BA","da":"23/03/2023","an":2023,"pa":10.0,"pv":10.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":309,"rs":"Dakar","ds":"NIANY TRANSIT","pn":"MOUHAMADOU BA","da":"23/03/2023","an":2023,"pa":25.0,"pv":25.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":310,"rs":"Dakar","ds":"NOGA MINE SARL","pn":"SULTAN DIOP","da":"07/09/2023","an":2023,"pa":34.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":311,"rs":"Dakar","ds":"HARANGA RESOURCES LTD","pn":"EDUARDO MANUEL PRIOR BASTOS","da":"27/01/2023","an":2023,"pa":2.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":312,"rs":"Dakar","ds":"JIN DIAN MINING","pn":"YANG QINHAI","da":"26/04/2023","an":2023,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":313,"rs":"Dakar","ds":"JIN DIAN MINING","pn":"YIYIRAN XIA","da":"26/04/2023","an":2023,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":314,"rs":"Dakar","ds":"JIWANA RESOURCES PTY.LTD","pn":"FATOU GUEYE","da":"07/03/2023","an":2023,"pa":null,"pv":null,"na":"AUSTRALIE","pr":"AUSTRALIE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":315,"rs":"Dakar","ds":"KANEL RESOURCES SARL","pn":"SYLLA","da":"08/12/2023","an":2023,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":316,"rs":"Dakar","ds":"KANEL RESOURCES SARL","pn":"WARREN FRANK MACKENZIE","da":"08/12/2023","an":2023,"pa":50.0,"pv":50.0,"na":"CANADA","pr":"CANADA","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":317,"rs":"Dakar","ds":"KARAMBA CONSTRUCTION TRANSPORT & SERVICES","pn":"ALASANE BA","da":"30/03/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":318,"rs":"Dakar","ds":"KARAMBA CONSTRUCTION TRANSPORT & SERVICES","pn":"AMINATA DIOP","da":"30/03/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":319,"rs":"Dakar","ds":"KARAMBA CONSTRUCTION TRANSPORT & SERVICES","pn":"KARAMBA KALOGA","da":"30/03/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":320,"rs":"Dakar","ds":"KHANIANG LIMITED","pn":"ABDOULAYE NIANG","da":"12/04/2023","an":2023,"pa":100.0,"pv":99.96,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":321,"rs":"Dakar","ds":"KOSMOS ENERGY INVESTMENTS SENEGAL LIMITED","pn":"KHADY DIOR NDIAYE","da":"16/06/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":322,"rs":"Dakar","ds":"L & D ECOMINING","pn":"DIARY DIALLO","da":"02/02/2023","an":2023,"pa":70.0,"pv":70.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":323,"rs":"Dakar","ds":"L & D ECOMINING","pn":"LAYTI NDIAYE","da":"02/02/2023","an":2023,"pa":30.0,"pv":30.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":324,"rs":"Dakar","ds":"LE GRAVIER","pn":"CHEIKH AHMADOU BAMBA DIENG","da":"23/05/2023","an":2023,"pa":100.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":325,"rs":"Dakar","ds":"LES MINES DU JEGUEM (MDJ)","pn":"BOUBACAR THIAW","da":"26/12/2023","an":2023,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":326,"rs":"Dakar","ds":"M&H CORPORATION","pn":"MOUHAMADOU FAYE","da":"22/08/2023","an":2023,"pa":100.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":327,"rs":"Dakar","ds":"MADISSIMO","pn":"DJIBRIL GUEYE","da":"28/04/2023","an":2023,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":328,"rs":"Dakar","ds":"MAKABINGUI GOLD OPERATION","pn":"MODOU DIOP GUENE","da":"27/01/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":329,"rs":"Dakar","ds":"MASSAWA","pn":"DAVID JACQUES MIMRAN","da":"27/01/2023","an":2023,"pa":null,"pv":null,"na":"FRANCE","pr":"FRANCE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":330,"rs":"Dakar","ds":"MASSAWA","pn":"YOUSRIYA NASSIF LOZA","da":"27/01/2023","an":2023,"pa":null,"pv":null,"na":"ÉGYPTE","pr":"ÉGYPTE","pp":true,"fp":NaN,"np":"NAGUIB ONSI SAWIRIS","gr":"Greffe"},{"id":331,"rs":"Dakar","ds":"MASSAWA","pn":"YOUSRIYA NASSIF LOZA","da":"27/01/2023","an":2023,"pa":null,"pv":null,"na":"ÉGYPTE","pr":"ÉGYPTE","pp":true,"fp":NaN,"np":"NAGUIB ONSI SAWIRIS","gr":"Greffe"},{"id":332,"rs":"Dakar","ds":"SDT NEW ENERGY TACHNOLOGY (SDTNET-SARL)","pn":"KAIXIANG SONG","da":"03/05/2023","an":2023,"pa":55.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":333,"rs":"Dakar","ds":"SDT NEW ENERGY TACHNOLOGY (SDTNET-SARL)","pn":"KARASSE KANE","da":"03/05/2023","an":2023,"pa":45.0,"pv":45.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":334,"rs":"Dakar","ds":"SEN GENERAL ACTIVITIES","pn":"ABDOULAYE BA","da":"20/04/2023","an":2023,"pa":5.0,"pv":5.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":335,"rs":"Dakar","ds":"SEN GENERAL ACTIVITIES","pn":"ALIOUNE TELEMAQUE SOW","da":"20/04/2023","an":2023,"pa":5.0,"pv":5.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":336,"rs":"Dakar","ds":"SEN GENERAL ACTIVITIES","pn":"AMADOU RACINE SOW","da":"20/04/2023","an":2023,"pa":5.0,"pv":5.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":337,"rs":"Dakar","ds":"SEN GENERAL ACTIVITIES","pn":"ELHADJI BABA SOW","da":"20/04/2023","an":2023,"pa":70.0,"pv":70.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":338,"rs":"Dakar","ds":"SEN GENERAL ACTIVITIES","pn":"NDEYE CELLE SOW","da":"20/04/2023","an":2023,"pa":5.0,"pv":5.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":339,"rs":"Dakar","ds":"SEN GENERAL ACTIVITIES","pn":"ROKHAYA DIALLO","da":"20/04/2023","an":2023,"pa":5.0,"pv":5.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":340,"rs":"Dakar","ds":"SEN GENERAL ACTIVITIES","pn":"SAMBALY","da":"20/04/2023","an":2023,"pa":5.0,"pv":5.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":341,"rs":"Dakar","ds":"SENEGAL KOM KOM PLUS","pn":"TAMSIR BABACAR","da":"29/09/2023","an":2023,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":342,"rs":"Dakar","ds":"SERTER","pn":"FATIMA ZOHRA","da":"13/03/2023","an":2023,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":343,"rs":"Dakar","ds":"SENEGAL MINERAL RESOURCES","pn":"GERARD ARTHUR KING","da":"07/06/2023","an":2023,"pa":null,"pv":null,"na":"PAKISTAN","pr":"PAKISTAN","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":344,"rs":"Dakar","ds":"SENEGAL NDINDI","pn":"BABACAR SECK","da":"21/02/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":345,"rs":"Dakar","ds":"SENEGAL NDINDI","pn":"MAME ISSA GAYE THIOYE","da":"21/02/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":346,"rs":"Dakar","ds":"SENEGAL NDINDI","pn":"ROKHAYA COULIBALY","da":"21/02/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":347,"rs":"Dakar","ds":"SONKO ET FILS SARL","pn":"BINTOU SONKO","da":"31/07/2023","an":2023,"pa":10.0,"pv":10.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":348,"rs":"Dakar","ds":"SONKO ET FILS SARL","pn":"IBRAHIM SONKO","da":"31/07/2023","an":2023,"pa":10.0,"pv":10.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":349,"rs":"Dakar","ds":"SONKO ET FILS SARL","pn":"LAMINE SONKO","da":"31/07/2023","an":2023,"pa":70.0,"pv":70.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":350,"rs":"Dakar","ds":"SONKO ET FILS SARL","pn":"MAIRAM SONKO","da":"31/07/2023","an":2023,"pa":10.0,"pv":10.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":351,"rs":"Dakar","ds":"TALIX MINES","pn":"SOULEYE SECK","da":"23/03/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":352,"rs":"Dakar","ds":"TAYSTONES SARL","pn":"AHMADDOU NDIAYE","da":"24/01/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":353,"rs":"Dakar","ds":"TAYSTONES SARL","pn":"OMAR SYLLA","da":"24/01/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":354,"rs":"Dakar","ds":"TIQ SENEGAL","pn":"MAMADOU OURY BA","da":"24/12/2023","an":2023,"pa":60.0,"pv":60.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":355,"rs":"Dakar","ds":"TIQ SENEGAL","pn":"MAMADOU SY","da":"24/12/2023","an":2023,"pa":20.0,"pv":20.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":356,"rs":"Dakar","ds":"TIQ SENEGAL","pn":"PAPA OUSMANE BADJI","da":"24/12/2023","an":2023,"pa":20.0,"pv":20.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":357,"rs":"Dakar","ds":"TOTALENERGIES EP SENEGAL","pn":"MOHAMED KHALED KOUKI","da":"09/10/2023","an":2023,"pa":null,"pv":null,"na":"FRANCE","pr":"FRANCE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":358,"rs":"Dakar","ds":"YELLOW GROUND SENEGAL SAS","pn":"AMADOU AIDARA","da":"01/12/2023","an":2023,"pa":14.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":359,"rs":"Dakar","ds":"YELLOW GROUND SENEGAL SAS","pn":"JULIEN ALEXANDRE COURCHET","da":"01/12/2023","an":2023,"pa":30.0,"pv":null,"na":"FRANCE","pr":"FRANCE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":360,"rs":"Dakar","ds":"YELLOW GROUND SENEGAL SAS","pn":"MICHEL WALTER ANGE HEER","da":"01/12/2023","an":2023,"pa":14.0,"pv":null,"na":"FRANCE","pr":"FRANCE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":361,"rs":"Dakar","ds":"YELLOW GROUND SENEGAL SAS","pn":"MOUHAMADOU SY","da":"01/12/2023","an":2023,"pa":14.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":362,"rs":"Dakar","ds":"YELLOW GROUND SENEGAL SAS","pn":"NGOM IBRAHIMA","da":"01/12/2023","an":2023,"pa":13.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":363,"rs":"Dakar","ds":"YELLOW GROUND SENEGAL SAS","pn":"OILIVIER MARC HEER","da":"01/12/2023","an":2023,"pa":15.0,"pv":null,"na":"FRANCE","pr":"FRANCE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":364,"rs":"Diourbel","ds":"ENTREPRISE DAROU SALAM TAWFEX","pn":"IBRAHIMA GAYE","da":"27/04/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":365,"rs":"Diourbel","ds":"Entreprise Générale Darou Salam (EGDS)","pn":"SERIGNE ASSA FALLE GAYE","da":"18/04/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":366,"rs":"Diourbel","ds":"ENTREPRISE GENERALE DE TRAVAUX PUBLICS ET BATIMENTS(EGTPB)","pn":"AMADOU GAYE","da":"22/03/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":367,"rs":"Diourbel","ds":"NIANE ET FRERES","pn":"SERIGNE MBACKE NIANE","da":"09/01/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":368,"rs":"Dakar","ds":"SOCIETE MINIERE DE LA VALLEE DU FLEUVE SENEGAL / SOMIVA","pn":"GEORGES MICHEL DOUMET","da":"14/12/2023","an":2023,"pa":null,"pv":null,"na":"LIBAN","pr":"LIBAN","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":369,"rs":"Dakar","ds":"SOCIETE MINIERE DE LA VALLEE DU FLEUVE SENEGAL / SOMIVA","pn":"PAPE CHEIKH AMADOU AMAR","da":"14/12/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":370,"rs":"Dakar","ds":"SOCIETE D'EXPLOITATION DE LOGISTIQUE ET DE TRAVAUX","pn":"MAMADOU LAMINE KEITA","da":"18/04/2023","an":2023,"pa":100.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":371,"rs":"Dakar","ds":"SUPER SALE","pn":"SAMBA GADIAGA","da":"26/04/2023","an":2023,"pa":100.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":372,"rs":"Dakar","ds":"SOCIETE SENEGALAISE DE PHOSPHATES DE THIES (SSPT)","pn":"FRANCOIS CHERPION","da":"12/06/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":373,"rs":"Diourbel","ds":"TOUBA DENDEYE","pn":"ABDOU SYLLA","da":"24/05/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":374,"rs":"Kaolack","ds":"TERRACALCO SENEGAL","pn":"BERNARD RAYMOND ORTEGAT","da":"17/11/2023","an":2023,"pa":null,"pv":null,"na":"BELGIQUE","pr":"BELGIQUE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":375,"rs":"Kédougou","ds":"BENKANTO","pn":"ABDOURAHMANE BA","da":"14/04/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":376,"rs":"Kédougou","ds":"BENKANTO","pn":"ADAMA CISSOKHO","da":"14/04/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":377,"rs":"Kédougou","ds":"BENKANTO","pn":"ADAMA DIALLO","da":"14/04/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":378,"rs":"Kédougou","ds":"BENKANTO","pn":"BANGALY FODE SAKHO","da":"14/04/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":379,"rs":"Kédougou","ds":"BENKANTO","pn":"BINTOU MADY DRAME","da":"14/04/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":380,"rs":"Kédougou","ds":"BENKANTO","pn":"BOUBACAR SOUARE","da":"14/04/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":381,"rs":"Kédougou","ds":"BENKANTO","pn":"DJIMO SOUARE","da":"14/04/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":382,"rs":"Kédougou","ds":"BENKANTO","pn":"FANTA CISSE SOUARE","da":"14/04/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":383,"rs":"Kédougou","ds":"BENKANTO","pn":"FATOU SAKHO","da":"14/04/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":384,"rs":"Kédougou","ds":"BENKANTO","pn":"FILY CAMARA","da":"14/04/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":385,"rs":"Kédougou","ds":"BENKANTO","pn":"IBRAHIMA CISSOKHO","da":"14/04/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":386,"rs":"Kédougou","ds":"BENKANTO","pn":"IBRAHIMA SORY KEITA","da":"14/04/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":387,"rs":"Kédougou","ds":"BENKANTO","pn":"KARAMOKHODING SAKHO","da":"14/04/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":388,"rs":"Kédougou","ds":"BENKANTO","pn":"LOLO CAMARA","da":"14/04/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":389,"rs":"Kédougou","ds":"BENKANTO","pn":"MAMADOU SAKHO","da":"14/04/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":390,"rs":"Kédougou","ds":"BENKANTO","pn":"MAMADOU SOUARE","da":"14/04/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":391,"rs":"Kédougou","ds":"BENKANTO","pn":"MARIAMA DIALLO","da":"14/04/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":392,"rs":"Kédougou","ds":"BENKANTO","pn":"MOUSSA CISSOKHO","da":"14/04/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":393,"rs":"Kédougou","ds":"BENKANTO","pn":"MOUSSA MOISE CAMARA","da":"14/04/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":394,"rs":"Kédougou","ds":"BENKANTO","pn":"OUMAR DIALLO","da":"14/04/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":395,"rs":"Kédougou","ds":"BENKANTO","pn":"RAMATA KEBE","da":"14/04/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":396,"rs":"Kédougou","ds":"BENKANTO","pn":"SADIO SADIAKHOU","da":"14/04/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":397,"rs":"Kédougou","ds":"BENKANTO","pn":"SAKHALE KABA","da":"14/04/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":398,"rs":"Kédougou","ds":"BENKANTO","pn":"SALIMOU DRAME","da":"14/04/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":399,"rs":"Kédougou","ds":"BENKANTO","pn":"SAMBA DIALLO","da":"14/04/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":400,"rs":"Kédougou","ds":"BENKANTO","pn":"SATOU SAKHO","da":"14/04/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":401,"rs":"Kédougou","ds":"BENKANTO","pn":"SORY SOUARE","da":"14/04/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":402,"rs":"Kédougou","ds":"BIGSAM OR","pn":"KWAMI SESSI GAYI","da":"19/05/2023","an":2023,"pa":20.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":403,"rs":"Kédougou","ds":"BIGSAM OR","pn":"XIAMING ZHANG","da":"19/05/2023","an":2023,"pa":80.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":404,"rs":"Kédougou","ds":"BINKHANTO BAITOULAYE","pn":"BAMBO DIABY","da":"24/06/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":405,"rs":"Kédougou","ds":"BINKHANTO BAITOULAYE","pn":"BANNA TOUNKARA","da":"24/06/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":406,"rs":"Kédougou","ds":"BINKHANTO BAITOULAYE","pn":"LAMINE DIABY","da":"24/06/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":407,"rs":"Kédougou","ds":"COMPTOIR D'OR DE LA REGION ( C.OR.R)","pn":"AMADOU THIAM","da":"06/03/2023","an":2023,"pa":15.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":408,"rs":"Kédougou","ds":"COMPTOIR D'OR DE LA REGION ( C.OR.R)","pn":"IBRAHIMA HANE","da":"06/03/2023","an":2023,"pa":35.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":409,"rs":"Kédougou","ds":"COMPTOIR D'OR DE LA REGION ( C.OR.R)","pn":"MANSOUR AMADOU SOW","da":"06/03/2023","an":2023,"pa":18.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":410,"rs":"Kédougou","ds":"COMPTOIR D'OR DE LA REGION ( C.OR.R)","pn":"SAME MBAYE NIASSE","da":"06/03/2023","an":2023,"pa":32.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":411,"rs":"Kédougou","ds":"DIAGNE ET FRERES ( SARAYA)","pn":"ABDOUL KARIMOU CISSOKHO","da":"24/03/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":412,"rs":"Kédougou","ds":"DIAGNE ET FRERES ( SARAYA)","pn":"AMADOU DIANGO","da":"24/03/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":413,"rs":"Kédougou","ds":"DIAGNE ET FRERES ( SARAYA)","pn":"DAOUDA KANE","da":"24/03/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":414,"rs":"Kédougou","ds":"DIAGNE ET FRERES ( SARAYA)","pn":"MARIAMA GUEYE","da":"24/03/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":415,"rs":"Kédougou","ds":"DIAGNE ET FRERES ( SARAYA)","pn":"OUMY DIAGNE","da":"24/03/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":416,"rs":"Kédougou","ds":"DIAGNE ET FRERES ( SARAYA)","pn":"SALIOU DIAGNE","da":"24/03/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":417,"rs":"Kédougou","ds":"ETABLISSEMENT SEGA ET FRERES","pn":"SEGA KANTE","da":"24/06/2023","an":2023,"pa":100.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":418,"rs":"Kédougou","ds":"GAYI SUARL","pn":"KWAMI SESSI GAYI","da":"20/04/2023","an":2023,"pa":100.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":419,"rs":"Kédougou","ds":"KANOUMERY","pn":"BAGNAN SIDIBE","da":"15/09/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":420,"rs":"Kédougou","ds":"KANOUMERY","pn":"HASSANA DIALLO","da":"15/09/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":421,"rs":"Kédougou","ds":"KANOUMERY","pn":"TIDIANE KEITA","da":"15/09/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":422,"rs":"Kédougou","ds":"KHAMBEN TEINKOTO NDIN","pn":"ANDRE SADIAKHOU","da":"24/06/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":423,"rs":"Kédougou","ds":"KHAMBEN TEINKOTO NDIN","pn":"KALY KEITA","da":"24/06/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":424,"rs":"Kédougou","ds":"KHAMBEN TEINKOTO NDIN","pn":"MOSSA SADIAKHOU","da":"24/06/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":425,"rs":"Kédougou","ds":"KOLIA","pn":"BAMBA SEKHOU DANSOKHO","da":"24/06/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":426,"rs":"Kédougou","ds":"KOLIA","pn":"DIALI SOUO CISSOKHO","da":"24/06/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":427,"rs":"Kédougou","ds":"KOLIA","pn":"SEGA KANTE","da":"24/06/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":428,"rs":"Kédougou","ds":"SYLLA COUNDA","pn":"ANSOUMANE CISSOKHO","da":"30/01/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":429,"rs":"Kédougou","ds":"SYLLA COUNDA","pn":"BINTOU SOUARE","da":"30/01/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":430,"rs":"Kédougou","ds":"SYLLA COUNDA","pn":"DIADIE KABA","da":"30/01/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":431,"rs":"Kédougou","ds":"SYLLA COUNDA","pn":"FAMARA KABA","da":"30/01/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":432,"rs":"Kédougou","ds":"SYLLA COUNDA","pn":"FANTA FOUNE SOUARE","da":"30/01/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":433,"rs":"Kédougou","ds":"SYLLA COUNDA","pn":"IBRAHIMA CISSOKHO","da":"30/01/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":434,"rs":"Kédougou","ds":"SYLLA COUNDA","pn":"KAMIDOU KABA","da":"30/01/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":435,"rs":"Kédougou","ds":"SYLLA COUNDA","pn":"LAMINE KABA","da":"30/01/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":436,"rs":"Kédougou","ds":"SYLLA COUNDA","pn":"LAMINE KONARE","da":"30/01/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":437,"rs":"Dakar","ds":"GADDE","pn":"GUEYE","da":"12/09/2023","an":2023,"pa":100.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":438,"rs":"Dakar","ds":"LAYE BEYE","pn":"LAYE BEYE","da":"10/02/2023","an":2023,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":439,"rs":"Kédougou","ds":"SYLLA COUNDA","pn":"MBALOUDI DIABY","da":"30/01/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":440,"rs":"Kédougou","ds":"SYLLA COUNDA","pn":"SORY KABA","da":"30/01/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":441,"rs":"Kédougou","ds":"SYLLA COUNDA","pn":"SOUAREBA SOUARE","da":"30/01/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":442,"rs":"Mbour","ds":"\"GRACE GOLD COMPANY SENEGAL\"","pn":"KOFFI FELIX EKRA","da":"24/07/2023","an":2023,"pa":null,"pv":null,"na":"CANADA","pr":"CANADA","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":443,"rs":"Mbour","ds":"\"GRACE GOLD COMPANY SENEGAL\"","pn":"PIERRE ALAIN BIRAME NDONG","da":"24/07/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":444,"rs":"Mbour","ds":"\"GRACE GOLD COMPANY SENEGAL\"","pn":"ROSALIE NDIAYE SENE","da":"24/07/2023","an":2023,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":445,"rs":"Tambacounda","ds":"ETS ABDOULAHAT MBAYE","pn":"Abdou Lahat  Mbaye","da":"16/10/2023","an":2023,"pa":2.0,"pv":2.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":446,"rs":"Thiès","ds":"GIE \" E.B.T.S \" ( ENTREPRISE BATIMENT TRAVAUX SARR)","pn":"BADJI FATOU KINE","da":"03/05/2023","an":2023,"pa":15.0,"pv":15.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":447,"rs":"Thiès","ds":"GIE \" E.B.T.S \" ( ENTREPRISE BATIMENT TRAVAUX SARR)","pn":"SARR CHEIKH","da":"03/05/2023","an":2023,"pa":70.0,"pv":70.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":448,"rs":"Thiès","ds":"GIE \" E.B.T.S \" ( ENTREPRISE BATIMENT TRAVAUX SARR)","pn":"SARR MATY","da":"03/05/2023","an":2023,"pa":15.0,"pv":15.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":449,"rs":"Dakar","ds":"X.W.O","pn":"LONZHANG WEI","da":"11/04/2023","an":2023,"pa":33.0,"pv":33.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":450,"rs":"Dakar","ds":"UTK MINING SENEGAL","pn":"KAIXIANG SONG","da":"10/05/2023","an":2023,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":451,"rs":"Dakar","ds":"TOUBA MINERAL RESSOURCES","pn":"DAME DIENG","da":"14/08/2023","an":2023,"pa":100.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":452,"rs":"Dakar","ds":"X.W.O","pn":"XIFU YANG","da":"11/04/2023","an":2023,"pa":33.0,"pv":33.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":453,"rs":"Dakar","ds":"X.W.O","pn":"YIYIRAN XIA","da":"11/04/2023","an":2023,"pa":34.0,"pv":34.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":454,"rs":"Dakar","ds":"WEST WIND-SA","pn":"MOHAMED KAGNASSY","da":"14/03/2024","an":2024,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":455,"rs":"Dakar","ds":"WALY DIOUF PARTNERS SOLUTION","pn":"WALY DIOUF","da":"12/01/2024","an":2024,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":456,"rs":"Ziguinchor","ds":"SENEGALAISE DE DISTRIBUTION AGROALIMENTAIRE  en abrégé  \"SE.D.ALI\" S.A.R.L","pn":"AMADOU MALICK SONKO","da":"22/10/2024","an":2024,"pa":35.0,"pv":35.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":457,"rs":"Dakar","ds":"MININVEST S.A","pn":"GEORGES MICHEL DOUMET","da":"15/02/2024","an":2024,"pa":null,"pv":null,"na":"LIBAN","pr":"LIBAN","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":458,"rs":"Mbour","ds":"GEOTEC","pn":"EDUARDO MANUEL PRIOR BASTOS","da":"27/03/2024","an":2024,"pa":2.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":459,"rs":"Dakar","ds":"AD GLOD","pn":"ABDOULATIF BOUSSO","da":"26/11/2024","an":2024,"pa":33.0,"pv":33.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":460,"rs":"Dakar","ds":"AD GLOD","pn":"ABDOULAYE DIOP","da":"26/11/2024","an":2024,"pa":34.0,"pv":34.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":461,"rs":"Dakar","ds":"AD GLOD","pn":"DIEYNABA DIALLO","da":"26/11/2024","an":2024,"pa":33.0,"pv":33.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":462,"rs":"Ziguinchor","ds":"SENEGALAISE DE DISTRIBUTION AGROALIMENTAIRE  en abrégé  \"SE.D.ALI\" S.A.R.L","pn":"CHEIKH MOHAMED FADEL SONKO","da":"22/10/2024","an":2024,"pa":30.0,"pv":30.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":463,"rs":"Ziguinchor","ds":"SENEGALAISE DE DISTRIBUTION AGROALIMENTAIRE  en abrégé  \"SE.D.ALI\" S.A.R.L","pn":"IBRAHIMA KHALILE SONKO","da":"22/10/2024","an":2024,"pa":35.0,"pv":35.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":464,"rs":"Dakar","ds":"BAOBAB GOLD (BG SARL)","pn":"ELHASJI MAKHA SANKHARE","da":"09/07/2024","an":2024,"pa":25.0,"pv":25.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":465,"rs":"Dakar","ds":"BAOBAB GOLD (BG SARL)","pn":"AMADOU DIOP GUEYE","da":"09/07/2024","an":2024,"pa":75.0,"pv":75.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":466,"rs":"Dakar","ds":"BATIR MON PAYS","pn":"DJIBRIL NDIME","da":"29/03/2024","an":2024,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":467,"rs":"Dakar","ds":"BLY SENEGAL","pn":"GUILLAUME JEAN HENRI DUBUY","da":"22/11/2024","an":2024,"pa":null,"pv":null,"na":"FRANCE","pr":"FRANCE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":468,"rs":"Dakar","ds":"SOCIETE GENERALE DES MINES (SGM)","pn":"ALIOUNE CISSE","da":"09/02/2024","an":2024,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":469,"rs":"Dakar","ds":"SOCIETE GENERALE DES MINES (SGM)","pn":"IBRAHIMA MBACKE","da":"09/02/2024","an":2024,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":470,"rs":"Thiès","ds":"DIA COMPANY","pn":"DIA MANSOUR","da":"17/10/2024","an":2024,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":471,"rs":"Thiès","ds":"EAUX SOUTERRAINES DU SENEGAL en abrégé ESS","pn":"ALAEDDIN MOHAMAD","da":"02/01/2024","an":2024,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":472,"rs":"Thiès","ds":"\" CANSEN ENERGY RESSOURCES \" SAS","pn":"CLEMENT ALPHONSE NDIAYE","da":"31/07/2024","an":2024,"pa":22.5,"pv":22.5,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":473,"rs":"Tambacounda","ds":"BENKHANGHO","pn":"SOULEYMANE KANTE","da":"05/12/2024","an":2024,"pa":null,"pv":25.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":474,"rs":"Thiès","ds":"\" CANSEN ENERGY RESSOURCES \" SAS","pn":"MAHOMAD BACHIR","da":"31/07/2024","an":2024,"pa":15.0,"pv":15.0,"na":"CANADA","pr":"CANADA","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":475,"rs":"Thiès","ds":"\" CANSEN ENERGY RESSOURCES \" SAS","pn":"MAMADOU ALPHA BARRY","da":"31/07/2024","an":2024,"pa":10.0,"pv":10.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":476,"rs":"Thiès","ds":"\" CANSEN ENERGY RESSOURCES \" SAS","pn":"NZUE NZUE FREEDY","da":"31/07/2024","an":2024,"pa":15.0,"pv":15.0,"na":"CANADA","pr":"CANADA","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":477,"rs":"Dakar","ds":"LAMTORO NATURAL RESOURCES","pn":"IBRAHIMA DIAW","da":"12/01/2024","an":2024,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":478,"rs":"Dakar","ds":"LE FATAA","pn":"YAKHYA DIOP","da":"26/07/2024","an":2024,"pa":100.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":479,"rs":"Dakar","ds":"EX. & CO SARL","pn":"POUYE","da":"12/01/2024","an":2024,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":480,"rs":"Dakar","ds":"FAYMINING CORPORATE","pn":"ABDOU DIOUF","da":"10/09/2024","an":2024,"pa":25.0,"pv":25.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":481,"rs":"Dakar","ds":"FAYMINING CORPORATE","pn":"BIRAME FAYE","da":"10/09/2024","an":2024,"pa":75.0,"pv":75.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":482,"rs":"Dakar","ds":"GAGNICK MINES","pn":"NDEYE DIOUMA DIAGNE","da":"16/12/2024","an":2024,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":483,"rs":"Dakar","ds":"GAMMA CORPORATE","pn":"NGOM IBRAHIMA","da":"06/09/2024","an":2024,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":484,"rs":"Dakar","ds":"GAMMA CORPORATE","pn":"SY MOUHAMADOU","da":"06/09/2024","an":2024,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":485,"rs":"Dakar","ds":"GOLDEN KADJOR","pn":"AMADOU DIOP GUEYE","da":"15/05/2024","an":2024,"pa":25.0,"pv":25.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":486,"rs":"Dakar","ds":"SAHAD COMPAGNY","pn":"BARA DIOUF NDIAYE","da":"04/07/2024","an":2024,"pa":5.0,"pv":5.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":487,"rs":"Dakar","ds":"SAHAD COMPAGNY","pn":"EMMANUEL DIOH","da":"04/07/2024","an":2024,"pa":95.0,"pv":95.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":488,"rs":"Dakar","ds":"SAM INVEST","pn":"KHADIDIATOU SARR","da":"18/03/2024","an":2024,"pa":20.0,"pv":20.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":489,"rs":"Dakar","ds":"SAM INVEST","pn":"MAMADOU SARR","da":"18/03/2024","an":2024,"pa":80.0,"pv":80.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":490,"rs":"Dakar","ds":"LOGICOM SN","pn":"ABDOU WAHAB DIOP","da":"29/02/2024","an":2024,"pa":5.0,"pv":5.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":491,"rs":"Dakar","ds":"LOGICOM SN","pn":"MOUHAMADOU MOUSTAPHA DIOP","da":"29/02/2024","an":2024,"pa":90.0,"pv":90.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":492,"rs":"Dakar","ds":"LOGICOM SN","pn":"SERIGNE BAMBA MBACKE DIOP","da":"29/02/2024","an":2024,"pa":5.0,"pv":5.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":493,"rs":"Dakar","ds":"GANGUE TOUS TRAVAUX (G2T)","pn":"AMRANE HAMADY GANGUE","da":"27/03/2024","an":2024,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":494,"rs":"Dakar","ds":"GENERALE DE COMMERCE ET D'INDUSTRIE (GECI))","pn":"OUMAR SYLLA","da":"18/04/2024","an":2024,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":495,"rs":"Dakar","ds":"GOLDEN KADJOR","pn":"MAMADOU DENAGO SARRE","da":"15/05/2024","an":2024,"pa":75.0,"pv":75.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":496,"rs":"Dakar","ds":"ENTREPRISE DE RECHERCHE ET D'EXPLOITATION MINIERE (EREM)","pn":"ABDOU SALAM MBACKE","da":"09/02/2024","an":2024,"pa":30.0,"pv":30.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":497,"rs":"Dakar","ds":"ENTREPRISE DE RECHERCHE ET D'EXPLOITATION MINIERE (EREM)","pn":"ALIOUNE CISSE","da":"09/02/2024","an":2024,"pa":30.0,"pv":30.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":498,"rs":"Dakar","ds":"ENTREPRISE DE RECHERCHE ET D'EXPLOITATION MINIERE (EREM)","pn":"IBRAHIMA MBACKE","da":"09/02/2024","an":2024,"pa":40.0,"pv":40.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":499,"rs":"Thiès","ds":"\" CANSEN ENERGY RESSOURCES \" SAS","pn":"ONGALI RUPHIN GLAISE","da":"31/07/2024","an":2024,"pa":15.0,"pv":15.0,"na":"CANADA","pr":"CANADA","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":500,"rs":"Dakar","ds":"SEN MINES GROUP","pn":"YAN ZHANG","da":"02/07/2024","an":2024,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":501,"rs":"Thiès","ds":"\" CANSEN ENERGY RESSOURCES \" SAS","pn":"OUSSEYNOU NDIAYE","da":"31/07/2024","an":2024,"pa":22.5,"pv":22.5,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":502,"rs":"Thiès","ds":"\" GEOSCIENCES AND PROCESS SERVICES \" SARL","pn":"NDIAYE MAMADOU","da":"15/04/2024","an":2024,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":503,"rs":"Dakar","ds":"SODA HOLDING COMPANY SUARL","pn":"ADAMA DIONGUE","da":"28/03/2024","an":2024,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":504,"rs":"Dakar","ds":"COMPAGNIE KHADIMOU RASSOUL","pn":"IGINIO TERZI","da":"08/03/2024","an":2024,"pa":14.0,"pv":null,"na":"ITALIE","pr":"ITALIE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":505,"rs":"Dakar","ds":"COMPAGNIE KHADIMOU RASSOUL","pn":"SECK SOKHNA MOUSLINE","da":"08/03/2024","an":2024,"pa":23.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":506,"rs":"Dakar","ds":"COMPAGNIE KHADIMOU RASSOUL","pn":"THIAM","da":"08/03/2024","an":2024,"pa":13.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":507,"rs":"Dakar","ds":"HINDOR","pn":"AMADOU DIOP GUEYE","da":"03/07/2024","an":2024,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":508,"rs":"Dakar","ds":"HAILITHEN","pn":"SULTAN DIOP","da":"26/07/2024","an":2024,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":509,"rs":"Dakar","ds":"HINDOR","pn":"AMADOU DIOP GUEYE","da":"03/07/2024","an":2024,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":510,"rs":"Dakar","ds":"HAILITHEN","pn":"SULTAN DIOP","da":"26/07/2024","an":2024,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":511,"rs":"Dakar","ds":"COMPAGNIE KHADIMOU RASSOUL","pn":"WILSON BELLI","da":"08/03/2024","an":2024,"pa":50.0,"pv":null,"na":"ITALIE","pr":"ITALIE","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":512,"rs":"Dakar","ds":"CONSULTING BUSINESS AGENCY","pn":"TSENG LUNG YI","da":"02/02/2024","an":2024,"pa":null,"pv":70.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":513,"rs":"Dakar","ds":"CONSULTING BUSINESS AGENCY","pn":"TSENG PING-FU","da":"02/02/2024","an":2024,"pa":30.0,"pv":30.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":514,"rs":"Dakar","ds":"DARA SALAM","pn":"KARASSE KANE","da":"28/03/2024","an":2024,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":515,"rs":"Dakar","ds":"ECOSEC","pn":"DIEYE DOUDOU","da":"26/07/2024","an":2024,"pa":100.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":516,"rs":"Dakar","ds":"DIAMOND OFFSHORE DRILLING SENEGAL","pn":"SALIOU CISSE","da":"20/03/2024","an":2024,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":517,"rs":"Dakar","ds":"DADICO","pn":"DAOUR DIENG","da":"26/01/2024","an":2024,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":518,"rs":"Thiès","ds":"\" SOGEMIC \" SARL","pn":"SECK FATOU KHADY","da":"16/05/2024","an":2024,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":519,"rs":"Dakar","ds":"ALLIANCE GOLD","pn":"AMADOU DIOP GUEYE","da":"12/11/2024","an":2024,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":520,"rs":"Dakar","ds":"ALLIANCE GOLD","pn":"MOMAR DIOP","da":"12/11/2024","an":2024,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":521,"rs":"Dakar","ds":"SANTANG NEGOCE INVESTMENT","pn":"BABACAR THIAM","da":"18/01/2024","an":2024,"pa":90.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":522,"rs":"Dakar","ds":"TERANGA HORIZON","pn":"CHEIKH AHMET TIDIANE DIOP","da":"16/07/2024","an":2024,"pa":50.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":523,"rs":"Dakar","ds":"TERANGA HORIZON","pn":"MAMADOU MANDE GUEYE","da":"16/07/2024","an":2024,"pa":50.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":524,"rs":"Dakar","ds":"SANTANG NEGOCE INVESTMENT","pn":"ELHADJI BITEYE","da":"18/01/2024","an":2024,"pa":10.0,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":525,"rs":"Dakar","ds":"SANTARGILE","pn":"ABDOULAYE NDIOGOU SAMB","da":"06/01/2024","an":2024,"pa":21.0,"pv":21.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":526,"rs":"Dakar","ds":"SANTARGILE","pn":"AMINATA SALL","da":"06/01/2024","an":2024,"pa":27.0,"pv":27.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":527,"rs":"Dakar","ds":"SANTARGILE","pn":"CHEIKHOU FAYE","da":"06/01/2024","an":2024,"pa":5.0,"pv":5.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":528,"rs":"Dakar","ds":"SANTARGILE","pn":"KHADY LENA SY","da":"06/01/2024","an":2024,"pa":5.0,"pv":5.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":529,"rs":"Dakar","ds":"SANTARGILE","pn":"MAMADOU SY","da":"06/01/2024","an":2024,"pa":23.0,"pv":23.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":530,"rs":"Dakar","ds":"SANTARGILE","pn":"MASSAMBA MAMADOU SY","da":"06/01/2024","an":2024,"pa":5.0,"pv":5.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":531,"rs":"Dakar","ds":"SANTARGILE","pn":"MIKIDACH MAMADOU SY","da":"06/01/2024","an":2024,"pa":5.0,"pv":5.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":532,"rs":"Dakar","ds":"SANTARGILE","pn":"MOCTAR ALIOUNE SADIAN SALL","da":"06/01/2024","an":2024,"pa":4.0,"pv":4.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":533,"rs":"Dakar","ds":"SANTARGILE","pn":"SAMBA MAMADOU SY","da":"06/01/2024","an":2024,"pa":5.0,"pv":5.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":534,"rs":"Kédougou","ds":"BANTAL DE BEROLA","pn":"ABDOULAYE DIALLO","da":"06/01/2024","an":2024,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":535,"rs":"Kédougou","ds":"BANTAL DE BEROLA","pn":"AMADOU BA","da":"06/01/2024","an":2024,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":536,"rs":"Kédougou","ds":"BANTAL DE BEROLA","pn":"AMADOU DIALLO","da":"06/01/2024","an":2024,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":537,"rs":"Dakar","ds":"MAXIMERIT","pn":"DAOUR DIENG","da":"26/01/2024","an":2024,"pa":40.0,"pv":40.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":538,"rs":"Dakar","ds":"MAXIMERIT","pn":"GHADA DIOKHANE","da":"26/01/2024","an":2024,"pa":30.0,"pv":30.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":539,"rs":"Dakar","ds":"MAXIMERIT","pn":"JOSEPH PREIRA","da":"26/01/2024","an":2024,"pa":30.0,"pv":30.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":540,"rs":"Dakar","ds":"MC TRANSPORT AND TRADING (MC2T)","pn":"ALIOUNE CISSE","da":"09/02/2024","an":2024,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":541,"rs":"Dakar","ds":"MC TRANSPORT AND TRADING (MC2T)","pn":"IBRAHIMA MBACKE","da":"09/02/2024","an":2024,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":542,"rs":"Dakar","ds":"NOGAYE BUSINESS CONSULTING COMPANY","pn":"YAYE NOGAYE DIOP","da":"16/02/2024","an":2024,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":543,"rs":"Dakar","ds":"NOV OIL & GAS SERVICES SENEGAL","pn":"TREVOR BRIAN MARTIN","da":"15/03/2024","an":2024,"pa":null,"pv":null,"na":"ÉTATS-UNIS","pr":"ÉTATS-UNIS","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":544,"rs":"Dakar","ds":"PANAFRICAN MINERAL RESOURCES (PMR SAS)","pn":"ABDOUL AZIZ NDIAYE","da":"12/12/2024","an":2024,"pa":30.0,"pv":30.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":545,"rs":"Dakar","ds":"PANAFRICAN MINERAL RESOURCES (PMR SAS)","pn":"CHEIKH IBRAHIMA FAYE","da":"12/12/2024","an":2024,"pa":30.0,"pv":30.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":546,"rs":"Dakar","ds":"PANAFRICAN MINERAL RESOURCES (PMR SAS)","pn":"IBRAHIMA DIAW","da":"12/12/2024","an":2024,"pa":40.0,"pv":40.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":547,"rs":"Dakar","ds":"PIKINE MINING","pn":"AMADOU DIOP","da":"08/02/2024","an":2024,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":548,"rs":"Dakar","ds":"PROSPECTIUNI","pn":"TENDER NICOLETA-DANIELA","da":"24/06/2024","an":2024,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":549,"rs":"Dakar","ds":"Q M D COMPANY","pn":"CHEN FANG","da":"20/03/2024","an":2024,"pa":5.0,"pv":5.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":550,"rs":"Dakar","ds":"Q M D COMPANY","pn":"EMMANUEL DIOH","da":"20/03/2024","an":2024,"pa":5.0,"pv":5.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":551,"rs":"Dakar","ds":"Q M D COMPANY","pn":"QIN MINGFU","da":"20/03/2024","an":2024,"pa":90.0,"pv":90.0,"na":"SÉNÉGAL","pr":"SÉNÉGAL","pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":552,"rs":"Dakar","ds":"SINOHYDRO SENEGAL-SARL","pn":"LIU YANLONG","da":"28/08/2025","an":2025,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":553,"rs":"Dakar","ds":"AMSA GROUP AFRICA SA","pn":"KARIM HARATI","da":"25/08/2025","an":2025,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":554,"rs":"Thiès","ds":"\" ETABLISSEMENT MAODO MINES \" SARL","pn":"DIOME MALICK","da":"22/08/2025","an":2025,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":555,"rs":"Thiès","ds":"\" ETABLISSEMENT MAODO MINES \" SARL","pn":"GAYE ASSANE","da":"22/08/2025","an":2025,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":556,"rs":"Dakar","ds":"COMPAGNIE SAKHO C.S","pn":"ABDOU SAKHO","da":"08/08/2025","an":2025,"pa":100.0,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":557,"rs":"Kédougou","ds":"GIE MAGNANKANTY","pn":"KOUMOUNA SADIAKHOU","da":"07/08/2025","an":2025,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":558,"rs":"Kédougou","ds":"GIE MAGNANKANTY","pn":"MAKHAN CAMARA","da":"07/08/2025","an":2025,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":559,"rs":"Kédougou","ds":"GIE MAGNANKANTY","pn":"TAMBA SADIAKHOU","da":"07/08/2025","an":2025,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":560,"rs":"Kédougou","ds":"BENCOUTA DE SAMECOUTA","pn":"ALIOU CAMARA","da":"07/08/2025","an":2025,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":561,"rs":"Kédougou","ds":"BENCOUTA DE SAMECOUTA","pn":"DJIBGUIBA DIAKHABY","da":"07/08/2025","an":2025,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":562,"rs":"Kédougou","ds":"BENCOUTA DE SAMECOUTA","pn":"LAMINE DABO","da":"07/08/2025","an":2025,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":563,"rs":"Kédougou","ds":"GIE COUMBOUTOUROU","pn":"FODE DANFAKHA","da":"06/08/2025","an":2025,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":564,"rs":"Mbour","ds":"\"GIE GARAGE SOUF\"","pn":"CHEIKH GUEYE","da":"06/08/2025","an":2025,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":565,"rs":"Thiès","ds":"\" P.S.S SERVICES MINES ET CARRIERES\" SARL","pn":"ALIOUNE DIALLO","da":"03/06/2025","an":2025,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":566,"rs":"Thiès","ds":"\" P.S.S SERVICES MINES ET CARRIERES\" SARL","pn":"SALL PAPA SANGONE","da":"03/06/2025","an":2025,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":567,"rs":"Dakar","ds":"TRANSPORT NAR GAYE SUARL","pn":"MAGATTE GAYE","da":"23/05/2025","an":2025,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":568,"rs":"Dakar","ds":"LES MINES DE LUMIERE","pn":"ALIOU CISSE","da":"07/05/2025","an":2025,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":569,"rs":"Mbour","ds":"\"EBD ENTREPRISE\" SUARL","pn":"BOUGAR DIOUF","da":"29/04/2025","an":2025,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":570,"rs":"Dakar","ds":"SOCIETE SAHELIENNE D'ENTREPRISE (SSE)","pn":"IBRAHIMA NGOM","da":"23/04/2025","an":2025,"pa":25.0,"pv":25.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":571,"rs":"Dakar","ds":"SOCIETE SAHELIENNE D'ENTREPRISE (SSE)","pn":"MOUHAMADOU SY","da":"23/04/2025","an":2025,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":572,"rs":"Dakar","ds":"SOCIETE SAHELIENNE D'ENTREPRISE (SSE)","pn":"OUSSEYNOU NDOUR","da":"23/04/2025","an":2025,"pa":25.0,"pv":25.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":573,"rs":"Kédougou","ds":"PITABOULOUNG DE SYLLABOUNDA","pn":"ALIOU SOUARE","da":"23/04/2025","an":2025,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":574,"rs":"Kédougou","ds":"PITABOULOUNG DE SYLLABOUNDA","pn":"IBRAHIMA SAKHO","da":"23/04/2025","an":2025,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":575,"rs":"Kédougou","ds":"PITABOULOUNG DE SYLLABOUNDA","pn":"SEKHOU SOUARE","da":"23/04/2025","an":2025,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":576,"rs":"Dakar","ds":"KAIXUN GOLD MINING CO.LTD (K.G.M CO.LTD)","pn":"CAILIN ZHU","da":"18/04/2025","an":2025,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":577,"rs":"Dakar","ds":"SWANI MINES-SA","pn":"DINESH GOVIND GORASIYA","da":"14/04/2025","an":2025,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":578,"rs":"Dakar","ds":"PETROLEUM SENEGAL INDUSTRIES (P.S.I)","pn":"BRUNO VICTOR LOUIS DERNEVILLE","da":"14/04/2025","an":2025,"pa":34.0,"pv":34.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":579,"rs":"Dakar","ds":"PETROLEUM SENEGAL INDUSTRIES (P.S.I)","pn":"CHEIKH SIDY BA","da":"14/04/2025","an":2025,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":580,"rs":"Dakar","ds":"PETROLEUM SENEGAL INDUSTRIES (P.S.I)","pn":"IBRAHIMA N'DANE","da":"14/04/2025","an":2025,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":581,"rs":"Dakar","ds":"PETROLEUM SENEGAL INDUSTRIES (P.S.I)","pn":"KENGUE MITAMONA JAUDY BREMN","da":"14/04/2025","an":2025,"pa":10.0,"pv":10.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":582,"rs":"Dakar","ds":"GASH MINING SENEGAL (GASH MINING SEN) SARL)","pn":"ABUBAKARY JAWARA","da":"09/04/2025","an":2025,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":583,"rs":"Dakar","ds":"SAHEL MINES ET LOGISTICS SARL","pn":"SEYDOU SAER HANE","da":"09/04/2025","an":2025,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":584,"rs":"Thiès","ds":"\"AWAHABA GROUP\" SARL","pn":"AIDARA ABDOUL WAHAB","da":"03/04/2025","an":2025,"pa":60.0,"pv":60.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":585,"rs":"Thiès","ds":"\"AWAHABA GROUP\" SARL","pn":"NDONG PAPA MALICK","da":"03/04/2025","an":2025,"pa":40.0,"pv":40.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":586,"rs":"Thiès","ds":"\" ADAMA UNIVERSAL IMMOBILIER ET AFFAIRES \" ADA-SUARL","pn":"MBENGUE BABACAR MASSAR","da":"25/03/2025","an":2025,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":587,"rs":"Kédougou","ds":"SARAKOTO DE TENKOTO","pn":"DIARIATOU KANTE","da":"17/03/2025","an":2025,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":588,"rs":"Kédougou","ds":"SARAKOTO DE TENKOTO","pn":"DJIBRIL CAMARA","da":"17/03/2025","an":2025,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":589,"rs":"Kédougou","ds":"SARAKOTO DE TENKOTO","pn":"MOUSSA CISSOKHO","da":"17/03/2025","an":2025,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":590,"rs":"Kédougou","ds":"HALDIFOTTY","pn":"BOUBACAR DIALLO","da":"17/03/2025","an":2025,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":591,"rs":"Kédougou","ds":"HALDIFOTTY","pn":"SAMBA CAMARA","da":"17/03/2025","an":2025,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":592,"rs":"Kédougou","ds":"FADIALLAYA DE LEFAKHO","pn":"MAMADOU KEITA","da":"17/03/2025","an":2025,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":593,"rs":"Kédougou","ds":"FADIALLAYA DE LEFAKHO","pn":"MOUSSA CISSOKHO","da":"17/03/2025","an":2025,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":594,"rs":"Kédougou","ds":"FADIALLAYA DE LEFAKHO","pn":"NDABA CISSOKHO","da":"17/03/2025","an":2025,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":595,"rs":"Dakar","ds":"EMMALY SARL","pn":"CIRE MAMADOU BAYO LY","da":"14/03/2025","an":2025,"pa":25.0,"pv":25.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":596,"rs":"Dakar","ds":"EMMALY SARL","pn":"EMMANUEL DIOH","da":"14/03/2025","an":2025,"pa":25.0,"pv":25.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":597,"rs":"Dakar","ds":"EMMALY SARL","pn":"MAGUETTE SECK","da":"14/03/2025","an":2025,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":598,"rs":"Kédougou","ds":"UNION GOLD SENEGAL","pn":"FILY CISSOKHO","da":"06/03/2025","an":2025,"pa":50.0,"pv":50.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":599,"rs":"Dakar","ds":"SENGINDIA SA","pn":"DINESH GOVIND GORASIYA","da":"04/03/2025","an":2025,"pa":47.26,"pv":47.26,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":600,"rs":"Dakar","ds":"SENGINDIA SA","pn":"HITESH GOPAL GORASIA","da":"04/03/2025","an":2025,"pa":47.25,"pv":47.25,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":601,"rs":"Dakar","ds":"SENGINDIA SA","pn":"KALYAN RAVJI PATEL","da":"04/03/2025","an":2025,"pa":5.49,"pv":5.49,"na":"ROYAUME-UNI","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":602,"rs":"Dakar","ds":"KALISO 2S-SAS","pn":"KHALILOU DIOP","da":"28/02/2025","an":2025,"pa":75.0,"pv":75.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":603,"rs":"Dakar","ds":"KALISO 2S-SAS","pn":"SOKHNA NDONGO","da":"28/02/2025","an":2025,"pa":25.0,"pv":25.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":604,"rs":"Kédougou","ds":"AMICALE DES ORPAILLEURS DE KEDOUGOU","pn":"SUZANE BOISSY","da":"25/02/2025","an":2025,"pa":40.0,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":605,"rs":"Dakar","ds":"AFRICA VISION MINING ( AVM-SARL)","pn":"DJIGA FAYE","da":"14/02/2025","an":2025,"pa":20.0,"pv":20.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":606,"rs":"Dakar","ds":"AFRICA VISION MINING ( AVM-SARL)","pn":"MARIAMA NDONG","da":"14/02/2025","an":2025,"pa":80.0,"pv":80.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":607,"rs":"Dakar","ds":"SOCIETE D'EXPLOITATION MINIERE DU SENEGAL (SEMIS-SUARL)","pn":"LIN WEI SONG","da":"14/02/2025","an":2025,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":608,"rs":"Mbour","ds":"\"LES LITIERES DU SENEGAL\" SARL","pn":"CHEICH BADIANE SAKHO","da":"14/02/2025","an":2025,"pa":51.0,"pv":51.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":609,"rs":"Dakar","ds":"ETOILE X 313 SUARL","pn":"MODOU DIAGNE","da":"14/02/2025","an":2025,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":610,"rs":"Dakar","ds":"WONDER MINE & TRADE (WMT-SAS)","pn":"AMINATA DIA","da":"10/02/2025","an":2025,"pa":70.0,"pv":70.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":611,"rs":"Dakar","ds":"WONDER MINE & TRADE (WMT-SAS)","pn":"AWA AMINATA BA","da":"10/02/2025","an":2025,"pa":5.0,"pv":5.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":612,"rs":"Dakar","ds":"WONDER MINE & TRADE (WMT-SAS)","pn":"KHADIDIATOU BA","da":"10/02/2025","an":2025,"pa":5.0,"pv":5.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":613,"rs":"Dakar","ds":"WONDER MINE & TRADE (WMT-SAS)","pn":"NDEYE PEINDA NIANG","da":"10/02/2025","an":2025,"pa":5.0,"pv":5.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":614,"rs":"Dakar","ds":"WONDER MINE & TRADE (WMT-SAS)","pn":"OUMOU KALSOUM BA","da":"10/02/2025","an":2025,"pa":5.0,"pv":5.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":615,"rs":"Dakar","ds":"WONDER MINE & TRADE (WMT-SAS)","pn":"PAPA LASSANA BA","da":"10/02/2025","an":2025,"pa":10.0,"pv":10.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":616,"rs":"Dakar","ds":"SOCIETE DES MINES DU SENEGAL (SOMISEN)","pn":"NGAGNE DEMBA TOURE","da":"29/01/2025","an":2025,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":true,"fp":"CHIEKH AHMADOU BAMBA NIANG","np":"les Directeurs généraux des ministères","gr":"Greffe"},{"id":617,"rs":"Dakar","ds":"SOCIETE DES MINES DU SENEGAL (SOMISEN)","pn":"NGAGNE DEMBA TOURE","da":"29/01/2025","an":2025,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":true,"fp":"CHIEKH AHMADOU BAMBA NIANG","np":"les Directeurs généraux des ministères","gr":"Greffe"},{"id":618,"rs":"Dakar","ds":"SIRAJ MINES ET INDUSTRIES SARL","pn":"ELHADJI FALILOU MBACKE","da":"17/01/2025","an":2025,"pa":49.0,"pv":49.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":619,"rs":"Dakar","ds":"SIRAJ MINES ET INDUSTRIES SARL","pn":"MAME MATAR SECK","da":"17/01/2025","an":2025,"pa":51.0,"pv":51.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":620,"rs":"Dakar","ds":"INTERNATIONAL DRILLING COMPANY SENEGAL SASU","pn":"JEAN NOEL BITTAR","da":"17/01/2025","an":2025,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":621,"rs":"Dakar","ds":"GIE SHENG HUA MINING CO,LTD","pn":"QI WANG","da":"15/01/2025","an":2025,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":622,"rs":"Dakar","ds":"GIE SHENG HUA MINING CO,LTD","pn":"YANTING WANG","da":"15/01/2025","an":2025,"pa":null,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":623,"rs":"Kédougou","ds":"KEDOUGOU MINE ET CARRIERE","pn":"ABDOULAYE BARRO","da":"12/01/2025","an":2025,"pa":1.0,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":624,"rs":"Kédougou","ds":"KEDOUGOU MINE ET CARRIERE","pn":"BEAUCLAIR RAYMOND ZEMFACK","da":"12/01/2025","an":2025,"pa":10.0,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":625,"rs":"Kédougou","ds":"KEDOUGOU MINE ET CARRIERE","pn":"MOUSSA MAKHASSOUBA","da":"12/01/2025","an":2025,"pa":29.0,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":626,"rs":"Kédougou","ds":"KEDOUGOU MINE ET CARRIERE","pn":"QI BO","da":"12/01/2025","an":2025,"pa":60.0,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":627,"rs":"Dakar","ds":"LIN WEILIN","pn":"WEILIN LIN","da":"09/01/2025","an":2025,"pa":100.0,"pv":null,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"},{"id":628,"rs":"Dakar","ds":"SEN ZHANGHUA MINERAL","pn":"ZHANG","da":"09/01/2025","an":2025,"pa":100.0,"pv":100.0,"na":"SÉNÉGAL","pr":NaN,"pp":false,"fp":NaN,"np":NaN,"gr":"Greffe"}];
+const COORDS = {"Dakar":[14.693,-17.447],"Thiès":[14.788,-16.924],"Diourbel":[14.655,-16.232],"Fatick":[14.339,-16.411],"Kaolack":[14.152,-16.073],"Kédougou":[12.560,-12.186],"Mbour":[14.408,-16.965],"Tambacounda":[13.771,-13.667],"Ziguinchor":[12.565,-16.272],"Louga":[15.617,-16.224],"Saint-Louis":[16.028,-16.499],"Matam":[15.658,-13.263],"Kolda":[12.886,-14.944],"Sédhiou":[12.708,-15.557],"Kaffrine":[14.106,-15.551]};
+const CL = {g:'#008C45',gd:'#005A2E',y:'#F4C300',yd:'#B89300',r:'#D62D20',b:'#005A8E'};
+const NR = '<span class="nr">—</span>';
+const v  = x => (!x && x !== 0) ? NR : x;
+const vp = x => (!x && x !== 0) ? NR : x + '%';
+const fmt = n => Number(n).toLocaleString('fr-FR');
+
+let FD = [...DB], charts = {}, leafMap = null;
+let nNodes = [], nLinks = [], nZoom = null, nSvg = null, nG = null;
+let dbFiltered = [...DB], dbPage = 1, dbPageSz = 50, dbQ = '';
+
+/* ─── NAV ─── */
+document.querySelectorAll('.nav-bar a').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    document.querySelectorAll('.nav-bar a').forEach(x => x.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+    a.classList.add('active');
+    const pg = a.dataset.page;
+    document.getElementById('page-' + pg).classList.add('active');
+    if (pg === 'map'      && !leafMap) initMap();
+    if (pg === 'network')  buildNet();
+    if (pg === 'ppe')      renderPPE();
+    if (pg === 'database') renderDB();
+  });
+});
+
+/* ─── FILTRES ─── */
+function popF() {
+  const add = (id, arr, multi) => {
+    const el = document.getElementById(id);
+    if (multi) el.innerHTML = '';
+    arr.forEach(x => { const o = document.createElement('option'); o.value = x; o.textContent = x; el.appendChild(o); });
+  };
+  add('fr', [...new Set(DB.map(r => r.rs).filter(Boolean))].sort(), true);
+  add('fn', [...new Set(DB.map(r => r.na).filter(Boolean))].sort(), true);
+  add('fp', [...new Set(DB.map(r => r.pr).filter(Boolean))].sort(), true);
+  const gEl = document.getElementById('fg');
+  [...new Set(DB.map(r => r.gr).filter(Boolean))].sort().forEach(g => {
+    const o = document.createElement('option'); o.value = g; o.textContent = g; gEl.appendChild(o);
+  });
+}
+
+function sv(id) { return [...document.getElementById(id).selectedOptions].map(o => o.value).filter(Boolean); }
+
+function applyF() {
+  const rs = sv('fr'), na = sv('fn'), pr = sv('fp');
+  const gr = document.getElementById('fg').value;
+  const pp = document.getElementById('fppe').checked;
+  const mn = +document.getElementById('fpmin').value;
+  const mx = +document.getElementById('fpmax').value;
+  FD = DB.filter(r => {
+    if (rs.length && !rs.includes(r.rs)) return false;
+    if (na.length && !na.includes(r.na)) return false;
+    if (pr.length && !pr.includes(r.pr)) return false;
+    if (gr && r.gr !== gr) return false;
+    if (pp && !r.pp) return false;
+    if (r.pa !== null && (r.pa < mn || r.pa > mx)) return false;
+    return true;
+  });
+  document.getElementById('scn').textContent = fmt(FD.length);
+  document.getElementById('scp').textContent = Math.round(100 * FD.length / DB.length) + '% du total';
+  renderAll();
+}
+
+['fr','fn','fp','fg'].forEach(id => document.getElementById(id).addEventListener('change', applyF));
+document.getElementById('fppe').addEventListener('change', applyF);
+[['fpmin','lpmin'],['fpmax','lpmax']].forEach(([id, l]) => {
+  document.getElementById(id).addEventListener('input', function() {
+    document.getElementById(l).textContent = this.value + '%';
+    applyF();
+  });
+});
+
+function resetF() {
+  ['fr','fn','fp'].forEach(id => [...document.getElementById(id).options].forEach(o => o.selected = false));
+  document.getElementById('fg').value = '';
+  document.getElementById('fppe').checked = false;
+  document.getElementById('fpmin').value = 0; document.getElementById('lpmin').textContent = '0%';
+  document.getElementById('fpmax').value = 100; document.getElementById('lpmax').textContent = '100%';
+  applyF();
+}
+
+/* ─── ANALYTICS ─── */
+function stats(d) {
+  const co = [...new Set(d.map(r => r.ds).filter(Boolean))];
+  const pp = d.filter(r => r.pp);
+  const na = [...new Set(d.map(r => r.na).filter(Boolean))];
+  const pr = [...new Set(d.map(r => r.pr).filter(Boolean))];
+  const avg = co.length ? (d.length / co.length).toFixed(1) : '—';
+  return { co, pp, na, pr, avg, total: d.length };
+}
+
+function compS(d) {
+  const m = {};
+  d.forEach(r => {
+    if (!r.ds) return;
+    if (!m[r.ds]) m[r.ds] = { ds: r.ds, rs: r.rs, gr: r.gr, n: 0, pcts: [], ppe: 0 };
+    m[r.ds].n++;
+    if (r.pa !== null) m[r.ds].pcts.push(r.pa);
+    if (r.pp) m[r.ds].ppe++;
+  });
+  return Object.values(m).map(c => {
+    const avg = c.pcts.length ? +(c.pcts.reduce((a,b) => a+b, 0) / c.pcts.length).toFixed(1) : null;
+    return { ...c, avg };
+  }).sort((a, b) => b.n - a.n);
+}
+
+function regS(d) {
+  const m = {};
+  d.forEach(r => {
+    if (!r.rs) return;
+    if (!m[r.rs]) m[r.rs] = { region: r.rs, nb: 0, cos: new Set(), np: 0 };
+    m[r.rs].nb++; m[r.rs].cos.add(r.ds); if (r.pp) m[r.rs].np++;
+  });
+  return Object.values(m).map(r => ({ ...r, ne: r.cos.size })).sort((a, b) => b.nb - a.nb);
+}
+
+/* ─── KPI ─── */
+function renderKPI() {
+  const s = stats(FD);
+  document.getElementById('k-co').textContent = fmt(s.co.length);
+  document.getElementById('k-be').textContent = fmt(s.total);
+  document.getElementById('k-av').textContent = s.avg;
+  document.getElementById('k-pp').textContent = s.pp.length;
+  document.getElementById('k-na').textContent = s.na.length;
+  document.getElementById('k-pa').textContent = s.pr.length;
+}
+
+/* ─── CHARTS ─── */
+const dc = id => { if (charts[id]) { charts[id].destroy(); delete charts[id]; } };
+
+function renderNat() {
+  dc('nat');
+  const cnt = {}; FD.forEach(r => { if (r.na) cnt[r.na] = (cnt[r.na] || 0) + 1; });
+  const s = Object.entries(cnt).sort((a,b) => b[1]-a[1]).slice(0, 15);
+  charts.nat = new Chart(document.getElementById('ch-nat').getContext('2d'), {
+    type: 'bar',
+    data: { labels: s.map(x => x[0]), datasets: [{ data: s.map(x => x[1]), backgroundColor: CL.g, borderColor: CL.gd, borderWidth: .5, hoverBackgroundColor: CL.yd }] },
+    options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ' ' + c.parsed.x + ' bén.' } } }, scales: { x: { grid: { color: '#f0f0f0' } }, y: { ticks: { font: { size: 10 } } } } }
+  });
+}
+
+function renderPiePPE() {
+  dc('ppe-ch');
+  const pp = FD.filter(r => r.pp).length;
+  charts['ppe-ch'] = new Chart(document.getElementById('ch-ppe').getContext('2d'), {
+    type: 'doughnut',
+    data: { labels: ['PPE', 'Non PPE'], datasets: [{ data: [pp, FD.length - pp], backgroundColor: [CL.r, CL.g], borderWidth: 2, borderColor: '#fff' }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' }, tooltip: { callbacks: { label: c => c.label + ': ' + c.parsed + ' (' + Math.round(100 * c.parsed / FD.length) + '%)' } } } }
+  });
+}
+
+function renderReg() {
+  dc('reg');
+  const d = regS(FD);
+  charts.reg = new Chart(document.getElementById('ch-reg').getContext('2d'), {
+    type: 'bar',
+    data: { labels: d.map(r => r.region), datasets: [{ label: 'Bénéficiaires', data: d.map(r => r.nb), backgroundColor: CL.g, borderWidth: .5 }, { label: 'Entreprises', data: d.map(r => r.ne), backgroundColor: CL.y, borderWidth: .5 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', labels: { font: { size: 11 } } } }, scales: { x: { ticks: { font: { size: 10 } } }, y: { grid: { color: '#f0f0f0' } } } }
+  });
+}
+
+function renderPct() {
+  dc('pct');
+  const bins = Array(20).fill(0);
+  FD.forEach(r => { if (r.pa !== null) bins[Math.min(19, Math.floor(r.pa / 5))]++; });
+  charts.pct = new Chart(document.getElementById('ch-pct').getContext('2d'), {
+    type: 'bar',
+    data: { labels: bins.map((_, i) => i * 5 + '%'), datasets: [{ data: bins, backgroundColor: CL.y, borderColor: CL.yd, borderWidth: .5 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { font: { size: 9 }, maxRotation: 60 } }, y: { grid: { color: '#f0f0f0' } } } }
+  });
+}
+
+/* ─── TOP TABLE ─── */
+function getTopData() {
+  return compS(FD).slice(0, 30).map(c => ({ 'Entreprise': c.ds, 'Région': c.rs||'', 'Greffe': c.gr||'', 'Bénéficiaires': c.n, 'Part. moy.': c.avg !== null ? c.avg + '%' : '', 'PPE': c.ppe }));
+}
+function renderTopTable() {
+  const tb = document.querySelector('#tbl-top tbody'); tb.innerHTML = '';
+  compS(FD).slice(0, 30).forEach(c => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td><strong>${c.ds}</strong></td><td>${c.rs ? '<span class="bg">' + c.rs + '</span>' : NR}</td><td>${c.gr ? '<span class="bgr">' + c.gr + '</span>' : NR}</td><td><strong>${c.n}</strong></td><td>${c.avg !== null ? c.avg + '%' : NR}</td><td>${c.ppe > 0 ? '<span class="br">' + c.ppe + ' PPE</span>' : '0'}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
+/* ══════════════════════════════════════
+   BASE COMPLÈTE
+══════════════════════════════════════ */
+function getDBData() {
+  return dbFiltered.map((r, i) => ({
+    '#': i + 1, 'Entreprise': r.ds||'', 'Bénéficiaire': r.pn||'',
+    'Région': r.rs||'', 'Nationalité': r.na||'', 'Pays résidence': r.pr||'',
+    '% Action': r.pa ?? '', '% Voix': r.pv ?? '',
+    'PPE': r.pp ? 'Oui' : 'Non', 'Fonction PPE': r.fp||'', 'Nom PPE': r.np||'',
+    'Greffe': r.gr||'', 'Date acquisition': r.da||'', 'Année': r.an||''
+  }));
+}
+
+function renderDB() {
+  const q = dbQ.toLowerCase().trim();
+  dbFiltered = FD.filter(r => {
+    if (!q) return true;
+    return [r.ds, r.pn, r.na, r.pr, r.rs, r.gr, r.fp, r.np].some(x => x && x.toLowerCase().includes(q));
+  });
+
+  const total = dbFiltered.length;
+  const psz = dbPageSz >= 9999 ? total : dbPageSz;
+  const totalPages = Math.max(1, Math.ceil(total / psz));
+  if (dbPage > totalPages) dbPage = 1;
+  const start = (dbPage - 1) * psz;
+  const end   = Math.min(start + psz, total);
+  const rows  = dbFiltered.slice(start, end);
+
+  // Info
+  document.getElementById('db-count-lbl').textContent = fmt(total) + ' enregistrement' + (total > 1 ? 's' : '');
+  const infoEl = document.getElementById('db-info');
+  infoEl.textContent = q ? 'Filtre "' + dbQ + '" : ' + fmt(total) + ' résultat(s) sur ' + fmt(FD.length) + ' bénéficiaires dans la sélection' : fmt(FD.length) + ' bénéficiaires dans la sélection courante — ' + fmt(DB.length) + ' au total';
+
+  // Lignes
+  const tb = document.getElementById('db-tbody'); tb.innerHTML = '';
+  rows.forEach((r, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="color:var(--gray);font-size:.74rem;text-align:right">${start + i + 1}</td>
+      <td><strong>${r.ds || '—'}</strong></td>
+      <td>${r.pn || NR}</td>
+      <td>${r.rs ? '<span class="bg">' + r.rs + '</span>' : NR}</td>
+      <td>${v(r.na)}</td>
+      <td>${v(r.pr)}</td>
+      <td style="text-align:center">${vp(r.pa)}</td>
+      <td style="text-align:center">${vp(r.pv)}</td>
+      <td style="text-align:center">${r.pp ? '<span class="br">PPE</span>' : ''}</td>
+      <td>${v(r.fp)}</td>
+      <td>${v(r.np)}</td>
+      <td>${r.gr ? '<span class="bgr">' + r.gr + '</span>' : NR}</td>
+      <td style="white-space:nowrap;font-size:.79rem">${v(r.da)}</td>
+      <td style="text-align:center">${v(r.an)}</td>`;
+    tb.appendChild(tr);
+  });
+
+  // Pagination
+  document.getElementById('pg-info').textContent = 'Lignes ' + fmt(start + 1) + '–' + fmt(end) + ' sur ' + fmt(total);
+  document.getElementById('pg-prev').disabled = dbPage <= 1;
+  document.getElementById('pg-next').disabled = dbPage >= totalPages;
+  const pgDiv = document.getElementById('pg-pages'); pgDiv.innerHTML = '';
+  const maxB = 7;
+  let s2 = Math.max(1, dbPage - 3), e2 = Math.min(totalPages, s2 + maxB - 1);
+  if (e2 - s2 < maxB - 1) s2 = Math.max(1, e2 - maxB + 1);
+  for (let p = s2; p <= e2; p++) {
+    const b = document.createElement('button');
+    b.className = 'pg-btn' + (p === dbPage ? ' on' : '');
+    b.textContent = p;
+    const pp = p;
+    b.onclick = () => { dbPage = pp; renderDB(); };
+    pgDiv.appendChild(b);
+  }
+}
+
+function dbPageNav(dir) { dbPage += dir; renderDB(); }
+function dbPageSize()  { dbPageSz = +document.getElementById('pg-sz').value; dbPage = 1; renderDB(); }
+
+let dbTimer;
+document.getElementById('db-search').addEventListener('input', function() {
+  clearTimeout(dbTimer);
+  dbQ = this.value;
+  dbTimer = setTimeout(() => { dbPage = 1; renderDB(); }, 200);
+});
+
+/* ─── RECHERCHE ENTREPRISE ─── */
+const allCo = [...new Set(DB.map(r => r.ds).filter(Boolean))].sort();
+const si = document.getElementById('si'), sdd = document.getElementById('sdd');
+
+si.addEventListener('input', function() {
+  const q = this.value.trim().toLowerCase();
+  sdd.innerHTML = '';
+  if (!q) { sdd.style.display = 'none'; return; }
+  const m = allCo.filter(c => c.toLowerCase().includes(q)).slice(0, 35);
+  if (!m.length) { sdd.style.display = 'none'; return; }
+  m.forEach(c => {
+    const d = document.createElement('div'); d.className = 'ddi';
+    const i = c.toLowerCase().indexOf(q);
+    d.innerHTML = c.substring(0, i) + '<mark>' + c.substring(i, i + q.length) + '</mark>' + c.substring(i + q.length);
+    d.addEventListener('click', () => { si.value = c; sdd.style.display = 'none'; renderCC(c); });
+    sdd.appendChild(d);
+  });
+  sdd.style.display = 'block';
+});
+document.addEventListener('click', e => { if (!e.target.closest('.sw')) sdd.style.display = 'none'; });
+
+function renderCC(nm) {
+  const rows = DB.filter(r => r.ds === nm);
+  if (!rows.length) return;
+  const nats  = [...new Set(rows.map(r => r.na).filter(Boolean))].sort();
+  const pays  = [...new Set(rows.map(r => r.pr).filter(Boolean))].sort();
+  const ppes  = rows.filter(r => r.pp);
+  const pcts  = rows.map(r => r.pa).filter(x => x !== null);
+  const avg   = pcts.length ? (pcts.reduce((a,b) => a+b, 0) / pcts.length).toFixed(1) : null;
+  const med   = pcts.length ? pcts.sort((a,b) => a-b)[Math.floor(pcts.length / 2)] : null;
+  const dates = rows.map(r => r.da).filter(Boolean).sort();
+  const annees= [...new Set(rows.map(r => r.an).filter(Boolean))].sort();
+  const sfx   = nm.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 30);
+
+  document.getElementById('ccw').innerHTML = `
+  <div class="cc">
+    <div class="cch">
+      <div class="cci"><i class="fas fa-building"></i></div>
+      <div>
+        <div class="ccn">${nm}</div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap">
+          ${rows[0].rs ? '<span class="bg">' + rows[0].rs + '</span>' : ''}
+          ${rows[0].gr ? '<span class="bgr">Greffe : ' + rows[0].gr + '</span>' : ''}
+        </div>
+      </div>
+    </div>
+    <div class="ccs">
+      <div><span class="csv">${rows.length}</span><span class="csl">Bénéficiaire(s)</span></div>
+      <div><span class="csv ${ppes.length > 0 ? 'red' : ''}">${ppes.length}</span><span class="csl">PPE</span></div>
+      <div><span class="csv">${avg !== null ? avg + '%' : '—'}</span><span class="csl">Part. moyenne</span></div>
+      <div><span class="csv">${med !== null ? med + '%' : '—'}</span><span class="csl">Part. médiane</span></div>
+    </div>
+    <div class="ccd">
+      <div><div class="cdl"><i class="fas fa-flag"></i> Nationalité(s)</div>${nats.length ? nats.join(' • ') : NR}</div>
+      <div><div class="cdl"><i class="fas fa-globe"></i> Pays de résidence</div>${pays.length ? pays.join(' • ') : NR}</div>
+      <div><div class="cdl"><i class="fas fa-calendar"></i> 1ère déclaration</div>${dates[0] || NR}</div>
+      <div><div class="cdl"><i class="fas fa-clock"></i> Dernière mise à jour</div>${dates[dates.length - 1] || NR}</div>
+      <div><div class="cdl"><i class="fas fa-calendar-alt"></i> Année(s)</div>${annees.length ? annees.join(', ') : NR}</div>
+      ${ppes.length ? '<div><div class="cdl" style="color:var(--r)"><i class="fas fa-user-shield"></i> PPE identifiés</div><div style="color:var(--r);font-weight:600">' + ppes.map(p => p.pn).join(' • ') + '</div></div>' : ''}
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct"><i class="fas fa-users"></i> Bénéficiaires effectifs de la société</div>
+    <div class="eb">
+      <button class="be bxl" onclick="exportXLSX(getBD('${nm.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}'),'bens_${sfx}')"><i class="fas fa-file-excel"></i> Excel</button>
+      <button class="be bcsv" onclick="exportCSV(getBD('${nm.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}'),'bens_${sfx}')"><i class="fas fa-file-csv"></i> CSV</button>
+    </div>
+    <div class="tw"><table><thead><tr>
+      <th>Bénéficiaire</th><th>Nationalité</th><th>Pays résidence</th>
+      <th>% Action</th><th>% Voix</th><th>PPE</th><th>Fonction PPE</th><th>Nom PPE</th><th>Date acq.</th>
+    </tr></thead><tbody>
+    ${rows.map(r => `<tr>
+      <td><strong>${r.pn || '—'}</strong></td><td>${v(r.na)}</td><td>${v(r.pr)}</td>
+      <td style="text-align:center">${vp(r.pa)}</td><td style="text-align:center">${vp(r.pv)}</td>
+      <td style="text-align:center">${r.pp ? '<span class="br">PPE</span>' : ''}</td>
+      <td>${v(r.fp)}</td><td>${v(r.np)}</td><td style="white-space:nowrap">${v(r.da)}</td>
+    </tr>`).join('')}
+    </tbody></table></div>
+  </div>`;
+}
+
+function getBD(nm) {
+  return DB.filter(r => r.ds === nm).map(r => ({
+    'Bénéficiaire': r.pn||'', 'Nationalité': r.na||'', 'Pays résidence': r.pr||'',
+    '% Action': r.pa ?? '', '% Voix': r.pv ?? '',
+    'PPE': r.pp ? 'Oui' : 'Non', 'Fonction PPE': r.fp||'', 'Nom PPE': r.np||'', 'Date': r.da||''
+  }));
+}
+
+/* ─── PPE ─── */
+function getPPEData() {
+  return FD.filter(r => r.pp).map(r => ({
+    'Bénéficiaire': r.pn, 'Entreprise': r.ds, 'Région': r.rs||'',
+    'Nationalité': r.na||'', 'Pays résidence': r.pr||'',
+    '% Action': r.pa ?? '', '% Voix': r.pv ?? '',
+    'Fonction PPE': r.fp||'', 'Nom PPE': r.np||''
+  }));
+}
+
+function renderPPE() {
+  const ppes = FD.filter(r => r.pp);
+  const na   = [...new Set(ppes.map(r => r.na).filter(Boolean))];
+  const pr   = [...new Set(ppes.map(r => r.pr).filter(Boolean))];
+  const pcts = ppes.map(r => r.pa).filter(x => x !== null);
+  const avg  = pcts.length ? (pcts.reduce((a,b) => a+b, 0) / pcts.length).toFixed(1) : '—';
+  const co   = [...new Set(ppes.map(r => r.ds).filter(Boolean))];
+
+  document.getElementById('ppe-kpis').innerHTML = [
+    { ico: 'fa-user-shield', v: ppes.length, l: 'Total PPE',      c: 'var(--r)' },
+    { ico: 'fa-building',    v: co.length,   l: 'Entreprises',     c: 'var(--yd)' },
+    { ico: 'fa-flag',        v: na.length,   l: 'Nationalités',    c: 'var(--g)' },
+    { ico: 'fa-globe',       v: pr.length,   l: 'Pays résidence',  c: 'var(--b)' },
+    { ico: 'fa-percent',     v: avg + '%',   l: 'Part. moy.',      c: 'var(--gd)' },
+  ].map(k => `<div class="kpi" style="border-top-color:${k.c}"><div class="ki" style="color:${k.c}"><i class="fas ${k.ico}"></i></div><div><div class="kv">${k.v}</div><div class="kl">${k.l}</div></div></div>`).join('');
+
+  dc('ppn'); dc('ppr');
+  const nc = {}, rc = {};
+  ppes.forEach(r => { if (r.na) nc[r.na] = (nc[r.na]||0)+1; if (r.rs) rc[r.rs] = (rc[r.rs]||0)+1; });
+  const ns = Object.entries(nc).sort((a,b) => b[1]-a[1]);
+  const rs2= Object.entries(rc).sort((a,b) => b[1]-a[1]);
+
+  charts.ppn = new Chart(document.getElementById('ch-pn').getContext('2d'), {
+    type: 'bar', data: { labels: ns.map(x=>x[0]), datasets: [{ data: ns.map(x=>x[1]), backgroundColor: CL.r, borderWidth: .5 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#f0f0f0' } } } }
+  });
+  charts.ppr = new Chart(document.getElementById('ch-pr').getContext('2d'), {
+    type: 'bar', data: { labels: rs2.map(x=>x[0]), datasets: [{ data: rs2.map(x=>x[1]), backgroundColor: CL.y, borderColor: CL.yd, borderWidth: .5 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#f0f0f0' } } } }
+  });
+
+  const tb = document.querySelector('#tbl-ppe tbody');
+  tb.innerHTML = ppes.length
+    ? ppes.map(r => `<tr>
+        <td><strong style="color:var(--r)">${r.pn || NR}</strong></td>
+        <td>${r.ds || NR}</td>
+        <td>${r.rs ? '<span class="bg">' + r.rs + '</span>' : NR}</td>
+        <td>${v(r.na)}</td><td>${v(r.pr)}</td>
+        <td style="text-align:center">${vp(r.pa)}</td>
+        <td style="text-align:center">${vp(r.pv)}</td>
+        <td>${v(r.fp)}</td><td>${v(r.np)}</td>
+      </tr>`).join('')
+    : '<tr><td colspan="9" style="text-align:center;color:var(--gray);padding:18px">Aucun PPE dans la sélection.</td></tr>';
+}
+
+/* ─── CARTE LEAFLET ─── */
+function initMap() {
+  leafMap = L.map('map', {
+    center: [14.4, -14.4], zoom: 7,
+    minZoom: 6, maxZoom: 10,
+    maxBounds: [[12, -17.6], [16.7, -11.3]],
+    maxBoundsViscosity: 1.0
+  });
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '© OpenStreetMap | © CartoDB | ITIE Sénégal', noWrap: true
+  }).addTo(leafMap);
+  updateMap();
+  document.querySelectorAll('input[name="mm"]').forEach(r => r.addEventListener('change', updateMap));
+}
+
+function updateMap() {
+  if (!leafMap) return;
+  leafMap.eachLayer(l => { if (l instanceof L.CircleMarker) leafMap.removeLayer(l); });
+  const metric = document.querySelector('input[name="mm"]:checked').value;
+  const rs = regS(FD);
+  const fk = { nb: 'nb', ne: 'ne', np: 'np' }[metric];
+  const maxV = Math.max(...rs.map(s => s[fk] || 0), 1);
+  const label = { nb: 'Bénéficiaires', ne: 'Entreprises', np: 'PPE' }[metric];
+
+  rs.forEach(s => {
+    const c = COORDS[s.region]; if (!c) return;
+    const val = s[fk] || 0, rad = 10 + (val / maxV) * 45;
+    L.circleMarker(c, { radius: rad, fillColor: val ? CL.g : '#ccc', fillOpacity: .2 + .65 * (val / maxV), color: CL.gd, weight: 1.5 })
+     .bindPopup(`<div style="font-family:DM Sans,sans-serif;min-width:190px">
+       <div style="font-size:15px;font-weight:700;color:#008C45;border-bottom:2px solid #008C45;padding-bottom:5px;margin-bottom:8px">${s.region}</div>
+       <table style="width:100%;font-size:13px">
+         <tr><td>Entreprises</td><td style="text-align:right;font-weight:600">${s.ne}</td></tr>
+         <tr><td>Bénéficiaires</td><td style="text-align:right;font-weight:600">${s.nb}</td></tr>
+         <tr><td style="color:#D62D20;font-weight:600">PPE</td><td style="text-align:right;color:#D62D20;font-weight:700">${s.np}</td></tr>
+       </table></div>`)
+     .bindTooltip(`${s.region} — ${label} : ${val}`, { sticky: true })
+     .addTo(leafMap);
+  });
+
+  const tb = document.querySelector('#tbl-reg tbody');
+  tb.innerHTML = rs.map(s => `<tr>
+    <td><span class="bg">${s.region}</span></td>
+    <td>${s.ne}</td>
+    <td><strong>${s.nb}</strong></td>
+    <td style="${s.np > 0 ? 'color:var(--r);font-weight:700' : ''}">${s.np}</td>
+  </tr>`).join('');
+}
+
+/* ─── RÉSEAU D3 ─── */
+function buildNet() {
+  const maxC = +document.getElementById('nmx').value;
+  const cnt = {}; FD.forEach(r => { if (r.ds) cnt[r.ds] = (cnt[r.ds]||0)+1; });
+  const top = Object.entries(cnt).sort((a,b) => b[1]-a[1]).slice(0, maxC).map(e => e[0]);
+  const sub = FD.filter(r => top.includes(r.ds));
+  const nm = {}; nNodes = []; nLinks = [];
+
+  top.forEach((c, i) => { const id = 'C' + i; nm['C|' + c] = id; nNodes.push({ id, label: c.length > 28 ? c.substring(0,28)+'…' : c, group: 'co', full: c }); });
+  [...new Set(sub.map(r => r.pn).filter(Boolean))].forEach((b, i) => { const id = 'B' + i; nm['B|' + b] = id; nNodes.push({ id, label: b.length > 24 ? b.substring(0,24)+'…' : b, group: 'be', full: b }); });
+  sub.forEach(r => { if (!r.ds || !r.pn) return; const s = nm['C|'+r.ds], t = nm['B|'+r.pn]; if (s && t) nLinks.push({ source: s, target: t, pct: r.pa }); });
+
+  const sc = document.getElementById('ns-co'), sb = document.getElementById('ns-be');
+  sc.innerHTML = '<option value="">— Toutes —</option>';
+  sb.innerHTML = '<option value="">— Tous —</option>';
+  top.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; sc.appendChild(o); });
+  [...new Set(sub.map(r => r.pn).filter(Boolean))].sort().forEach(b => { const o = document.createElement('option'); o.value = b; o.textContent = b; sb.appendChild(o); });
+  drawNet();
+}
+
+function drawNet() {
+  d3.select('#nsvg').selectAll('*').remove();
+  document.getElementById('nib').style.display = 'none';
+  const wrap = document.getElementById('nwrap'), W = wrap.clientWidth || 900, H = wrap.clientHeight || 500;
+  nSvg = d3.select('#nsvg').attr('viewBox', `0 0 ${W} ${H}`);
+  nG   = nSvg.append('g');
+  nZoom= d3.zoom().scaleExtent([.15, 6]).on('zoom', e => nG.attr('transform', e.transform));
+  nSvg.call(nZoom);
+
+  const sim = d3.forceSimulation(nNodes)
+    .force('link',   d3.forceLink(nLinks).id(d => d.id).distance(90).strength(.5))
+    .force('charge', d3.forceManyBody().strength(-130))
+    .force('center', d3.forceCenter(W/2, H/2))
+    .force('col',    d3.forceCollide(22));
+
+  const link = nG.append('g').selectAll('line').data(nLinks).join('line').attr('stroke', '#ddd').attr('stroke-width', 1);
+  const node = nG.append('g').selectAll('g').data(nNodes).join('g').attr('cursor', 'pointer')
+    .call(d3.drag()
+      .on('start', (e,d) => { if (!e.active) sim.alphaTarget(.3).restart(); d.fx = d.x; d.fy = d.y; })
+      .on('drag',  (e,d) => { d.fx = e.x; d.fy = e.y; })
+      .on('end',   (e,d) => { if (!e.active) sim.alphaTarget(0); d.fx = null; d.fy = null; })
+    )
+    .on('click', (e, d) => { e.stopPropagation(); zoomNode(d); });
+
+  node.append('circle')
+    .attr('r',  d => d.group === 'co' ? 15 : 9)
+    .attr('fill',   d => d.group === 'co' ? CL.g  : CL.y)
+    .attr('stroke', d => d.group === 'co' ? CL.gd : CL.yd)
+    .attr('stroke-width', 1.5);
+
+  node.append('text')
+    .text(d => d.label)
+    .attr('x', 0).attr('y', d => d.group === 'co' ? -19 : -13)
+    .attr('text-anchor', 'middle')
+    .attr('font-size', d => d.group === 'co' ? '10px' : '9px')
+    .attr('fill', '#1A1A1A')
+    .attr('font-family', 'DM Sans, sans-serif')
+    .attr('font-weight', d => d.group === 'co' ? '600' : '400');
+
+  sim.on('tick', () => {
+    link.attr('x1', d => d.source.x).attr('y1', d => d.source.y).attr('x2', d => d.target.x).attr('y2', d => d.target.y);
+    node.attr('transform', d => `translate(${d.x},${d.y})`);
+  });
+  nSvg.on('click', () => document.getElementById('nib').style.display = 'none');
+}
+
+function zoomNode(nd) {
+  if (!nd || !nSvg || !nZoom) return;
+  const el = document.getElementById('nsvg'), W = el.clientWidth||900, H = el.clientHeight||500;
+  const sc = 2.4, tx = W/2 - sc*(nd.x||W/2), ty = H/2 - sc*(nd.y||H/2);
+  nSvg.transition().duration(700).call(nZoom.transform, d3.zoomIdentity.translate(tx, ty).scale(sc));
+
+  const lk = nLinks.filter(l => (l.source.id||l.source) === nd.id || (l.target.id||l.target) === nd.id);
+  const isCo = nd.group === 'co';
+  const info = document.getElementById('nib'); info.style.display = 'flex';
+  info.innerHTML = `
+    <div class="niico" style="background:${isCo ? CL.g : CL.yd}">
+      <i class="fas ${isCo ? 'fa-building' : 'fa-user'}"></i>
+    </div>
+    <div>
+      <strong style="font-size:14px;display:block">${nd.full}</strong>
+      <span style="font-size:12px;color:var(--gray)">${isCo ? 'Entreprise' : 'Bénéficiaire'} — ${lk.length} ${isCo ? 'bénéficiaire(s) relié(s)' : 'entreprise(s) reliée(s)'}</span>
+    </div>`;
+}
+
+function focusNode(val, type) {
+  if (!val) return;
+  const nd = nNodes.find(n => n.full === val && (type === 'co' ? n.group === 'co' : n.group === 'be'));
+  if (!nd) return;
+  if (type === 'co') document.getElementById('ns-be').value = '';
+  else document.getElementById('ns-co').value = '';
+  zoomNode(nd);
+}
+
+function expNetPNG() {
+  const se = document.getElementById('nsvg');
+  const s  = new XMLSerializer().serializeToString(se);
+  const c  = document.createElement('canvas'); c.width = se.clientWidth||900; c.height = se.clientHeight||500;
+  const ctx= c.getContext('2d'); ctx.fillStyle = '#FAFCFB'; ctx.fillRect(0, 0, c.width, c.height);
+  const img= new Image();
+  img.onload = () => { ctx.drawImage(img, 0, 0); const a = document.createElement('a'); a.download = 'openrbe_reseau.png'; a.href = c.toDataURL('image/png'); a.click(); };
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(s);
+}
+
+/* ─── EXPORTS ─── */
+function exportCSV(rows, name) {
+  if (!rows.length) return;
+  const h = Object.keys(rows[0]);
+  const lines = [h.join(';'), ...rows.map(r => h.map(k => {
+    const val = r[k] == null ? '' : String(r[k]);
+    return val.includes(';') || val.includes('"') ? '"' + val.replace(/"/g, '""') + '"' : val;
+  }).join(';'))];
+  const b = new Blob(['\uFEFF' + lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+  const u = URL.createObjectURL(b), a = document.createElement('a');
+  a.href = u; a.download = name + '_' + new Date().toISOString().slice(0, 10) + '.csv';
+  a.click(); URL.revokeObjectURL(u);
+}
+function exportXLSX(rows, name) { exportCSV(rows, name); }
+
+/* ─── RENDER ALL ─── */
+function renderAll() {
+  renderKPI(); renderNat(); renderPiePPE(); renderReg(); renderPct(); renderTopTable();
+  if (document.getElementById('page-ppe').classList.contains('active'))      renderPPE();
+  if (document.getElementById('page-database').classList.contains('active')) renderDB();
+  if (leafMap) updateMap();
+}
+
+/* ─── INIT ─── */
+window.addEventListener('load', () => {
+  popF(); applyF(); buildNet();
+  document.getElementById('ld').style.display = 'none';
+});
+
+</script>
+</body>
+</html>

@@ -1,0 +1,622 @@
+---
+title: "Analyse des Paiements Sociaux des Entreprises Extractives"
+subtitle: "Chiffre d'affaires, résultat net et paiements sociaux — ITIE Sénégal (2020–2024)"
+author: "Traoré"
+date: "`r format(Sys.Date(), '%d %B %Y')`"
+output:
+  bookdown::pdf_document2:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+    latex_engine: xelatex
+    keep_tex: false
+    includes:
+      in_header: preamble.tex
+fontsize: 12pt
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo      = FALSE,
+  warning   = FALSE,
+  message   = FALSE,
+  fig.align = "center",
+  fig.width = 8,
+  fig.height = 4.5,
+  out.width = "95%"
+)
+```
+
+```{r packages}
+library(readxl)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(naniar)
+library(knitr)
+library(kableExtra)
+library(scales)
+```
+
+```{r chargement-donnees}
+df <- read_excel(
+  "C:/Users/Bmd/Documents/ISE/Cours/ISE3/Stage ITIE/Liste entreprise brute/Paiements_sociaux_vf.xlsx",
+  sheet = "CA&RN"
+)
+
+df <- df %>%
+  mutate(
+    Annee       = as.integer(Annee),
+    CA_Mds      = CA      / 1e9,
+    RN_Mds      = RN      / 1e9,
+    Pmt_Mds     = Paiement / 1e9
+  )
+```
+
+\newpage
+
+# Présentation des données
+
+\begin{boitedef}{Source et contexte}
+Les données proviennent du processus de déclaration de l'\textbf{Initiative pour la Transparence dans les Industries Extractives (ITIE) au Sénégal}. Elles couvrent \textbf{31 entreprises} du secteur extractif sur la période \textbf{2020--2024}, soit 155 observations au total.
+\end{boitedef}
+
+## Structure du jeu de données
+
+```{r structure-table}
+struct_df <- data.frame(
+  Variable    = c("Entreprise", "Annee", "CA", "RN", "Paiement"),
+  Type        = c("Caractère", "Entier", "Numérique", "Numérique", "Numérique"),
+  Description = c(
+    "Nom de l'entreprise déclarante",
+    "Année de déclaration (2020–2024)",
+    "Chiffre d'affaires (FCFA)",
+    "Résultat net (FCFA)",
+    "Paiements sociaux déclarés à l'ITIE (FCFA)"
+  ),
+  Manquants = c(
+    sum(is.na(df$Entreprise)),
+    sum(is.na(df$Annee)),
+    sum(is.na(df$CA)),
+    sum(is.na(df$RN)),
+    sum(is.na(df$Paiement))
+  )
+)
+
+kable(struct_df,
+      booktabs = TRUE,
+      caption  = "Description des variables du jeu de données",
+      col.names = c("Variable", "Type", "Description", "Valeurs manquantes")) %>%
+  kable_styling(latex_options = c("striped", "hold_position"),
+                stripe_color  = "gray!10") %>%
+  column_spec(3, width = "7cm")
+```
+
+## Liste des entreprises
+
+L'échantillon comprend **`r length(unique(df$Entreprise))`** entreprises couvrant les secteurs minier, pétrolier et gazier, et des industries chimiques.
+
+```{r liste-entreprises}
+entreprises <- sort(unique(df$Entreprise))
+n    <- length(entreprises)
+mid  <- ceiling(n / 2)
+
+ent_g <- data.frame(N = 1:mid,       Entreprise = entreprises[1:mid])
+ent_d <- data.frame(N = (mid+1):n,   Entreprise = entreprises[(mid+1):n])
+if (nrow(ent_d) < nrow(ent_g)) {
+  ent_d <- rbind(ent_d, data.frame(N = NA, Entreprise = ""))
+}
+
+kable(cbind(ent_g, ent_d),
+      booktabs = TRUE,
+      caption  = "Liste des 31 entreprises déclarantes",
+      col.names = c("N°", "Entreprise", "N°", "Entreprise"),
+      align = c("c","l","c","l")) %>%
+  kable_styling(latex_options = c("striped", "hold_position"),
+                stripe_color  = "gray!10",
+                font_size = 9)
+```
+
+\newpage
+
+# Analyse des valeurs manquantes
+
+## Taux de complétude
+
+```{r miss-summary}
+miss_summary <- miss_var_summary(df[, c("CA", "RN", "Paiement")]) %>%
+  mutate(pct_miss = round(pct_miss, 1)) %>%
+  rename(Variable = variable,
+         `Nb. manquants` = n_miss,
+         `Pct manquant` = pct_miss)
+
+kable(miss_summary,
+      booktabs = TRUE,
+      caption  = "Résumé des valeurs manquantes par variable") %>%
+  kable_styling(latex_options = c("hold_position", "striped"),
+                stripe_color  = "gray!10")
+```
+
+\begin{boiteattn}{Taux de manquants élevé}
+Le CA et le RN présentent chacun plus de \textbf{40\%} de valeurs manquantes, reflétant l'hétérogénéité du périmètre de déclaration.
+\end{boiteattn}
+
+## Carte des valeurs manquantes
+
+```{r vis-miss, fig.cap="Carte des valeurs manquantes dans le jeu de données"}
+vis_miss(df[, c("Entreprise", "Annee", "CA", "RN", "Paiement")]) +
+  labs(title    = "Visualisation des valeurs manquantes",
+       subtitle = "Jeu de données ITIE (2020--2024)") +
+  theme_minimal(base_size = 11) +
+  theme(
+    plot.title    = element_text(color = "#19196F", face = "bold"),
+    plot.subtitle = element_text(color = "gray40"),
+    axis.text.x   = element_text(angle = 30, hjust = 1)
+  )
+```
+
+```{r gg-miss-var, fig.cap="Nombre de valeurs manquantes par variable"}
+gg_miss_var(df[, c("CA", "RN", "Paiement")]) +
+  labs(title    = "Valeurs manquantes par variable",
+       subtitle = "CA = Chiffre d'affaires | RN = Résultat net | Paiement = Paiements sociaux ITIE",
+       x = "Variable", y = "Nb. de valeurs manquantes") +
+  theme_minimal(base_size = 11) +
+  theme(
+    plot.title    = element_text(color = "#19196F", face = "bold"),
+    plot.subtitle = element_text(color = "gray40")
+  )
+```
+
+## Manquants par année
+
+```{r miss-annee}
+miss_annee <- df %>%
+  group_by(Annee) %>%
+  summarise(
+    N_obs    = n(),
+    CA_miss  = sum(is.na(CA)),
+    CA_pct   = round(100 * CA_miss  / N_obs, 1),
+    RN_miss  = sum(is.na(RN)),
+    RN_pct   = round(100 * RN_miss  / N_obs, 1),
+    Pmt_miss = sum(is.na(Paiement)),
+    Pmt_pct  = round(100 * Pmt_miss / N_obs, 1)
+  )
+
+kable(miss_annee,
+      booktabs = TRUE,
+      caption  = "Valeurs manquantes par année",
+      col.names = c("Année", "Obs.", "CA manq.", "CA (%)",
+                    "RN manq.", "RN (%)", "Pmt manq.", "Pmt (%)")) %>%
+  kable_styling(latex_options = c("hold_position", "striped"),
+                stripe_color  = "gray!10")
+```
+
+\newpage
+
+# Statistiques descriptives
+
+## Chiffre d'affaires (CA)
+
+```{r stats-CA}
+ca_stat <- df %>%
+  filter(!is.na(CA)) %>%
+  summarise(
+    N          = n(),
+    Minimum    = round(min(CA_Mds), 2),
+    Q1         = round(quantile(CA_Mds, 0.25), 2),
+    Mediane    = round(median(CA_Mds), 2),
+    Moyenne    = round(mean(CA_Mds), 2),
+    Q3         = round(quantile(CA_Mds, 0.75), 2),
+    Maximum    = round(max(CA_Mds), 2),
+    Ecart_type = round(sd(CA_Mds), 2)
+  ) %>%
+  pivot_longer(everything(),
+               names_to  = "Statistique",
+               values_to = "Valeur (Mds FCFA)")
+
+kable(ca_stat,
+      booktabs = TRUE,
+      caption  = "Statistiques descriptives du CA (en milliards FCFA)") %>%
+  kable_styling(latex_options = c("hold_position", "striped"),
+                stripe_color  = "gray!10")
+```
+
+\begin{boiteresultat}{Interprétation}
+Distribution très asymétrique : la médiane (\textasciitilde{}12,7 Mds) est très inférieure à la moyenne (\textasciitilde{}74,6 Mds FCFA), signe de quelques entreprises à très fort CA tirant la distribution vers le haut.
+\end{boiteresultat}
+
+## Résultat net (RN)
+
+```{r stats-RN}
+rn_stat <- df %>%
+  filter(!is.na(RN)) %>%
+  summarise(
+    N          = n(),
+    Minimum    = round(min(RN_Mds), 2),
+    Q1         = round(quantile(RN_Mds, 0.25), 2),
+    Mediane    = round(median(RN_Mds), 2),
+    Moyenne    = round(mean(RN_Mds), 2),
+    Q3         = round(quantile(RN_Mds, 0.75), 2),
+    Maximum    = round(max(RN_Mds), 2),
+    Ecart_type = round(sd(RN_Mds), 2)
+  ) %>%
+  pivot_longer(everything(),
+               names_to  = "Statistique",
+               values_to = "Valeur (Mds FCFA)")
+
+kable(rn_stat,
+      booktabs = TRUE,
+      caption  = "Statistiques descriptives du RN (en milliards FCFA)") %>%
+  kable_styling(latex_options = c("hold_position", "striped"),
+                stripe_color  = "gray!10")
+```
+
+\begin{boiteattn}{Interprétation}
+La moyenne du RN est \textbf{négative} (\textasciitilde{}-7,4 Mds FCFA), tirée par des pertes exceptionnelles (min : -662,9 Mds). La médiane reste positive (\textasciitilde{}0,19 Mds), indiquant que la majorité des entreprises sont bénéficiaires.
+\end{boiteattn}
+
+## Paiements sociaux (Paiement)
+
+```{r stats-Pmt}
+pmt_stat <- df %>%
+  filter(!is.na(Paiement)) %>%
+  summarise(
+    N          = n(),
+    Minimum    = round(min(Pmt_Mds), 3),
+    Q1         = round(quantile(Pmt_Mds, 0.25), 3),
+    Mediane    = round(median(Pmt_Mds), 3),
+    Moyenne    = round(mean(Pmt_Mds), 3),
+    Q3         = round(quantile(Pmt_Mds, 0.75), 3),
+    Maximum    = round(max(Pmt_Mds), 3),
+    Total      = round(sum(Pmt_Mds), 1),
+    Ecart_type = round(sd(Pmt_Mds), 3)
+  ) %>%
+  pivot_longer(everything(),
+               names_to  = "Statistique",
+               values_to = "Valeur (Mds FCFA)")
+
+kable(pmt_stat,
+      booktabs = TRUE,
+      caption  = "Statistiques descriptives des paiements sociaux (en milliards FCFA)") %>%
+  kable_styling(latex_options = c("hold_position", "striped"),
+                stripe_color  = "gray!10")
+```
+
+\begin{boiteresultat}{Interprétation}
+Les paiements sociaux présentent une variabilité importante entre entreprises. Le total cumulé sur la période donne une mesure directe de la contribution fiscale et parafiscale du secteur extractif à l'État sénégalais.
+\end{boiteresultat}
+
+\newpage
+
+# Analyse temporelle (2020--2024)
+
+## Évolution annuelle du CA
+
+```{r ca-annee, fig.cap="Évolution du chiffre d'affaires annuel"}
+ca_annee <- df %>%
+  filter(!is.na(CA)) %>%
+  group_by(Annee) %>%
+  summarise(mediane = median(CA_Mds), moyenne = mean(CA_Mds))
+
+ggplot(ca_annee, aes(x = Annee)) +
+  geom_line(aes(y = mediane, color = "Médiane"), linewidth = 1.2) +
+  geom_point(aes(y = mediane, color = "Médiane"), size = 3) +
+  geom_line(aes(y = moyenne, color = "Moyenne"), linewidth = 1.2, linetype = "dashed") +
+  geom_point(aes(y = moyenne, color = "Moyenne"), size = 3) +
+  scale_color_manual(values = c("Médiane" = "#19196F", "Moyenne" = "#D4AF37")) +
+  scale_x_continuous(breaks = 2020:2024) +
+  scale_y_continuous(labels = label_number(suffix = " Mds")) +
+  labs(title    = "Évolution du chiffre d'affaires annuel",
+       subtitle = "Secteur extractif sénégalais — ITIE (2020–2024)",
+       x = "Année", y = "CA (Mds FCFA)", color = NULL) +
+  theme_minimal(base_size = 11) +
+  theme(plot.title      = element_text(color = "#19196F", face = "bold"),
+        plot.subtitle   = element_text(color = "gray40"),
+        legend.position = "bottom")
+```
+
+## Évolution annuelle du RN
+
+```{r rn-annee, fig.cap="Évolution du résultat net annuel"}
+rn_annee <- df %>%
+  filter(!is.na(RN)) %>%
+  group_by(Annee) %>%
+  summarise(mediane = median(RN_Mds), moyenne = mean(RN_Mds))
+
+ggplot(rn_annee, aes(x = Annee)) +
+  geom_hline(yintercept = 0, linetype = "dotted", color = "gray50") +
+  geom_line(aes(y = mediane, color = "Médiane"), linewidth = 1.2) +
+  geom_point(aes(y = mediane, color = "Médiane"), size = 3) +
+  geom_line(aes(y = moyenne, color = "Moyenne"), linewidth = 1.2, linetype = "dashed") +
+  geom_point(aes(y = moyenne, color = "Moyenne"), size = 3) +
+  scale_color_manual(values = c("Médiane" = "#19196F", "Moyenne" = "#D4AF37")) +
+  scale_x_continuous(breaks = 2020:2024) +
+  scale_y_continuous(labels = label_number(suffix = " Mds")) +
+  labs(title    = "Évolution du résultat net annuel",
+       subtitle = "Secteur extractif sénégalais — ITIE (2020–2024)",
+       x = "Année", y = "RN (Mds FCFA)", color = NULL) +
+  theme_minimal(base_size = 11) +
+  theme(plot.title      = element_text(color = "#19196F", face = "bold"),
+        plot.subtitle   = element_text(color = "gray40"),
+        legend.position = "bottom")
+```
+
+## Récapitulatif par année
+
+```{r recap-annee}
+recap <- df %>%
+  group_by(Annee) %>%
+  summarise(
+    N_ent    = n_distinct(Entreprise),
+    CA_med   = round(median(CA_Mds,  na.rm = TRUE), 1),
+    CA_moy   = round(mean(CA_Mds,    na.rm = TRUE), 1),
+    RN_med   = round(median(RN_Mds,  na.rm = TRUE), 1),
+    RN_moy   = round(mean(RN_Mds,    na.rm = TRUE), 1),
+    Pmt_tot  = round(sum(Pmt_Mds,    na.rm = TRUE), 2),
+    Pmt_moy  = round(mean(Pmt_Mds,   na.rm = TRUE), 3)
+  )
+
+kable(recap,
+      booktabs = TRUE,
+      caption  = "Récapitulatif annuel (en Mds FCFA)",
+      col.names = c("Année", "Nb. ent.",
+                    "CA méd.", "CA moy.",
+                    "RN méd.", "RN moy.",
+                    "Pmt total", "Pmt moyen")) %>%
+  kable_styling(latex_options = c("hold_position", "striped"),
+                stripe_color  = "gray!10",
+                font_size = 9)
+```
+
+## Évolution annuelle des paiements sociaux
+
+```{r pmt-annee, fig.cap="Évolution des paiements sociaux totaux et moyens par année"}
+pmt_annee <- df %>%
+  filter(!is.na(Paiement)) %>%
+  group_by(Annee) %>%
+  summarise(
+    total   = sum(Pmt_Mds),
+    moyenne = mean(Pmt_Mds),
+    n       = n()
+  )
+
+ggplot(pmt_annee, aes(x = Annee)) +
+  geom_col(aes(y = total), fill = "#19196F", alpha = 0.75, width = 0.6) +
+  geom_line(aes(y = moyenne * (max(total) / max(moyenne)),
+                color = "Moyenne (éch. droite)"),
+            linewidth = 1.2, linetype = "dashed") +
+  geom_point(aes(y = moyenne * (max(total) / max(moyenne)),
+                 color = "Moyenne (éch. droite)"),
+             size = 3) +
+  scale_color_manual(values = c("Moyenne (éch. droite)" = "#D4AF37")) +
+  scale_x_continuous(breaks = 2020:2024) +
+  scale_y_continuous(
+    name   = "Total paiements (Mds FCFA)",
+    labels = label_number(suffix = " Mds"),
+    sec.axis = sec_axis(
+      ~ . * (max(pmt_annee$moyenne) / max(pmt_annee$total)),
+      name   = "Paiement moyen (Mds FCFA)",
+      labels = label_number(suffix = " Mds")
+    )
+  ) +
+  labs(title    = "Évolution annuelle des paiements sociaux",
+       subtitle = "Barres = total | Pointillés = moyenne par entreprise déclarante",
+       x = "Année", color = NULL) +
+  theme_minimal(base_size = 11) +
+  theme(
+    plot.title      = element_text(color = "#19196F", face = "bold"),
+    plot.subtitle   = element_text(color = "gray40"),
+    legend.position = "bottom",
+    axis.title.y.right = element_text(color = "#D4AF37"),
+    axis.text.y.right  = element_text(color = "#D4AF37")
+  )
+```
+
+\newpage
+
+# Analyse par entreprise
+
+
+## Top 10 par CA moyen
+
+```{r top10-ca}
+top10 <- df %>%
+  filter(!is.na(CA)) %>%
+  group_by(Entreprise) %>%
+  summarise(N      = n(),
+            CA_moy = round(mean(CA_Mds), 1),
+            CA_max = round(max(CA_Mds),  1)) %>%
+  arrange(desc(CA_moy)) %>%
+  slice_head(n = 10)
+
+kable(top10,
+      booktabs = TRUE,
+      caption  = "Top 10 des entreprises par CA moyen (Mds FCFA)",
+      col.names = c("Entreprise", "Années obs.", "CA moyen", "CA max")) %>%
+  kable_styling(latex_options = c("hold_position", "striped"),
+                stripe_color  = "gray!10")
+```
+
+## Composition du CA par entreprise et par année
+
+```{r stacked-bar-ca, fig.cap="Chiffre d'affaires total par année — composition par entreprise", fig.height=5, fig.width=9, out.width="100%"}
+# Palette de 31 couleurs autour de MidnightBlue/RoyalBlue/gold
+palette_31 <- colorRampPalette(
+  c("#19196F", "#2B4DB0", "#4169E1", "#5B8DEE", "#87CEEB",
+    "#1A7A4A", "#2EBF72", "#A8DF8E",
+    "#D4AF37", "#E87722", "#CC2200",
+    "#8B0000", "#C71585", "#9B59B6",
+    "#2C3E50", "#95A5A6")
+)(31)
+
+df_stack <- df %>%
+  filter(!is.na(CA)) %>%
+  mutate(Annee = factor(Annee))
+
+# Ordonner les entreprises par CA total décroissant (dominantes en bas du stack)
+ordre_stack <- df_stack %>%
+  group_by(Entreprise) %>%
+  summarise(total = sum(CA_Mds, na.rm = TRUE)) %>%
+  arrange(total) %>%
+  pull(Entreprise)
+
+df_stack$Entreprise <- factor(df_stack$Entreprise, levels = ordre_stack)
+
+ggplot(df_stack, aes(y = Annee, x = CA_Mds, fill = Entreprise)) +
+  geom_bar(stat = "identity", position = "stack", color = "white", linewidth = 0.15) +
+  scale_fill_manual(values = palette_31,
+                    guide  = guide_legend(ncol = 3,
+                                          keyheight = unit(0.45, "cm"),
+                                          keywidth  = unit(0.45, "cm"))) +
+  scale_x_continuous(labels = label_number(suffix = " Mds")) +
+  labs(
+    title    = "Composition du chiffre d'affaires par année et par entreprise",
+    subtitle = "Barres horizontales empilées — valeurs manquantes exclues",
+    x        = "CA cumulé (Mds FCFA)",
+    y        = "Année",
+    fill     = "Entreprise"
+  ) +
+  theme_minimal(base_size = 9) +
+  theme(
+    plot.title      = element_text(color = "#19196F", face = "bold", size = 10),
+    plot.subtitle   = element_text(color = "gray40", size = 8),
+    legend.position = "bottom",
+    legend.text     = element_text(size = 6.5),
+    legend.title    = element_text(size = 7.5, face = "bold"),
+    axis.text.y     = element_text(size = 9, face = "bold"),
+    panel.grid.major.y = element_blank()
+  )
+```
+
+
+## Paiements sociaux par entreprise
+
+```{r top10-pmt}
+top10_pmt <- df %>%
+  filter(!is.na(Paiement)) %>%
+  group_by(Entreprise) %>%
+  summarise(
+    N        = n(),
+    Pmt_tot  = round(sum(Pmt_Mds),  3),
+    Pmt_moy  = round(mean(Pmt_Mds), 3),
+    Pmt_max  = round(max(Pmt_Mds),  3)
+  ) %>%
+  arrange(desc(Pmt_tot)) %>%
+  slice_head(n = 10)
+
+kable(top10_pmt,
+      booktabs = TRUE,
+      caption  = "Top 10 des entreprises par paiements sociaux cumulés (Mds FCFA)",
+      col.names = c("Entreprise", "Années obs.",
+                    "Total cumulé", "Moy. annuelle", "Maximum annuel")) %>%
+  kable_styling(latex_options = c("hold_position", "striped"),
+                stripe_color  = "gray!10")
+```
+
+## Composition des paiements par entreprise et par année
+
+```{r stacked-bar-pmt, fig.cap="Paiements sociaux par année — composition par entreprise", fig.height=5, fig.width=9, out.width="100%"}
+palette_pmt <- colorRampPalette(
+  c("#19196F", "#2B4DB0", "#4169E1", "#5B8DEE", "#87CEEB",
+    "#1A7A4A", "#2EBF72", "#A8DF8E",
+    "#D4AF37", "#E87722", "#CC2200",
+    "#8B0000", "#C71585", "#9B59B6",
+    "#2C3E50", "#95A5A6")
+)(length(unique(df$Entreprise[!is.na(df$Paiement)])))
+
+df_pmt_stack <- df %>%
+  filter(!is.na(Paiement)) %>%
+  mutate(Annee = factor(Annee))
+
+ordre_pmt <- df_pmt_stack %>%
+  group_by(Entreprise) %>%
+  summarise(total = sum(Pmt_Mds, na.rm = TRUE)) %>%
+  arrange(total) %>%
+  pull(Entreprise)
+
+df_pmt_stack$Entreprise <- factor(df_pmt_stack$Entreprise, levels = ordre_pmt)
+
+ggplot(df_pmt_stack, aes(y = Annee, x = Pmt_Mds, fill = Entreprise)) +
+  geom_bar(stat = "identity", position = "stack",
+           color = "white", linewidth = 0.15) +
+  scale_fill_manual(values = palette_pmt,
+                    guide  = guide_legend(ncol = 3,
+                                          keyheight = unit(0.45, "cm"),
+                                          keywidth  = unit(0.45, "cm"))) +
+  scale_x_continuous(labels = label_number(suffix = " Mds")) +
+  labs(
+    title    = "Composition des paiements sociaux par année et par entreprise",
+    subtitle = "Barres horizontales empilées — valeurs manquantes exclues",
+    x        = "Paiements cumulés (Mds FCFA)",
+    y        = "Année",
+    fill     = "Entreprise"
+  ) +
+  theme_minimal(base_size = 9) +
+  theme(
+    plot.title         = element_text(color = "#19196F", face = "bold", size = 10),
+    plot.subtitle      = element_text(color = "gray40", size = 8),
+    legend.position    = "bottom",
+    legend.text        = element_text(size = 6.5),
+    legend.title       = element_text(size = 7.5, face = "bold"),
+    axis.text.y        = element_text(size = 9, face = "bold"),
+    panel.grid.major.y = element_blank()
+  )
+```
+
+## Taux de pression fiscale (Paiement / CA)
+
+```{r taux-pression, fig.cap="Taux de pression fiscale moyen par entreprise (Paiement/CA, en \\%)", fig.height=5.5}
+pression <- df %>%
+  filter(!is.na(Paiement), !is.na(CA), CA > 0) %>%
+  mutate(taux = 100 * Pmt_Mds / CA_Mds) %>%
+  group_by(Entreprise) %>%
+  summarise(taux_moy = round(mean(taux), 1)) %>%
+  arrange(taux_moy)
+
+ggplot(pression, aes(x = reorder(Entreprise, taux_moy), y = taux_moy)) +
+  geom_col(fill = "#19196F", alpha = 0.8) +
+  geom_text(aes(label = paste0(taux_moy, "%")),
+            hjust = -0.15, size = 2.5, color = "gray30") +
+  coord_flip(clip = "off") +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.18))) +
+  labs(
+    title    = "Taux de pression fiscale moyen par entreprise",
+    subtitle = "Rapport Paiements sociaux / Chiffre d'affaires (en %)",
+    x = NULL, y = "Taux de pression (%)"
+  ) +
+  theme_minimal(base_size = 9) +
+  theme(
+    plot.title    = element_text(color = "#19196F", face = "bold"),
+    plot.subtitle = element_text(color = "gray40")
+  )
+```
+
+\newpage
+
+# Synthèse et recommandations
+
+\begin{boiteresultat}{Principaux enseignements}
+\begin{enumerate}
+  \item \textbf{Forte hétérogénéité sectorielle :} Le CA varie de 0 à 566 Mds FCFA selon les entreprises.
+  \item \textbf{Résultat net globalement fragile :} La moyenne du RN est négative malgré une médiane positive, en raison de quelques pertes exceptionnelles.
+  \item \textbf{Paiements sociaux concentrés :} Les paiements à l'ITIE sont fortement concentrés sur un petit nombre d'entreprises. Le taux de pression fiscale (Paiement/CA) varie très significativement selon les acteurs.
+  \item \textbf{Couverture insuffisante :} Plus de 40\% des valeurs de CA et RN sont manquantes, limitant la portée des analyses.
+  \item \textbf{Reprise post-COVID :} Une reprise progressive des paiements est observable à partir de 2022 après la contraction de 2020--2021.
+\end{enumerate}
+\end{boiteresultat}
+
+\begin{boiteex}{Recommandations}
+\begin{itemize}
+  \item Renforcer les mécanismes de relance auprès des entreprises non déclarantes.
+  \item Envisager des méthodes d'imputation (MICE, k-NN) pour les analyses approfondies.
+  \item Désagréger systématiquement par secteur (hydrocarbures, mines, phosphates).
+  \item Analyser la cohérence entre le taux de pression fiscale déclaré à l'ITIE et les obligations légales sectorielles pour identifier d'éventuels écarts de déclaration.
+\end{itemize}
+\end{boiteex}
+
+\vfill
+
+\begin{center}
+\textcolor{MidnightBlue}{\rule{0.6\linewidth}{1.5pt}}\\[6pt]
+\textit{\textcolor{gray}{Document généré automatiquement sous RMarkdown --- ENSAE Pierre Ndiaye, Dakar}}
+\end{center}

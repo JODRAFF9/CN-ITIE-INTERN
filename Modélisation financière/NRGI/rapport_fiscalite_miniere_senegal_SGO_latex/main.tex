@@ -1,0 +1,163 @@
+\documentclass[12pt,a4paper]{report}
+
+% ---------- Langue et encodage ----------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french,provide=*]{babel}
+
+% ---------- Mise en page ----------
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\usepackage{fancyhdr}
+\setlength{\headheight}{15pt}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancyhead[L]{\nouppercase{\leftmark}}
+\fancyhead[R]{\thepage}
+\renewcommand{\chaptermark}[1]{\markboth{\thechapter.\ #1}{}}
+
+% ---------- Tableaux, figures, graphiques ----------
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{makecell}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{tikz}
+
+% ---------- Mathématiques ----------
+\usepackage{amsmath,amssymb}
+
+% ---------- Couleurs ----------
+\usepackage{xcolor}
+\definecolor{itieblue}{RGB}{0,61,107}
+\definecolor{itiegold}{RGB}{196,154,49}
+
+% ---------- Liens et bibliographie ----------
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=itieblue,
+  citecolor=itieblue,
+  urlcolor=itieblue,
+  pdftitle={Impact du régime fiscal minier sur les recettes publiques au Sénégal},
+  pdfauthor={Stagiaire ITIE Sénégal},
+}
+\usepackage[round]{natbib}
+
+% ---------- Numérotation et table des matières ----------
+\usepackage[nottoc]{tocbibind}
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{3}
+
+% ---------- Listes ----------
+\usepackage{enumitem}
+
+% ---------- Commandes utiles ----------
+\newcommand{\TEMI}{\textsc{temi}}
+\newcommand{\VAN}{\textsc{van}}
+\newcommand{\TRI}{\textsc{tri}}
+\newcommand{\CAPEX}{\textsc{capex}}
+\newcommand{\OPEX}{\textsc{opex}}
+
+\begin{document}
+
+% =========================================================
+% PAGE DE GARDE
+% =========================================================
+\begin{titlepage}
+\centering
+
+{\large \textsc{République du Sénégal}}\\[0.2cm]
+{\large \textsc{Initiative pour la Transparence dans les Industries Extractives (ITIE Sénégal)}}\\[0.2cm]
+{\large \textsc{École Nationale de la Statistique et de l'Analyse Économique de Dakar (ENSAE Dakar)}}\\[1.5cm]
+
+\rule{\textwidth}{0.4pt}\\[0.4cm]
+{\Huge \bfseries Impact du régime fiscal minier sur les recettes publiques au Sénégal (Evaluation de la performance fiscale d'un projet minier : Approche de NRGI et Cas du projet aurifère Sabodala Massawa)}\\[0.4cm]
+{\Large Une application du modèle FARI/NRGI au projet aurifère\\ Sabodala-Massawa (SGO)}\\[0.4cm]
+\rule{\textwidth}{0.4pt}\\[1.5cm]
+
+{\large \textsc{Rapport de stage}}\\[0.3cm]
+{\large présenté comme produit d'analyse économique}\\
+{\large dans le cadre du stage effectué auprès du}\\
+{\large Comité National ITIE Sénégal}\\[2cm]
+
+\vfill
+
+\begin{minipage}{0.45\textwidth}
+\begin{flushleft}
+\large
+\emph{Élève ingénieur statisticien économiste}\\
+ENSAE Dakar\\
+Stagiaire, ITIE Sénégal
+\end{flushleft}
+\end{minipage}
+\hfill
+\begin{minipage}{0.45\textwidth}
+\begin{flushright}
+\large
+\emph{Encadrement}\\
+Comité National ITIE Sénégal\\
+ENSAE Dakar
+\end{flushright}
+\end{minipage}
+
+\vfill
+
+{\large Juin 2026}
+
+\end{titlepage}
+
+% =========================================================
+% PAGES LIMINAIRES
+% =========================================================
+\pagenumbering{roman}
+
+\input{chapters/remerciements}
+\input{chapters/resume}
+
+\tableofcontents
+\clearpage
+
+\listoftables
+\clearpage
+
+\listoffigures
+\clearpage
+
+\input{chapters/sigles}
+
+% =========================================================
+% CORPS DU RAPPORT
+% =========================================================
+\clearpage
+\pagenumbering{arabic}
+
+\input{chapters/introduction}
+\input{chapters/chap1_cadre}
+\input{chapters/chap2_senegal_sgo}
+\input{chapters/chap3_methodologie}
+\input{chapters/chap4_resultats}
+%\input{chapters/chap5_recommandations}
+\input{chapters/conclusion}
+
+% =========================================================
+% BIBLIOGRAPHIE
+% =========================================================
+\clearpage
+\bibliographystyle{apalike}
+\bibliography{references}
+
+% =========================================================
+% ANNEXES
+% =========================================================
+\appendix
+\input{chapters/annexes}
+
+\end{document}

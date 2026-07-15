@@ -1,0 +1,151 @@
+\chapter{Méthodologie~: adaptation du modèle NRGI au projet Sabodala-Massawa}
+\label{chap:methodo}
+
+\section{L'outil de modélisation utilisé}
+
+L'outil mobilisé dans ce rapport est le classeur Excel de modélisation financière d'une mine d'or diffusé par NRGI, dont l'architecture suit la méthodologie FARI présentée au chapitre~\ref{chap:cadre}. Ce classeur comprend quatre feuilles~:
+
+\begin{enumerate}
+  \item une feuille de \textbf{présentation}, qui documente l'objectif de l'outil, sa table des matières et sa relation avec la méthodologie FARI du FMI~;
+  \item une feuille de \textbf{paramètres}, qui regroupe (i)~un tableau comparatif des principaux instruments fiscaux pour onze régimes --- dix régimes pré-paramétrés (RDC~2002, RDC amendée et trois variantes, Chili, Pérou, Australie-Occidentale, Tanzanie, Ghana, Zambie~2016) et une onzième colonne initialement vide --- (ii)~les hypothèses économiques et financières générales (taux d'actualisation, taux d'inflation, taux d'intérêt réel, niveau d'endettement) et (iii)~le profil opérationnel du projet (production, dépenses d'investissement, coûts d'exploitation, prix) sur 50 années~;
+  \item une feuille de \textbf{résultats}, qui synthétise les indicateurs clés --- \VAN, \TRI, \TEMI, période de récupération --- ainsi que les graphiques de comparaison entre régimes~;
+  \item une feuille de \textbf{modèle}, qui contient l'ensemble des calculs intermédiaires~: flux de trésorerie avant impôt, calcul de chaque instrument fiscal pour le régime sélectionné, flux après impôt, et tableaux de sensibilité comparant les onze régimes entre eux pour un même profil de projet.
+\end{enumerate}
+
+Dans sa version d'origine, le profil opérationnel correspondait à une mine fictive de taille moyenne (production constante de 270~koz/an pendant onze ans, à partir de la troisième année, pour un investissement de développement de 500~millions \$US) et la onzième colonne du tableau comparatif des régimes fiscaux était vide. L'adaptation réalisée pour ce rapport a consisté à (i)~remplacer ce profil générique par le profil réel du projet Sabodala-Massawa (section~\ref{sec:donnees-pfs}) et (ii)~renseigner la onzième colonne du tableau des régimes fiscaux avec les paramètres applicables à SGO (section~\ref{sec:scenario-senegal}), sans modifier par ailleurs la structure des feuilles, les formules existantes, ni les dix régimes de comparaison déjà paramétrés.
+
+\section{Extraction et insertion des données du projet}
+\label{sec:donnees-pfs}
+
+\subsection{Calendrier de production}
+
+Le profil de production inséré dans le modèle reprend, pour les années 2020 à 2036 (notées années~1 à~17 dans le modèle), la ligne « Production » du tableau de synthèse des flux de trésorerie du PFS (\emph{LOM Cash Flow Summary}), convertie de milliers d'onces en onces. La première année de production du modèle (année~1) correspond ainsi directement à 2020, contrairement au profil générique d'origine qui faisait démarrer la production en année~3. Le tableau~\ref{tab:profil-production} reproduit ce calendrier.
+
+\begin{table}[H]
+\centering
+\caption{Profil de production, dépenses d'investissement et coûts d'exploitation insérés dans le modèle (2020-2036)}
+\label{tab:profil-production}
+\small
+\begin{tabular}{ccccc}
+\toprule
+Année & Production & \CAPEX{} développement & Capital de maintien & Coût opérationnel \\
+      & (oz)       & (millions \$US)        & (millions \$US)     & (\$US/oz) \\
+\midrule
+2020 & 245\,000 & 37  & 41 & 698,0 \\
+2021 & 359\,000 & 109 & 37 & 470,8 \\
+2022 & 360\,000 & 160 & 45 & 494,4 \\
+2023 & 400\,000 & 0   & 25 & 507,5 \\
+2024 & 400\,000 & 0   & 27 & 542,5 \\
+2025 & 400\,000 & 0   & 12 & 507,5 \\
+2026 & 400\,000 & 0   & 11 & 450,0 \\
+2027 & 320\,000 & 24  & 8  & 550,0 \\
+2028 & 173\,000 & 23  & 6  & 913,3 \\
+2029 & 173\,000 & 9   & 9  & 867,1 \\
+2030 & 173\,000 & 2   & 12 & 913,3 \\
+2031 & 173\,000 & 1   & 6  & 890,2 \\
+2032 & 173\,000 & 9   & 3  & 780,3 \\
+2033 & 173\,000 & 18  & 5  & 757,2 \\
+2034 & 173\,000 & 10  & 3  & 531,8 \\
+2035 & 133\,000 & 4   & 2  & 609,0 \\
+2036 & 56\,000  & 1   & 1  & 678,6 \\
+\midrule
+\textbf{Total} & \textbf{4\,284\,000} & \textbf{407} & \textbf{253} & -- \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.2cm}
+\footnotesize Source~: élaboration des auteurs à partir de \citet{lycopodium2020pfs}, tableaux 1.7, 1.10, 1.11 et 22.1.
+\end{table}
+
+La figure~\ref{fig:production} illustre la trajectoire de production retenue~: un palier proche de 400~koz/an entre 2023 et 2026, porté par l'exploitation simultanée des unités de traitement WOL et ROT, suivi d'un repli vers 173~koz/an à partir de 2028 lorsque la contribution de l'usine ROT s'amenuise, puis d'une décroissance en fin de vie de mine.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+  width=0.95\textwidth, height=6.5cm,
+  ybar, bar width=10pt,
+  symbolic x coords={2020,2021,2022,2023,2024,2025,2026,2027,2028,2029,2030,2031,2032,2033,2034,2035,2036},
+  xtick=data, x tick label style={rotate=45,anchor=east,font=\scriptsize},
+  ylabel={Production (koz)}, ymin=0, ymax=450,
+  ylabel style={font=\small}, tick label style={font=\small},
+  enlarge x limits=0.02,
+  axis lines*=left,
+  ymajorgrids, grid style={dashed,gray!30},
+  bar shift=0pt,
+  nodes near coords, every node near coord/.append style={font=\tiny, rotate=90, anchor=west},
+]
+\addplot[fill=itieblue] coordinates {
+ (2020,245)(2021,359)(2022,360)(2023,400)(2024,400)(2025,400)(2026,400)
+ (2027,320)(2028,173)(2029,173)(2030,173)(2031,173)(2032,173)(2033,173)
+ (2034,173)(2035,133)(2036,56)
+};
+\end{axis}
+\end{tikzpicture}
+\caption{Profil de production aurifère de Sabodala-Massawa, 2020-2036 (milliers d'onces)}
+\label{fig:production}
+\end{figure}
+
+\subsection{Dépenses d'investissement}
+
+Les dépenses d'investissement de développement (colonne « \CAPEX{} développement » du tableau~\ref{tab:profil-production}) correspondent à la ligne « \emph{Total Development} » du tableau de synthèse des coûts en capital du PFS, qui regroupe les phases~1 et~2 de mise à niveau de l'usine Massawa, le développement souterrain et la relocalisation de communautés. Les dépenses de maintien en exploitation (\emph{sustaining capital}) correspondent à la ligne « \emph{Sustaining Capex} » du tableau de synthèse des flux de trésorerie. Aucune dépense d'exploration n'est intégrée au profil, conformément au périmètre de l'analyse économique du PFS, qui exclut les coûts d'exploration de l'estimation des flux de trésorerie.
+
+\subsection{Coûts d'exploitation}
+
+Le modèle NRGI ne comporte, dans sa feuille de calcul, qu'une seule ligne de coût d'exploitation unitaire (exprimée en \$US par once), les lignes complémentaires prévues dans la feuille de paramètres (broyage, autres, énergie, services domestiques) n'étant pas reprises dans les formules de calcul du flux de trésorerie. Pour ne pas modifier la structure de calcul du classeur --- conformément à la contrainte de préservation de l'intégrité méthodologique de l'outil --- l'ensemble des coûts d'exploitation du PFS (exploitation minière à ciel ouvert et souterraine, traitement WOL et ROT, coûts généraux et administratifs, administration régionale) a été agrégé en un coût unitaire annuel, calculé comme~:
+\begin{equation}
+  c_t = \frac{C^{\text{OP}}_t + C^{\text{UG}}_t + C^{\text{WOL}}_t + C^{\text{ROT}}_t + C^{\text{G\&A}}_t + C^{\text{adm.~rég.}}_t}{Q_t}
+\end{equation}
+où $Q_t$ est la production annuelle en onces et chaque terme $C_t$ le coût annuel correspondant, exprimé en millions \$US, issu des tableaux de synthèse des coûts d'exploitation du PFS. Cette agrégation explique le profil en dents de scie du coût unitaire observé dans le tableau~\ref{tab:profil-production}~: les années 2028 à 2032, où la production chute fortement alors que les coûts fixes (administration, maintenance de l'usine ROT) restent élevés, affichent un coût unitaire proche de 900~\$US/oz, contre 450 à 550~\$US/oz pendant la période de production maximale.
+
+\subsection{Prix de l'or et coûts de fermeture}
+
+Le prix de l'or retenu (1\,600~\$US/once) correspond au cas central de l'analyse économique du PFS et a été reporté à la fois dans le paramètre de prix de référence et dans le paramètre de prix utilisé pour le calcul de l'impôt sur les profits excédentaires (où il se substitue au prix de 1\,300~\$US/once du profil générique d'origine~; le prix de réserve, utilisé par certains régimes pour la définition de seuils, a été fixé à 1\,250~\$US/once conformément à l'hypothèse de réserve du PFS). Un coût de fermeture et de réhabilitation de 5~millions \$US a été affecté à la dernière année de production (2036), conformément à l'indication du PFS selon laquelle la majeure partie de ces coûts est engagée en fin de vie de mine.
+
+\section{Construction du scénario fiscal « Sénégal »}
+\label{sec:scenario-senegal}
+
+La onzième colonne du tableau comparatif des régimes fiscaux --- vide dans la version d'origine, mais déjà référencée par l'ensemble des formules de calcul (plages de type \texttt{INDEX(H\textit{ligne}:R\textit{ligne}, \$F\$6)}) et par le sélecteur de régime --- a été renseignée avec les paramètres du régime sénégalais décrits à la section~\ref{sec:regime-sgo}. Le tableau~\ref{tab:regimes} reproduit, pour les quatre instruments fiscaux les plus déterminants, les paramètres retenus pour le Sénégal et pour les dix régimes de comparaison déjà présents dans l'outil.
+
+\begin{table}[H]
+\centering
+\caption{Paramètres des principaux instruments fiscaux par régime}
+\label{tab:regimes}
+\small
+\begin{tabular}{lcccc}
+\toprule
+Régime & Redevance & Impôt sur les & Participation & Droits de \\
+       & (assiette) & bénéfices & gratuite de l'État & douane \\
+\midrule
+RDC -- 2002            & 2,5\,\% (nette) & 30,0\,\% & 5\,\%  & 5,0\,\% \\
+RDC -- amendée (2018)  & 3,5\,\% (brute) & 35,0\,\% & 10\,\% & 5,0\,\% \\
+Chili                  & 0\,\%           & 22,4\,\% & 0\,\%  & 0\,\% \\
+Pérou                  & 0\,\%           & 28,0\,\% & 0\,\%  & 0\,\% \\
+Australie-Occidentale  & 2,5\,\% (brute) & 30,0\,\% & 0\,\%  & 0\,\% \\
+Tanzanie               & 4,0\,\% (brute) & 30,0\,\% & 0\,\%  & 0\,\% \\
+Ghana                  & 5,0\,\% (brute) & 35,0\,\% & 10\,\% & 0\,\% \\
+Zambie -- 2016         & 5,0\,\% (brute) & 30,0\,\% & 0\,\%  & 0\,\% \\
+RDC -- redevance variable & 2,5\,\% (brute) & 30,0\,\% & 5\,\% & 5,0\,\% \\
+RDC -- taxe sur la rente  & 2,5\,\% (brute) & 30,0\,\% & 5\,\% & 5,0\,\% \\
+\textbf{Sénégal (SGO)} & \textbf{5,0\,\% (brute)} & \textbf{25,0\,\%} & \textbf{10\,\%} & \textbf{0,0\,\%} \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.2cm}
+\footnotesize Source~: dix premiers régimes -- paramétrage d'origine de l'outil NRGI~; régime « Sénégal » -- construit par les auteurs d'après \citet{lycopodium2020pfs}, section~22.3-22.4 et \citet{senegal2016codeminier}.
+\end{table}
+
+Les autres paramètres du régime sénégalais --- modalités d'amortissement, report des pertes, taux de retenue à la source sur les dividendes --- n'étant pas détaillés dans le PFS, ils ont été repris, à titre conservatoire, des valeurs du régime « RDC amendée », régime le plus proche du Sénégal en termes de taux d'imposition global sur les bénéfices avant l'amendement de 2018. Cette convention n'affecte que marginalement les résultats présentés au chapitre~\ref{chap:resultats}, dans la mesure où, pour le profil de Sabodala-Massawa --- dont le flux de trésorerie avant impôt est positif dès la première année --- ni le report de pertes ni le calendrier d'amortissement ne deviennent contraignants.
+
+Le sélecteur de régime de l'outil (paramètre \texttt{F6}) reste positionné, par défaut, sur le régime « RDC amendée », ce qui permet de continuer à utiliser l'outil pour son objet initial (analyse du code minier congolais)~; il suffit de le repositionner sur la valeur~11 pour activer le régime « Sénégal » et obtenir directement, pour le profil Sabodala-Massawa, les résultats détaillés présentés au chapitre~\ref{chap:resultats}.
+
+\section{Hypothèses économiques et financières générales, et limites}
+
+Les hypothèses économiques et financières générales du modèle --- taux d'actualisation de l'État (10\,\%) et de l'investisseur (12,5\,\%), taux d'inflation du dollar (2\,\%), part de l'investissement financée par emprunt (50\,\%), durée de remboursement (5~ans) et taux d'intérêt réel (12,5\,\%) --- correspondent aux valeurs de référence du modèle FARI et n'ont pas été modifiées, le PFS de Sabodala-Massawa ne fournissant pas d'hypothèses de financement alternatives explicites pour cette extension de mine déjà en exploitation.
+
+Trois limites méritent d'être signalées à ce stade~:
+\begin{enumerate}
+  \item le modèle ne représente que les instruments fiscaux génériques (redevance, impôt sur les bénéfices, participation de l'État, retenue à la source, droits de douane, instruments progressifs)~; les flux spécifiques à la transaction Massawa (paiement initial de 15~millions \$US, \emph{gold stream} Franco-Nevada) n'y figurent pas, pour les raisons indiquées à la section~\ref{sec:regime-sgo}~;
+  \item le profil de Sabodala-Massawa correspond à l'\textbf{extension} d'une mine déjà en production, et non à un projet \emph{greenfield}~: le flux de trésorerie avant impôt est positif dès la première année du modèle (2020), ce qui prive de sens les indicateurs de \TRI{} et de période de récupération calculés par l'outil --- conçus pour un projet dont les premières années sont marquées par un investissement net négatif. Ce point est discuté en détail à la section~\ref{sec:limites-tri}~;
+  \item enfin, le modèle suppose, conformément à la méthodologie FARI, un prix de l'or constant en termes réels sur toute la période~; aucune analyse de sensibilité au prix n'est présentée dans ce rapport, le PFS lui-même limitant cette sensibilité à quatre scénarios de prix (1\,500 à 1\,800~\$US/once) appliqués à la \VAN{} globale du projet et non à sa décomposition par instrument fiscal.
+\end{enumerate}
