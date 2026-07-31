@@ -193,7 +193,7 @@
 \begin{titlepage}
   \begin{center}
     {\small\bfseries RÉPUBLIQUE DU SÉNÉGAL}\\[0.1cm]
-    {\scriptsize Un Peuple -- Un But -- Une Foi}\\[0.4cm]
+    {\scriptsize Un Peuple - Un But - Une Foi}\\[0.4cm]
     \begin{minipage}{0.45\textwidth}
       \centering
       \includegraphics[height=2.1cm]{Itie.png}\\[0.15cm]
@@ -201,30 +201,31 @@
     \end{minipage}\hfill
     \begin{minipage}{0.45\textwidth}
       \centering
-      {\color{ensaeblue}\bfseries\large ENSAE}\\[0.1cm]
+      \includegraphics[height=3.2cm]{ensae.png}\\[0.05cm]
       {\scriptsize\bfseries École Nationale de la Statistique\\ et de l'Analyse Économique Pierre Ndiaye}
     \end{minipage}\\[1.2cm]
 
     {\color{ensaeblue}\rule{\textwidth}{1.2pt}}\\[0.7cm]
     {\large\scshape Rapport de stage}\\[0.45cm]
-    {\color{ensaeblue}\LARGE\bfseries Appui à la gestion des données du secteur extractif :
-    fiabilisation du Registre des Bénéficiaires Effectifs et analyse
+    {\color{ensaeblue}\large\bfseries Appui à la gestion des données du secteur extractif}\\[0.25cm]
+    {\color{ensaeblue}\LARGE\bfseries Fiabilisation du Registre des Bénéficiaires Effectifs et analyse
     du sous-secteur de l'EMAPE par la statistique miroir}\\[0.6cm]
     {\color{ensaeblue}\rule{\textwidth}{1.2pt}}\\[0.9cm]
 
     {\normalsize Stage effectué au sein du \textbf{Comité national de l'Initiative pour la
-    Transparence dans les Industries Extractives (CN-ITIE)} --- Service « Gestion des données »}\\[0.3cm]
-    {\normalsize\itshape Ngor-Almadies, Dakar --- du 04 mai au 31 juillet 2026}\\[1.1cm]
+    Transparence dans les Industries Extractives (CN-ITIE)}, Service « Gestion des données »}\\[0.3cm]
+    {\normalsize\itshape Ngor-Almadies, Dakar, du 04 mai au 31 juillet 2026}\\[1.1cm]
 
     \begin{tabular}{p{0.46\textwidth}p{0.46\textwidth}}
-      \textbf{Présenté par :} & \textbf{Encadrement :}\\[0.15cm]
-      Sié Rachid TRAORÉ & M. Thaddée Adiouma SECK\\
-      Élève Ingénieur Statisticien & \emph{Secrétaire Permanent du CN-ITIE}\\
-      Économiste (ISE3) & M. Fallou DIONE\\
-      ENSAE Pierre Ndiaye, Dakar & \emph{Gestionnaire de données, encadrant}\\
+      \textbf{Présenté par :} & \textbf{Encadreur :}\\[0.15cm]
+      Sié Rachid TRAORÉ & M. Fallou DIONE\\
+      Élève Ingénieur Statisticien & \emph{Gestionnaire de données, CN-ITIE}\\[0.15cm]
+      Économiste (ISE3) & \textbf{Supervision :}\\[0.15cm]
+      ENSAE Pierre Ndiaye, Dakar & M. Thaddée Adiouma SECK\\
+      & \emph{Secrétaire Permanent du CN-ITIE}\\
     \end{tabular}\\[1.2cm]
 
-    {\color{ensaeblue}\bfseries Année académique 2025--2026}
+    {\color{ensaeblue}\bfseries Année académique 2025-2026}
   \end{center}
 \end{titlepage}
 
@@ -247,7 +248,7 @@ l'institution et pour la confiance accordée dans le traitement de données
 sensibles du secteur extractif.
 
 Je remercie tout particulièrement Monsieur \textbf{Fallou DIONE}, Gestionnaire de
-données et encadrant du stage, pour son suivi hebdomadaire rigoureux, ses
+données et encadreur du stage, pour son suivi hebdomadaire rigoureux, ses
 orientations méthodologiques et la validation attentive de chacun des livrables.
 
 Ma reconnaissance va également à l'ensemble de l'équipe du Secrétariat Technique
@@ -272,7 +273,7 @@ du CN-ITIE, des travaux réalisés au regard du cahier des charges, des résulta
 obtenus, ainsi que des compétences acquises.
 
 Conformément aux articles 4 et 7 du contrat de stage, les données individuelles
-traitées durant le stage demeurent confidentielles : le présent rapport ne
+traitées durant le stage demeurent confidentielles. Le présent rapport ne
 restitue que des résultats agrégés et des éléments méthodologiques, à
 l'exclusion de toute donnée nominative non publique.
 
@@ -357,19 +358,19 @@ Le dispositif de stage reposait sur un lot commun obligatoire (RBE), mené
 conjointement avec mon binôme M. Rasmané BAMOGO durant les six premières
 semaines, puis sur un lot thématique individuel (EMAPE) mené en parallèle à
 compter de la troisième semaine. Le stage était explicitement « orienté
-résultats » : les livrables constituaient des obligations contractuelles, tout
+résultats ». Les livrables constituaient des obligations contractuelles, tout
 choix méthodologique devait être justifié, les scripts documentés et
 reproductibles, et les sources systématiquement référencées.
 
 Le présent rapport s'articule en quatre parties. La première présente la
 structure d'accueil et le cadre du stage. La deuxième détaille les travaux
-menés sur le Registre des Bénéficiaires Effectifs : audit de qualité des
-données 2021--2025 et développement de la plateforme de consultation
+menés sur le Registre des Bénéficiaires Effectifs, à savoir l'audit de qualité
+des données 2021-2025 et le développement de la plateforme de consultation
 \emph{OpenRBE}. La troisième expose les travaux sur le sous-secteur de l'EMAPE
 et l'application de la méthode des statistiques miroir aux flux d'or
-2020--2024. La quatrième restitue les travaux transverses d'appui au service,
-puis dresse le bilan du stage : résultats, difficultés, compétences acquises et
-recommandations.
+2020-2024. La quatrième restitue les travaux transverses d'appui au service,
+puis dresse le bilan du stage (résultats, difficultés, compétences acquises et
+recommandations).
 
 \section{Présentation de la structure d'accueil et cadre du stage}
 
@@ -419,11 +420,11 @@ récapitulés ci-dessous.
   \entete
   \textcolor{white}{\textbf{Élément}} & \textcolor{white}{\textbf{Description}}\\
   Structure d'accueil & CN-ITIE Sénégal, service « Gestion des données »\\
-  Période & 04 mai -- 31 juillet 2026 (3 mois, 12 semaines)\\
+  Période & 04 mai - 31 juillet 2026 (3 mois, 12 semaines)\\
   Stagiaire & Sié Rachid TRAORÉ, élève ISE3 (ENSAE Pierre Ndiaye)\\
   Binôme & Rasmané BAMOGO (lot commun RBE)\\
   Supervision & M. Thaddée Adiouma SECK, Secrétaire Permanent\\
-  Encadrement technique & M. Fallou DIONE, Gestionnaire de données\\
+  Encadreur & M. Fallou DIONE, Gestionnaire de données\\
   Suivi & Points hebdomadaires (30 min) sur compte rendu d'avancement ; revue formelle de mi-parcours ; présentation finale devant l'équipe\\
   Obligations & Confidentialité des données, scripts reproductibles, sources référencées, validation des livrables avant diffusion\\
 \end{tabular}
@@ -431,8 +432,8 @@ récapitulés ci-dessous.
 \end{table}
 
 Le calendrier prévisionnel du cahier des charges structurait le stage en quatre
-phases : cadrage et collecte (S1--S2), structuration des bases (S3--S6),
-analyse et modélisation (S7--S9), livrables finaux (S10--S12). Les travaux qui
+phases, cadrage et collecte (S1-S2), structuration des bases (S3-S6),
+analyse et modélisation (S7-S9), puis livrables finaux (S10-S12). Les travaux qui
 m'étaient assignés couvraient le lot commun RBE et le lot thématique EMAPE ;
 la modélisation économétrique des coûts de production relevait du lot de mon
 binôme.
@@ -452,13 +453,13 @@ visaient à objectiver puis résorber ces lacunes.
 \subsection{Revue documentaire et collecte}
 
 La phase de cadrage a consisté à constituer et exploiter un corpus
-réglementaire et méthodologique : Norme ITIE 2023 (exigence 2.5), décret
-n°~2020-791 et ses modificatifs, décret n°~2025-1354, arrêté ministériel
-n°~1598 relatif au formulaire de déclaration des bénéficiaires effectifs,
+réglementaire et méthodologique comprenant la Norme ITIE 2023 (exigence 2.5), le décret
+n°~2020-791 et ses modificatifs, le décret n°~2025-1354, l'arrêté ministériel
+n°~1598 relatif au formulaire de déclaration des bénéficiaires effectifs et les
 codes minier et pétrolier, ainsi que le diagnostic OE 2024 et le projet d'étude
 « Bénéficiaires effectifs » du Sénégal.
 
-La collecte a ensuite mobilisé plusieurs sources croisées : la base RBE
+La collecte a ensuite mobilisé plusieurs sources croisées, dont la base RBE
 existante du CN-ITIE (exercices 2021 à 2025), les formulaires de déclaration
 ITIE (annexes 1 et 3), la base des titres miniers du MEPM (extraction
 Landfolio), le registre des permis, la liste des sous-traitants ainsi que les
@@ -467,47 +468,47 @@ sociétés titulaires de titres actifs sans déclaration de bénéficiaires
 effectifs, matérialisé par un fichier dédié recensant les entreprises présentes
 dans le RBE mais absentes des autres registres, et réciproquement.
 
-\subsection{Audit de la qualité des données du RBE 2021--2025}
+\subsection{Audit de la qualité des données du RBE 2021-2025}
 
 Le premier livrable majeur du lot RBE est le rapport d'analyse de la qualité
 des données du RBE (« \emph{Analyse de la qualité des données du RBE} »,
 version finale), élaboré conjointement avec mon binôme. La base auditée couvre
-cinq exercices (2021--2025) et recense \textbf{628 enregistrements} de
+cinq exercices (2021-2025) et recense \textbf{628 enregistrements} de
 bénéficiaires effectifs pour \textbf{317 entreprises} réparties dans neuf
 régions. Les principaux constats sont les suivants :
 
 \begin{itemize}
-  \item \textbf{Complétude} : sur 7~536 cellules attendues, 23~\% sont
+  \item \textbf{Complétude}. Sur 7~536 cellules attendues, 23~\% sont
   manquantes. Les six variables d'identification (région, dénomination
   sociale, greffe, prénom et nom, nationalité, année) sont intégralement
   renseignées, mais les variables liées au statut de Personne Politiquement
-  Exposée concentrent les déficits les plus graves : « Nom PPE » absent dans
-  97,1~\% des cas, « Est une PPE » dans 85,2~\%. Les variables financières
+  Exposée concentrent les déficits les plus graves, avec « Nom PPE » absent dans
+  97,1~\% des cas et « Est une PPE » dans 85,2~\%. Les variables financières
   sont également lacunaires (27,1~\% des pourcentages d'actions et 41,9~\% des
   droits de vote manquants) ;
-  \item \textbf{Doublons} : 12 enregistrements en double (1,9~\% des
+  \item \textbf{Doublons}. 12 enregistrements en double (1,9~\% des
   observations), dont 2 cas présentant des valeurs financières contradictoires
   conduisant à des totaux de participation supérieurs à 100~\% ;
-  \item \textbf{Erreurs de saisie} : 547 enregistrements affectés, dont 545
+  \item \textbf{Erreurs de saisie}. 547 enregistrements affectés, dont 545
   contenant un code binaire dans le champ textuel « Fonction PPE » et 14 un nom
   de pays dans le champ « Est une PPE » ;
-  \item \textbf{Cohérences structurelles} : entreprises dont la somme des
+  \item \textbf{Cohérences structurelles}. Entreprises dont la somme des
   participations dépasse ou n'atteint pas 100~\%, hétérogénéités régionales
   fortes (Diourbel et Kaolack affichent 100~\% de valeurs manquantes sur les
   variables financières et PPE) ;
-  \item \textbf{Couverture} : analyse croisée des statuts de déclaration par
+  \item \textbf{Couverture}. Analyse croisée des statuts de déclaration par
   type et statut de titre minier, par région, par substance et par année, et
   identification des entreprises présentes dans le RBE uniquement.
 \end{itemize}
 
 Ce diagnostic, décliné en tableaux et cartographies croisées (variable
 $\times$ exercice, variable $\times$ région), fonde les recommandations
-adressées au CN-ITIE : fiabilisation du formulaire de déclaration, contrôles de
-saisie bloquants, priorité de relance sur les variables PPE et financières, et
-dédoublonnage systématique. Il conditionne aussi l'analyse des risques prévue
-par le programme OE (âges atypiques, croisements GAFI/UE) : celle-ci n'a pu
+adressées au CN-ITIE, notamment la fiabilisation du formulaire de déclaration,
+des contrôles de saisie bloquants, la priorité de relance sur les variables PPE
+et financières, et le dédoublonnage systématique. Il conditionne aussi l'analyse des risques prévue
+par le programme OE (âges atypiques, croisements GAFI/UE), qui n'a pu
 être conduite que partiellement, la carence quasi totale des variables PPE
-rendant toute analyse de risque PPE impossible en l'état — ce constat étant
+rendant toute analyse de risque PPE impossible en l'état, ce constat étant
 lui-même un résultat central de l'audit.
 
 \subsection{Développement de la plateforme OpenRBE}
@@ -516,7 +517,7 @@ Le cahier des charges prévoyait la mise en place d'une plateforme RBE
 relationnelle et d'un tableau de bord interactif. Ce volet a été réalisé sous
 la forme d'\textbf{OpenRBE}, une application de consultation et de valorisation
 du RBE développée de manière itérative (versions v1.0 à v7, puis versions web
-successives et version de livraison), en concertation avec l'encadrant dont les
+successives et version de livraison), en concertation avec l'encadreur dont les
 observations étaient intégrées à chaque itération.
 
 Deux déclinaisons complémentaires ont été produites :
@@ -526,7 +527,7 @@ Deux déclinaisons complémentaires ont été produites :
   recherche, cartographie, réseau, PPE) avec bibliothèque d'indicateurs et de
   graphiques ;
   \item une \textbf{application web autonome} générée par un script Python
-  documenté (\texttt{build.py}) qui nettoie et normalise la base RBE 2021--2025
+  documenté (\texttt{build.py}) qui nettoie et normalise la base RBE 2021-2025
   (recodage des champs PPE, bornage des pourcentages, harmonisation des
   nationalités et pays de résidence, extraction des années) puis produit une
   page interactive unique (tableau de bord filtrable, visualisation des réseaux
@@ -534,7 +535,7 @@ Deux déclinaisons complémentaires ont été produites :
 \end{itemize}
 
 Le module « réseau » de la plateforme permet la visualisation des chaînes
-d'actionnariat entreprise--bénéficiaire, première brique de l'analyse des
+d'actionnariat entreprise-bénéficiaire, première brique de l'analyse des
 structures de contrôle prévue par le programme OE. En revanche, le schéma
 relationnel cible à trois tables normalisées (Entités, Personnes, Relations)
 avec identifiants uniques de type UUID, permettant le calcul des participations
@@ -551,9 +552,9 @@ Une présentation de synthèse du RBE (support de 13 diapositives) a par ailleur
 Le lot thématique individuel portait sur le sous-secteur de l'Exploitation
 Minière Artisanale et à Petite Échelle, dont la contribution à l'économie
 extractive demeure structurellement sous-estimée dans les statistiques
-officielles. L'objectif était double : documenter l'état des lieux
-institutionnel et statistique du sous-secteur, et estimer les volumes d'or
-non déclarés par la méthode des statistiques miroir sur la période 2020--2024,
+officielles. L'objectif était double, documenter l'état des lieux
+institutionnel et statistique du sous-secteur, puis estimer les volumes d'or
+non déclarés par la méthode des statistiques miroir sur la période 2020-2024,
 en cohérence avec les exigences 6.1 et 6.3 de la Norme ITIE 2023.
 
 \subsection{Note méthodologique sur l'analyse miroir}
@@ -576,7 +577,7 @@ La base analytique a été constituée à partir de trois corpus complémentaire
 les statistiques du commerce international (UN Comtrade, complétées par des
 données de type Trade Data Monitor), les données nationales (exportations
 déclarées côté Sénégal, rapports ITIE, données DCSOM/DGMG, rapports annuels
-BCEAO 2020--2023) et les données de production EMAPE déclarées au CN-ITIE.
+BCEAO 2020-2023) et les données de production EMAPE déclarées au CN-ITIE.
 Les scripts de traitement ont été développés sous R, de façon documentée et
 reproductible.
 
@@ -586,18 +587,18 @@ final, sont les suivants :
 \begin{itemize}
   \item un \textbf{écart cumulé de 25,4 tonnes} entre les importations d'or
   déclarées par les pays partenaires (93,6~t) et les exportations déclarées
-  côté Sénégal (68,2~t) sur 2020--2024, source d'une perte fiscale
+  côté Sénégal (68,2~t) sur 2020-2024, source d'une perte fiscale
   importante pour l'État ;
   \item un \textbf{taux moyen de non-déclaration de 27,1~\%} sur la période,
   avec une forte variabilité annuelle (50,4~\% en 2020, 4,6~\% en 2024) dont
   l'interprétation requiert prudence ;
-  \item une \textbf{production EMAPE déclarée dérisoire} : 62~kg en 2023,
-  88~kg en 2024 et 23~kg en 2025, pour 12 entreprises déclarantes seulement
+  \item une \textbf{production EMAPE déclarée dérisoire} (62~kg en 2023,
+  88~kg en 2024 et 23~kg en 2025), pour 12 entreprises déclarantes seulement
   sur environ 150 autorisations actives, révélant un angle mort statistique
   majeur ;
   \item une \textbf{concentration géographique persistante} des importations
-  sur deux corridors — la Suisse (57~\% des flux cumulés) et l'Australie
-  (19~\%) — et une trajectoire préoccupante du corridor des Émirats Arabes
+  sur deux corridors, la Suisse (57~\% des flux cumulés) et l'Australie
+  (19~\%), et une trajectoire préoccupante du corridor des Émirats Arabes
   Unis (progression jusqu'en 2023 puis disparition totale en 2024) ;
   \item une \textbf{triangulation} des estimations miroir avec les données de
   production déclarées et une vue multidimensionnelle du manque à gagner pour
@@ -613,10 +614,10 @@ réglementaire (régimes AMA et AMSM du Code minier de 2016, cartes d'orpailleur
 couloirs d'orpaillage de Tambacounda et Kédougou) et la situation des titres
 EMAPE établie à partir de la base des titres miniers.
 
-La cartographie des circuits de commercialisation a été établie : structure des
-acheteurs de la production artisanale (comptoirs d'achat, collecteurs,
-négociants, exportateurs), corridors d'exportation et acteurs de la chaîne de
-valeur, avec identification des obstacles institutionnels, techniques,
+La cartographie des circuits de commercialisation a été établie, couvrant la
+structure des acheteurs de la production artisanale (comptoirs d'achat,
+collecteurs, négociants, exportateurs), les corridors d'exportation et les
+acteurs de la chaîne de valeur, avec identification des obstacles institutionnels, techniques,
 statistiques et douaniers qui limitent la transparence du sous-secteur
 (informalité, défaillances des comptoirs, absence de base centralisée, faible
 traçabilité, fragmentation institutionnelle entre DGMG, DCSOM, douanes et
@@ -637,15 +638,16 @@ Au-delà des deux lots contractuels, le stage a donné lieu à plusieurs travaux
 d'appui au service « Gestion des données », qui ont enrichi la maîtrise du
 périmètre ITIE.
 
-\subsection{Consolidation des données des rapports ITIE 2013--2024}
+\subsection{Consolidation des données des rapports ITIE 2013-2024}
 
 Les données publiées dans les rapports ITIE successifs (2013 à 2024) ont été
-extraites et consolidées en bases exploitables : production et exportations
-par substance, flux financiers, paiements sociaux, emplois, contribution du
-secteur extractif au budget de l'État, données hydrocarbures, complétées par
+extraites et consolidées en bases exploitables couvrant la production et les
+exportations par substance, les flux financiers, les paiements sociaux, les
+emplois, la contribution du secteur extractif au budget de l'État et les
+données hydrocarbures, complétées par
 une série des taux de change USD/FCFA (BCEAO). De petits scripts Python ont été
 écrits pour découper et structurer les fichiers volumineux. Ces bases
-alimentent notamment l'analyse des exportations aurifères 2020--2024 utilisée
+alimentent notamment l'analyse des exportations aurifères 2020-2024 utilisée
 dans le lot EMAPE.
 
 \subsection{Analyse des paiements sociaux}
@@ -666,8 +668,8 @@ aboutissant à un compte de résultat agrégé multi-exercices par entreprise.
 \subsection{Comparaison des prix des minerais exportés}
 
 Une base de comparaison entre les valeurs unitaires des exportations ITIE
-(2020--2024) et les cours mondiaux de référence (World Bank Commodities Price
-Data — « Pink Sheet », Commodity Markets Outlook) a été constituée afin de
+(2020-2024) et les cours mondiaux de référence (World Bank Commodities Price
+Data, « Pink Sheet », Commodity Markets Outlook) a été constituée afin de
 détecter d'éventuelles anomalies de valorisation des minerais exportés.
 
 \subsection{Initiation à la modélisation financière extractive}
@@ -679,7 +681,7 @@ sectoriels (modèles NRGI or et pétrole). Une maquette de modélisation du proj
 pétrolier Sangomar a été explorée, ainsi qu'un projet de rapport sur l'impact
 du régime fiscal minier sur les recettes publiques appliqué à la convention
 minière de Sabodala (SGO). J'ai également participé à la réunion d'échange
-LAREM--CN-ITIE sur la modélisation financière du projet Sangomar
+LAREM-CN-ITIE sur la modélisation financière du projet Sangomar
 (02 juillet 2026). Ces travaux, entamés en fin de stage, restent en cours.
 
 \subsection{Vie institutionnelle}
@@ -698,17 +700,17 @@ réalisation des travaux prévus au contrat de stage et au cahier des charges.
 En synthèse :
 
 \begin{itemize}
-  \item les livrables analytiques majeurs sont \textbf{réalisés} : rapport
-  final d'audit de la qualité du RBE 2021--2025, rapport analytique EMAPE
-  (statistique miroir 2020--2024), note méthodologique sur l'analyse miroir,
-  inventaire des sociétés sans déclaration, plateforme de consultation OpenRBE
-  et supports de restitution ;
+  \item les livrables analytiques majeurs sont \textbf{réalisés}, qu'il
+  s'agisse du rapport final d'audit de la qualité du RBE 2021-2025, du rapport
+  analytique EMAPE (statistique miroir 2020-2024), de la note méthodologique
+  sur l'analyse miroir, de l'inventaire des sociétés sans déclaration, de la
+  plateforme de consultation OpenRBE ou des supports de restitution ;
   \item plusieurs chantiers sont \textbf{partiellement réalisés} et
-  constituent des prolongements naturels : formalisation du schéma relationnel
-  à trois tables avec identifiants uniques, enrichissement ISIN/cotation,
-  analyse de risques GAFI/UE (limitée par la carence des variables PPE),
-  cartographie interactive des sites EMAPE, détection systématique des
-  structures d'actionnariat opaques ;
+  constituent des prolongements naturels, parmi lesquels la formalisation du
+  schéma relationnel à trois tables avec identifiants uniques, l'enrichissement
+  ISIN/cotation, l'analyse de risques GAFI/UE (limitée par la carence des
+  variables PPE), la cartographie interactive des sites EMAPE et la détection
+  systématique des structures d'actionnariat opaques ;
   \item les \textbf{enquêtes de terrain} à Kédougou n'ont pas pu être menées
   dans la fenêtre du stage et demeurent recommandées pour consolider les
   estimations endogènes de production.
@@ -717,14 +719,14 @@ En synthèse :
 \subsection{Difficultés rencontrées}
 
 Les principales difficultés ont été de trois ordres. D'abord, la
-\textbf{qualité des données sources} : la carence quasi totale des variables
+\textbf{qualité des données sources}. La carence quasi totale des variables
 PPE et l'hétérogénéité des saisies ont contraint à réorienter une partie de
 l'effort analytique vers l'audit et le nettoyage. Ensuite,
-l'\textbf{accessibilité des données} : certaines sources externes (cotations,
+l'\textbf{accessibilité des données}. Certaines sources externes (cotations,
 données douanières fines, données de terrain) n'étaient pas mobilisables dans
 les délais. Enfin, la \textbf{contrainte temporelle} d'un stage de douze
 semaines orienté résultats, qui a imposé des arbitrages entre profondeur
-méthodologique et couverture des lots — arbitrages systématiquement validés
+méthodologique et couverture des lots, arbitrages systématiquement validés
 lors des points hebdomadaires.
 
 \subsection{Compétences acquises}
@@ -732,19 +734,20 @@ lors des points hebdomadaires.
 Ce stage m'a permis de mettre en pratique et de consolider :
 
 \begin{itemize}
-  \item des compétences \textbf{statistiques et économétriques} appliquées :
-  audit de qualité de données, statistique miroir, triangulation de sources,
-  analyse de flux commerciaux ;
-  \item des compétences \textbf{techniques} : R (traitement de données,
-  R Markdown, Shiny), Python (scripts de construction de la plateforme,
-  structuration de fichiers), Excel avancé, QGIS, visualisation de réseaux,
-  \LaTeX{} ;
-  \item des compétences \textbf{sectorielles} : Norme ITIE 2023, propriété
-  effective et lutte anti-blanchiment (GAFI, PPE), gouvernance minière et
-  pétrolière sénégalaise, fiscalité extractive et modélisation FARI ;
-  \item des compétences \textbf{professionnelles} : travail en binôme et en
-  équipe multipartite, restitution devant des non-statisticiens, gestion de
-  livrables contractuels sous contrainte de confidentialité.
+  \item des compétences \textbf{statistiques et économétriques} appliquées
+  (audit de qualité de données, statistique miroir, triangulation de sources,
+  analyse de flux commerciaux) ;
+  \item des compétences \textbf{techniques} en R (traitement de données,
+  R Markdown, Shiny), en Python (scripts de construction de la plateforme,
+  structuration de fichiers), en Excel avancé, en QGIS, en visualisation de
+  réseaux et en \LaTeX{} ;
+  \item des compétences \textbf{sectorielles} sur la Norme ITIE 2023, la
+  propriété effective et la lutte anti-blanchiment (GAFI, PPE), la gouvernance
+  minière et pétrolière sénégalaise, la fiscalité extractive et la
+  modélisation FARI ;
+  \item des compétences \textbf{professionnelles}, du travail en binôme et en
+  équipe multipartite à la restitution devant des non-statisticiens, en passant
+  par la gestion de livrables contractuels sous contrainte de confidentialité.
 \end{itemize}
 
 \subsection{Recommandations}
@@ -753,18 +756,19 @@ Au terme du stage, les recommandations suivantes sont formulées à l'attention
 du CN-ITIE :
 
 \begin{enumerate}
-  \item \textbf{Fiabiliser la chaîne de collecte du RBE} : formulaire à
-  contrôles bloquants, champs PPE obligatoires, dédoublonnage à la saisie et
-  identifiants uniques partagés avec le RCCM, la DGI et Landfolio ;
-  \item \textbf{Pérenniser et institutionnaliser OpenRBE} : hébergement,
-  gestion des utilisateurs et des exports, mise à jour administrée des données,
-  formalisation du schéma Entités--Personnes--Relations pour le calcul des
-  participations indirectes ;
+  \item \textbf{Fiabiliser la chaîne de collecte du RBE}, par un formulaire à
+  contrôles bloquants, des champs PPE obligatoires, un dédoublonnage à la
+  saisie et des identifiants uniques partagés avec le RCCM, la DGI et
+  Landfolio ;
+  \item \textbf{Pérenniser et institutionnaliser OpenRBE}, en assurant
+  l'hébergement, la gestion des utilisateurs et des exports, la mise à jour
+  administrée des données et la formalisation du schéma
+  Entités-Personnes-Relations pour le calcul des participations indirectes ;
   \item \textbf{Systématiser l'analyse miroir} comme outil de veille annuelle
   sur les flux d'or, en lien avec les douanes, l'ANSD et la BCEAO ;
-  \item \textbf{Renforcer la statistique du sous-secteur EMAPE} : base
-  centralisée des comptoirs et des déclarations de production, couplage avec
-  les données satellitaires et les titres Landfolio, enquêtes de terrain
+  \item \textbf{Renforcer la statistique du sous-secteur EMAPE}, avec une base
+  centralisée des comptoirs et des déclarations de production, un couplage avec
+  les données satellitaires et les titres Landfolio et des enquêtes de terrain
   régulières à Kédougou ;
   \item \textbf{Poursuivre la montée en charge sur la modélisation
   financière} (FARI) pour éclairer les négociations et le suivi des projets
@@ -776,26 +780,26 @@ du CN-ITIE :
 Ce stage de trois mois au service « Gestion des données » du CN-ITIE aura été
 une immersion complète dans la gouvernance des données du secteur extractif
 sénégalais. Les deux missions contractuelles ont abouti à des livrables
-concrets : un diagnostic chiffré et actionnable de la qualité du Registre des
+concrets, à savoir un diagnostic chiffré et actionnable de la qualité du Registre des
 Bénéficiaires Effectifs, une plateforme de consultation interactive du RBE, et
 une première estimation rigoureuse, par la statistique miroir, des flux d'or
-non déclarés issus de l'EMAPE — soit un écart cumulé de 25,4 tonnes sur
-2020--2024 dont la seule mise en évidence justifie le renforcement des
+non déclarés issus de l'EMAPE, soit un écart cumulé de 25,4 tonnes sur
+2020-2024 dont la seule mise en évidence justifie le renforcement des
 dispositifs de traçabilité.
 
 Au-delà des livrables, le stage a confirmé l'apport du profil d'ingénieur
-statisticien économiste dans une institution de transparence : transformer des
+statisticien économiste dans une institution de transparence, celui de transformer des
 données administratives imparfaites en connaissances utiles à la décision
-publique. Les chantiers ouverts — schéma relationnel du RBE, analyse de risques
-PPE, cartographie EMAPE, modélisation financière — tracent une feuille de route
+publique. Les chantiers ouverts (schéma relationnel du RBE, analyse de risques
+PPE, cartographie EMAPE, modélisation financière) tracent une feuille de route
 claire pour la poursuite de la collaboration entre le CN-ITIE et l'ENSAE, et
 nourriront directement mon mémoire de fin d'études.
 
 % ── Annexe ───────────────────────────────────────────────────
 \clearpage
 \phantomsection
-\addcontentsline{toc}{section}{Annexe : état de suivi des travaux}
-\section*{Annexe : état de suivi des travaux}
+\addcontentsline{toc}{section}{Annexe. État de suivi des travaux}
+\section*{Annexe. État de suivi des travaux}
 \label{annexe:suivi}
 
 Le tableau ci-dessous récapitule l'état de réalisation des travaux prévus au
@@ -820,24 +824,24 @@ complémentaires. Il est également fourni sous forme de classeur Excel
   Revue documentaire (Norme ITIE 2023 ex.~2.5, décret 2020-791, diagnostic OE 2024) & Oui & Corpus réglementaire constitué et exploité (décrets 2020-791 et 2025-1354, arrêté 1598, codes minier et pétrolier).\\
   Note sur la méthode d'analyse miroir & Oui & Note méthodologique rédigée (principe, nomenclature SH, variables, précautions d'interprétation).\\
   Collecte formulaires ITIE (annexes 1 \& 3), RCCM, DGI ; inventaire des sociétés sans déclaration & Oui & Croisement RBE / titres miniers (Landfolio, MEPM) / permis / sous-traitants ; fichier des écarts entre registres produit.\\
-  Plateforme RBE relationnelle (tables Entités, Personnes, Relations ; identifiants uniques) & Partiellement & Plateforme OpenRBE développée (Shiny + web autonome, v1.0 à v7) sur base nettoyée 2021--2025 ; schéma 3 tables avec UUID non finalisé.\\
-  Enrichissement RBE : résidences, statuts PPE, cotation boursière (ISIN) & Partiellement & Nettoyage et normalisation réalisés (nationalités, résidences, recodage PPE) ; enrichissement ISIN/cotation non abouti faute de sources.\\
-  Premiers travaux EMAPE : cartographie des zones actives (Landfolio) & Partiellement & Situation des titres EMAPE (AMSM/AMA) établie ; cartographie interactive dédiée restée en préparation.\\
-  Analyse de réseau : chaînes d'actionnariat, détection des structures opaques & Partiellement & Module réseau intégré à OpenRBE (visualisation des chaînes) ; détection systématique des structures opaques non aboutie.\\
+  Plateforme RBE relationnelle (tables Entités, Personnes, Relations ; identifiants uniques) & Partiellement & Plateforme OpenRBE développée (Shiny + web autonome, v1.0 à v7) sur base nettoyée 2021-2025 ; schéma 3 tables avec UUID non finalisé.\\
+  Enrichissement RBE (résidences, statuts PPE, cotation boursière ISIN) & Partiellement & Nettoyage et normalisation réalisés (nationalités, résidences, recodage PPE) ; enrichissement ISIN/cotation non abouti faute de sources.\\
+  Premiers travaux EMAPE, cartographie des zones actives (Landfolio) & Partiellement & Situation des titres EMAPE (AMSM/AMA) établie ; cartographie interactive dédiée restée en préparation.\\
+  Analyse de réseau (chaînes d'actionnariat, détection des structures opaques) & Partiellement & Module réseau intégré à OpenRBE (visualisation des chaînes) ; détection systématique des structures opaques non aboutie.\\
   Enquêtes auprès des structures concernées & Partiellement & Échanges à distance avec les parties prenantes ; enquêtes de terrain à Kédougou non réalisées dans la fenêtre du stage.\\
   Finalisation analyse des risques RBE (GAFI, UE, âges atypiques) & Partiellement & Audit qualité complet (complétude, doublons, erreurs, profils nationalité/résidence) ; croisements GAFI/UE limités par 97~\% de valeurs PPE manquantes.\\
-  Estimation des volumes EMAPE par analyse miroir (2020--2024) & Oui & Écart cumulé estimé à 25,4~t (93,6~t importées vs 68,2~t exportées) ; taux moyen de non-déclaration de 27,1~\%.\\
+  Estimation des volumes EMAPE par analyse miroir (2020-2024) & Oui & Écart cumulé estimé à 25,4~t (93,6~t importées vs 68,2~t exportées) ; taux moyen de non-déclaration de 27,1~\%.\\
   Cartographie des circuits de commercialisation et des acteurs de la chaîne de valeur & Oui & Structure des acheteurs, corridors (Suisse 57~\%, Australie 19~\%, EAU), obstacles à la traçabilité, manque à gagner estimé.\\
-  Rédaction du rapport RBE final & Oui & « Analyse de la qualité des données du RBE 2021--2025 » (version finale) + présentation de restitution.\\
+  Rédaction du rapport RBE final & Oui & « Analyse de la qualité des données du RBE 2021-2025 » (version finale) + présentation de restitution.\\
   Rédaction du rapport EMAPE final & Oui & « Rapport analytique EMAPE : flux commerciaux d'or, problématiques de données et statistique miroir » (vf).\\
   Dashboard RBE interactif (Power BI) & Partiellement & Réalisé sous forme de plateforme web OpenRBE (tableau de bord filtrable, carte, réseau, exports) plutôt que Power BI.\\
-  Intégration des observations et finalisation & Oui & Versions successives des rapports et de la plateforme intégrant les observations de l'encadrant.\\
+  Intégration des observations et finalisation & Oui & Versions successives des rapports et de la plateforme intégrant les observations de l'encadreur.\\
   \sousentete \multicolumn{3}{l}{\textbf{Travaux complémentaires (hors cahier des charges)}}\\
-  Consolidation des données des rapports ITIE 2013--2024 & Oui & Bases production, exportations, flux financiers, paiements sociaux, emplois, contribution, hydrocarbures ; taux de change BCEAO.\\
+  Consolidation des données des rapports ITIE 2013-2024 & Oui & Bases production, exportations, flux financiers, paiements sociaux, emplois, contribution, hydrocarbures ; taux de change BCEAO.\\
   Analyse des paiements sociaux & Oui & Rapport R Markdown reproductible + carte de répartition géographique (QGIS).\\
-  Traitement des états financiers des entreprises & Oui & Plus de 75 liasses DGI saisies (2020, 2022--2024) ; compte de résultat agrégé multi-exercices.\\
-  Comparaison prix des minerais exportés vs cours mondiaux & Oui & Base valeurs unitaires ITIE 2020--2024 vs Pink Sheet / CMO (Banque mondiale).\\
-  Initiation à la modélisation financière extractive (FARI, Sangomar, SGO) & Partiellement & Cadre FARI étudié, maquette Sangomar explorée, projet de rapport SGO en cours ; réunion LAREM--CN-ITIE du 02/07/2026.\\
+  Traitement des états financiers des entreprises & Oui & Plus de 75 liasses DGI saisies (2020, 2022-2024) ; compte de résultat agrégé multi-exercices.\\
+  Comparaison prix des minerais exportés vs cours mondiaux & Oui & Base valeurs unitaires ITIE 2020-2024 vs Pink Sheet / CMO (Banque mondiale).\\
+  Initiation à la modélisation financière extractive (FARI, Sangomar, SGO) & Partiellement & Cadre FARI étudié, maquette Sangomar explorée, projet de rapport SGO en cours ; réunion LAREM-CN-ITIE du 02/07/2026.\\
   Participation à la vie institutionnelle (réunions, webinaires) & Oui & Réunions de coordination, webinaires Norme ITIE 2023, comptes rendus.\\
   Rédaction du rapport de stage (article 8 du contrat) & Oui & Présent document.\\
 \end{longtable}
