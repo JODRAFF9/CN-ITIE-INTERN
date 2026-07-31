@@ -196,23 +196,41 @@
     {\scriptsize Un Peuple - Un But - Une Foi}\\[0.4cm]
     \begin{minipage}[t]{0.45\textwidth}
       \centering
-      \includegraphics[height=2.1cm]{Itie.png}\\[0.15cm]
-      {\scriptsize\bfseries Comité national ITIE Sénégal}\\[0.1cm]
-      {\scriptsize\bfseries Présidence de la République}
-    \end{minipage}\hfill
-    \begin{minipage}[t]{0.45\textwidth}
-      \centering
       \includegraphics[height=1.9cm]{ANSD.jpg}\\[0.15cm]
       \includegraphics[height=2.0cm]{ensae.png}\\[0.05cm]
       {\scriptsize\bfseries École Nationale de la Statistique\\ et de l'Analyse Économique Pierre Ndiaye}
+    \end{minipage}\hfill
+    \begin{minipage}[t]{0.45\textwidth}
+      \centering
+      {\scriptsize\bfseries Présidence de la République}\\[0.2cm]
+      \includegraphics[height=2.1cm]{Itie.png}\\[0.15cm]
+      {\scriptsize\bfseries Comité national ITIE Sénégal}
     \end{minipage}\\[1.2cm]
 
-    {\color{ensaeblue}\rule{\textwidth}{1.2pt}}\\[0.7cm]
-    {\color{ensaeblue}\Huge\bfseries\scshape Rapport de stage}\\[0.55cm]
-    {\large Appui à la gestion des données du secteur extractif}\\[0.2cm]
-    {\large Fiabilisation du Registre des Bénéficiaires Effectifs et analyse
-    du sous-secteur de l'EMAPE par la statistique miroir}\\[0.6cm]
-    {\color{ensaeblue}\rule{\textwidth}{1.2pt}}\\[0.9cm]
+    \begin{tikzpicture}
+      % Bandeau principal : fond bleu ENSAE, coins arrondis, filet cyan
+      % interieur et pastilles orange aux extremites (rappel du cadre de page).
+      \node[fill=ensaeblue, rounded corners=10pt, inner ysep=15pt,
+            text width=0.88\textwidth, align=center] (titre) at (0,0)
+        {\color{white}\Huge\bfseries\scshape Rapport de stage};
+      \draw[ensaecyan, line width=0.6pt, rounded corners=7pt]
+        ([xshift=4pt,yshift=-4pt]titre.north west)
+          rectangle ([xshift=-4pt,yshift=4pt]titre.south east);
+      \fill[ensaeorange] (titre.west) circle (3.5pt);
+      \fill[ensaeorange] (titre.east) circle (3.5pt);
+      % Cartouche du sous-titre : fond orange tres clair, lisere bleu
+      \node[below=0.45cm of titre, fill=ensaerow, draw=ensaeblue,
+            line width=0.8pt, rounded corners=8pt, inner ysep=11pt,
+            text width=0.82\textwidth, align=center] (soustitre)
+        {\color{ensaeblue}\large Appui à la gestion des données du secteur
+         extractif\\[3pt]
+         \color{ensaeblue}\large Fiabilisation du Registre des Bénéficiaires
+         Effectifs et analyse du sous-secteur de l'EMAPE par la statistique
+         miroir};
+      % Trait de liaison entre bandeau et cartouche
+      \draw[ensaeorange, line width=1.6pt]
+        ([yshift=1pt]titre.south) -- ([yshift=-1pt]soustitre.north);
+    \end{tikzpicture}\\[0.7cm]
 
     {\normalsize Stage effectué au sein du \textbf{Comité national de l'Initiative pour la
     Transparence dans les Industries Extractives (CN-ITIE)}, Service « Gestion des données »}\\[0.3cm]
@@ -280,8 +298,7 @@ restitue que des résultats agrégés et des éléments méthodologiques, à
 l'exclusion de toute donnée nominative non publique.
 
 Un état de suivi détaillé des travaux (réalisés, partiellement réalisés ou non
-réalisés), assorti de commentaires, figure en annexe~\ref{annexe:suivi} et fait
-l'objet d'un classeur Excel séparé (\emph{rapport de stage.xlsx}).
+réalisés), assorti de commentaires, figure en annexe~\ref{annexe:suivi}.
 
 \clearpage
 
@@ -804,14 +821,13 @@ nourriront directement mon mémoire de fin d'études.
 % ── Annexe ───────────────────────────────────────────────────
 \clearpage
 \phantomsection
-\addcontentsline{toc}{section}{Annexe. État de suivi des travaux}
-\section*{Annexe. État de suivi des travaux}
+\addcontentsline{toc}{section}{Annexe État de suivi des travaux}
+\section*{Annexe État de suivi des travaux}
 \label{annexe:suivi}
 
 Le tableau ci-dessous récapitule l'état de réalisation des travaux prévus au
 contrat de stage (article 2) et au cahier des charges, ainsi que des travaux
-complémentaires. Il est également fourni sous forme de classeur Excel
-(\emph{rapport de stage.xlsx}).
+complémentaires.
 
 \begin{small}
 \begin{singlespace}
