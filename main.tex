@@ -1,0 +1,485 @@
+% ============================================================
+%  main.tex - Memoire de fin d'etudes
+%  Impact des transferts de migrants sur la pauvrete multidimensionnelle
+%  des enfants au Senegal - ENSAE Dakar
+%  Compilation : latexmk -pdf main.tex  (biber obligatoire, pas bibtex)
+% ============================================================
+
+\documentclass[12pt, a4paper, twoside]{article}
+
+% ── Encodage & langue (XeLaTeX/LuaLaTeX : Unicode natif) ─────
+\usepackage[french]{babel}
+\usepackage{csquotes}
+
+% ── Mise en page ────────────────────────────────────────────
+\usepackage[
+  top=2.5cm, bottom=2.5cm,
+  left=3cm, right=2.5cm,
+  headheight=28pt
+]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\raggedbottom
+
+% Paragraphes separes par un blanc vertical plutot que par un alinea
+\usepackage[indent=0pt, skip=8pt]{parskip}
+
+% ── Police (Times New Roman via XeLaTeX/LuaLaTeX) ────────────
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\usepackage{microtype}
+
+% ── En-têtes et pieds de page ───────────────────────────────
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyfoot[L]{\scriptsize Sié Rachid TRAORÉ, ISE3 (ENSAE-DAKAR)}
+\fancyfoot[C]{\scriptsize\textbf{\{\,\thepage\,\}}}
+\fancyfoot[R]{\scriptsize 2025-2026}
+
+% Même style pour les pages "plain" (début de section)
+\fancypagestyle{plain}{%
+  \fancyhf{}
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{0.4pt}
+  \fancyfoot[L]{\scriptsize Sié Rachid TRAORÉ, ISE3 (ENSAE-DAKAR)}
+  \fancyfoot[C]{\scriptsize\textbf{\{\,\thepage\,\}}}
+  \fancyfoot[R]{\scriptsize 2025-2026}
+}
+
+% ── Couleurs ENSAE ───────────────────────────────────────────
+\usepackage[table]{xcolor}
+\definecolor{ensaeblue}{RGB}{25,25,112}      % midnight blue (titres, filets)
+\definecolor{ensaecyan}{RGB}{0,174,239}       % cyan ENSAE (bordure)
+\definecolor{ensaeorange}{RGB}{224,123,57}    % orange (en-tête de tableau)
+\definecolor{tableline}{RGB}{180,180,180}     % gris des filets de grille
+\definecolor{ensaerow}{RGB}{252,232,215}      % orange très clair (ligne paire)
+
+% ── Style « tableur » (grille + en-tête orange + zébrage) ────
+\arrayrulecolor{tableline}
+\newcommand{\entete}{\rowcolor{ensaeorange}}
+% \zebre s'utilise juste avant un tableau pour alterner les lignes
+\newcommand{\zebre}{\rowcolors{2}{white}{ensaerow}}
+% \nozebre annule un zebrage herite d'un tableau precedent
+\newcommand{\nozebre}{\rowcolors{1}{}{}}
+% \sousentete colore une ligne de regroupement
+\newcommand{\sousentete}{\rowcolor{ensaerow}}
+
+% Coefficients de la definition alternative du traitement (beneficiaires
+% stables). A mettre a jour apres chaque relance de tout.do.
+\newcommand{\ATTstaDD}{$0{,}022$}
+\newcommand{\ATTstaDDse}{$(0{,}033)$}
+\newcommand{\ATTstaPSM}{-$0{,}008$}
+\newcommand{\ATTstaPSMse}{$(0{,}044)$}
+
+% Heterogeneite selon le genre du chef de menage. A mettre a jour apres
+% chaque relance de tout.do.
+\newcommand{\ATTchefH}{$0{,}062^{*}$}
+\newcommand{\ATTchefF}{$0{,}071$}
+\newcommand{\PchefEg}{0,879}
+\newcommand{\StatutChef}{non validé}
+
+% Tableaux descriptifs croisant le genre du chef de menage et le statut.
+% A renseigner apres relance de tout.do.
+\newcommand{\ChefHEnsA}{68,3}
+\newcommand{\ChefHEnsB}{50,0}
+\newcommand{\ChefHEnsC}{-18,2$^{***}$}
+\newcommand{\ChefHEnsD}{61,9}
+\newcommand{\ChefHEnsE}{46,0}
+\newcommand{\ChefHEnsF}{-15,9$^{***}$}
+\newcommand{\ChefFEnsA}{59,3}
+\newcommand{\ChefFEnsB}{38,7}
+\newcommand{\ChefFEnsC}{-20,7$^{***}$}
+\newcommand{\ChefFEnsD}{54,2}
+\newcommand{\ChefFEnsE}{35,6}
+\newcommand{\ChefFEnsF}{-18,6$^{***}$}
+\newcommand{\ChefHZqA}{62,5}
+\newcommand{\ChefHZqB}{40,7}
+\newcommand{\ChefHZqC}{-21,9$^{***}$}
+\newcommand{\ChefHZqD}{64,3}
+\newcommand{\ChefHZqE}{48,7}
+\newcommand{\ChefHZqF}{-15,5$^{***}$}
+\newcommand{\ChefFZqA}{51,3}
+\newcommand{\ChefFZqB}{28,5}
+\newcommand{\ChefFZqC}{-22,8$^{***}$}
+\newcommand{\ChefFZqD}{55,1}
+\newcommand{\ChefFZqE}{39,3}
+\newcommand{\ChefFZqF}{-15,8$^{***}$}
+\newcommand{\ChefHCqA}{71,8}
+\newcommand{\ChefHCqB}{54,8}
+\newcommand{\ChefHCqC}{-16,9$^{***}$}
+\newcommand{\ChefHCqD}{60,9}
+\newcommand{\ChefHCqE}{44,5}
+\newcommand{\ChefHCqF}{-16,5$^{***}$}
+\newcommand{\ChefFCqA}{64,2}
+\newcommand{\ChefFCqB}{43,1}
+\newcommand{\ChefFCqC}{-21,1$^{***}$}
+\newcommand{\ChefFCqD}{53,9}
+\newcommand{\ChefFCqE}{33,7}
+\newcommand{\ChefFCqF}{-20,2$^{***}$}
+\newcommand{\ChefHDxA}{60,1}
+\newcommand{\ChefHDxB}{61,2}
+\newcommand{\ChefHDxC}{1,1}
+\newcommand{\ChefHDxD}{54,9}
+\newcommand{\ChefHDxE}{48,4}
+\newcommand{\ChefHDxF}{-6,5}
+\newcommand{\ChefFDxA}{49,1}
+\newcommand{\ChefFDxB}{57,2}
+\newcommand{\ChefFDxC}{8,0}
+\newcommand{\ChefFDxD}{47,0}
+\newcommand{\ChefFDxE}{36,6}
+\newcommand{\ChefFDxF}{-10,4}
+
+% ── Titres de section - bandeau ENSAE ────────────────────────
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{0pt}{4pt}
+\titlespacing*{\subsection}{0pt}{8pt}{4pt}
+\titlespacing*{\subsubsection}{0pt}{6pt}{3pt}
+
+\newif\ifensaeenchaine
+\ensaeenchainefalse
+
+% En-tete de section : titre centre, souligne d'un bandeau epais dont la
+% pastille numerotee marque l'extremite droite. #1 = titre, #2 = numero
+% (vide pour une section non numerotee, la pastille n'est alors pas tracee).
+\setlength{\fboxsep}{6pt}
+\newcommand{\ensaetetesection}[2]{%
+  \par\begingroup\setlength{\parskip}{0pt}%
+  % L'en-tete de page est vide mais sa hauteur reste reservee ; l'espace
+  % « avant » de titlespacing etant une glue, il est jete en haut de page
+  % et n'a aucun effet sur un titre qui ouvre la page. Seul un \vspace*
+  % (etoile) survit au saut de page : c'est lui qui remonte le titre.
+  % Un titre qui ouvre la page doit remonter sous l'en-tete vide ; un titre
+  % enchaine a la suite d'un texte doit au contraire s'en ecarter.
+  \ifensaeenchaine
+    \vspace{1.8cm}\global\ensaeenchainefalse
+  \else
+    \vspace*{-1.5cm}%
+  \fi
+  % Le titre est confine a 78 % de la largeur : un intitule long passe a la
+  % ligne au lieu de venir buter sur la pastille, qui occupe la droite.
+  {\centering
+   \parbox{0.78\textwidth}{\centering\color{ensaeblue}\Large\bfseries #1}\par}
+  \vspace{0.12cm}
+  \noindent
+  \begin{tikzpicture}
+    \ifx\relax#2\relax
+      % Section non numerotee : sans pastille, le bandeau occupe toute la
+      % largeur, faute de quoi la droite resterait vide.
+      \fill[ensaeblue, rounded corners=3pt] (0,-3pt) rectangle (\textwidth,3pt);
+    \else
+      % Le bandeau souligne le titre et vient mourir dans la pastille : le
+      % bas du cercle affleure le bas du filet, si bien que l'extremite du
+      % bandeau, tracee d'abord, disparait sous lui -- le trait entre dans
+      % le cercle, sans rupture. Meme bleu uni pour les deux. La pastille
+      % est en « overlay » : elle monte au-dessus du filet sans entrer dans
+      % la boite englobante, faute de quoi elle ecarterait le soulignement
+      % du titre.
+      \fill[ensaeblue, rounded corners=3pt]
+        (0,-3pt) rectangle (0.925\textwidth,3pt);
+      \node[circle, fill=ensaeblue, text=white, minimum size=1.8cm,
+            inner sep=0pt, overlay,
+            font=\fontsize{36}{36}\selectfont] (pastille)
+        at ([yshift=0.9cm]0.925\textwidth,-3pt) {#2};
+    \fi
+  \end{tikzpicture}\par
+  \endgroup
+  % La pastille repose desormais sur le bandeau : plus rien ne deborde en
+  % dessous, l'espace se regle librement.
+  \vspace{0.45cm}
+}
+% Wrappers : évite #1 direct dans \titleformat (incompatible avec certaines versions titlesec)
+\newcommand{\ensaebandeaunum}[1]{\ensaetetesection{#1}{\thesection}}
+\newcommand{\ensaebandeaunn}[1]{\ensaetetesection{#1}{}}
+
+\titleformat{\section}[block]{\normalfont}{}{0pt}{\ensaebandeaunum}
+\titleformat{name=\section,numberless}[block]{\normalfont}{}{0pt}{\ensaebandeaunn}
+
+\titleformat{\subsection}
+  {\normalfont\normalsize\bfseries\color{ensaeblue}}
+  {\thesubsection.}{0.5em}{}
+
+\titleformat{\subsubsection}
+  {\normalfont\normalsize\bfseries\color{ensaeblue}}
+  {\thesubsubsection.}{0.5em}{}
+
+% ── Bordure de page ENSAE (double filet cyan) ────────────────
+\usepackage{tikz}
+\usetikzlibrary{positioning,shadows.blur,calc}
+% Bordure de page dessinee au coin de la feuille via eso-pic, SANS
+% remember picture : robuste quel que soit le moteur (pdflatex/xelatex).
+% Double filet a coins arrondis (bleu ENSAE + cyan) dont le canal est rempli
+% d'orange dans la seule portion courbe des quatre angles.
+\usepackage{eso-pic}
+% Etendue du remplissage orange depuis l'angle. Calee sur le rayon du filet
+% exterieur (9pt) : seule la portion courbe du canal est remplie, le
+% remplissage s'arretant la ou les bords redeviennent droits.
+\newlength\ensaecoin
+\setlength\ensaecoin{10pt}
+% Remplit le canal compris entre les deux filets, restreint par #1 a l'angle.
+% La regle even-odd evide le rectangle interieur ; le remplissage epouse donc
+% la courbure du coin au lieu de former une equerre a angle droit.
+\newcommand*\ensaecoinorange[1]{%
+  \begin{scope}
+    \clip #1;
+    \fill[ensaeorange, even odd rule, rounded corners=9pt]
+      (SW) rectangle (NE)
+      [rounded corners=6pt] (sw) rectangle (ne);
+  \end{scope}%
+}
+% Cadre reserve a la page de garde : \AddToShipoutPictureBG* (etoile)
+% ne s'applique qu'a la page courante, au moment de l'inclusion.
+\newcommand{\ensaecadrepage}{%
+  \AtPageLowerLeft{%
+    \begin{tikzpicture}[overlay, line cap=round, line join=round]
+      \coordinate (SW) at (15pt,15pt);
+      \coordinate (NE) at ($(\paperwidth,\paperheight)-(15pt,15pt)$);
+      \coordinate (sw) at (20pt,20pt);
+      \coordinate (ne) at ($(\paperwidth,\paperheight)-(20pt,20pt)$);
+      \coordinate (SE) at (NE|-SW);
+      \coordinate (NW) at (SW|-NE);
+      % Accent orange dans les quatre angles (cf. \ensaecoinorange)
+      \ensaecoinorange{($(SW)+(-3pt,-3pt)$) rectangle ($(SW)+(\ensaecoin,\ensaecoin)$)}
+      \ensaecoinorange{($(SE)+(3pt,-3pt)$)  rectangle ($(SE)+(-\ensaecoin,\ensaecoin)$)}
+      \ensaecoinorange{($(NW)+(-3pt,3pt)$)  rectangle ($(NW)+(\ensaecoin,-\ensaecoin)$)}
+      \ensaecoinorange{($(NE)+(3pt,3pt)$)   rectangle ($(NE)+(-\ensaecoin,-\ensaecoin)$)}
+      % filet bleu exterieur (coins arrondis)
+      \draw[ensaeblue, line width=1.7pt, rounded corners=9pt] (SW) rectangle (NE);
+      % filet cyan interieur, plus fin
+      \draw[ensaecyan, line width=0.6pt, rounded corners=6pt] (sw) rectangle (ne);
+    \end{tikzpicture}%
+  }%
+}
+
+% ── Mathématiques ───────────────────────────────────────────
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{mathtools}
+\usepackage{bm}
+
+% Ancre les notes de bas de page en bas de la page (au ras du pied de
+% page) meme lorsque le texte s'arrete plus haut.
+\usepackage[bottom]{footmisc}
+
+% ── Figures & tableaux ──────────────────────────────────────
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{subfigure}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{makecell}
+\usepackage{multirow}
+\usepackage{caption}
+\captionsetup{font=small, labelfont=bf, labelsep=period}
+
+% ── Tableaux avancés ────────────────────────────────────────
+\usepackage{tabularx}
+\usepackage{threeparttable}
+
+% ── Liens & PDF ─────────────────────────────────────────────
+\usepackage[
+  colorlinks=true,
+  linkcolor=ensaeblue,
+  citecolor=ensaeorange,
+  urlcolor=ensaeblue,
+  filecolor=ensaeblue,
+  linktoc=all,
+  bookmarks=true,
+  pdftitle={Impact des transferts de migrants sur la pauvrete multidimensionnelle des enfants au Senegal},
+  pdfauthor={Sie Rachid TRAORE},
+  pdfsubject={Memoire de fin d'etudes - ENSAE Dakar}
+]{hyperref}
+
+% ── Bibliographie (biber requis) ─────────────────────────────
+\usepackage[
+  backend=biber,
+  style=apa,
+  sorting=nyt,
+  maxcitenames=4,   % « et al. » seulement a partir de 5 auteurs (norme DOSSIER)
+  mincitenames=1,
+  maxbibnames=99,
+  % Deux auteurs cites portent le nom Ndiaye. APA leve l'ambiguite en
+  % ajoutant l'initiale du prenom, mais « M. Ndiaye » se lit « Monsieur »
+  % en francais. Le style apa abrege le prenom quelle que soit la valeur
+  % de uniquename : la desambiguisation par le prenom est donc desactivee,
+  % les deux references restant distinguees par l'annee et le coauteur.
+  uniquename=false
+]{biblatex}
+\addbibresource{references.bib}
+
+% Noms d'auteurs en casse normale (ni gras ni petites capitales) dans les
+% citations et la bibliographie : \textnormal annule un éventuel \scshape ambiant
+\AtBeginDocument{%
+  \renewcommand*{\mkbibnamefamily}[1]{\textnormal{#1}}%
+  \renewcommand*{\mkbibnamegiven}[1]{\textnormal{#1}}%
+  \renewcommand*{\mkbibnameprefix}[1]{\textnormal{#1}}%
+  \renewcommand*{\mkbibnamesuffix}[1]{\textnormal{#1}}%
+  \renewcommand*{\mkbibcompletename}[1]{\textnormal{#1}}%
+}
+
+% ── Listes & énumérations ───────────────────────────────────
+% Puces rondes a tous les niveaux au lieu du tiret long de babel-french.
+% Fixe via enumitem (applique a la creation de la liste, donc prioritaire
+% sur le reglage de babel).
+\AtBeginDocument{\renewcommand{\labelitemi}{\textbullet}}
+\usepackage{enumitem}
+\setlist[itemize]{noitemsep, topsep=4pt, label=\textbullet}
+\setlist[itemize,2]{label=$\circ$}
+\setlist[itemize,3]{label=$\cdot$}
+\setlist[enumerate]{noitemsep, topsep=4pt}
+
+% ── Saut de page avant chaque \section ─────────────────────
+\usepackage{etoolbox}
+\pretocmd{\section}{\clearpage}{}{}
+% \sautunefois neutralise le prochain \clearpage seulement, ce qui permet
+% d'enchainer une annexe sans desactiver ses sauts de page internes.
+\newcommand{\sautunefois}{%
+  \let\vraiclearpage\clearpage
+  \def\clearpage{\let\clearpage\vraiclearpage}%
+  \global\ensaeenchainetrue
+}
+
+% ── Annexes ─────────────────────────────────────────────────
+\usepackage{pdflscape}
+\usepackage[titletoc]{appendix}
+\renewcommand{\appendixname}{Annexe}
+
+% ── Sommaire court (coexiste avec \tableofcontents via fichier .stoc séparé)
+\usepackage{shorttoc}
+
+% ── Théorèmes (numérotés par section dans article) ───────────
+\theoremstyle{plain}
+\newtheorem{theoreme}{Théorème}[section]
+\newtheorem{proposition}{Proposition}[section]
+\newtheorem{lemme}{Lemme}[section]
+\theoremstyle{definition}
+\newtheorem{definition}{Définition}[section]
+\newtheorem{exemple}{Exemple}[section]
+\theoremstyle{remark}
+\newtheorem{remarque}{Remarque}[section]
+
+% ── Commandes personnalisées ─────────────────────────────────
+\DeclareMathOperator*{\argmin}{arg\,min}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\Cov}{\mathrm{Cov}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+
+% ── Numérotation des sections ────────────────────────────────
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+% ── Informations du document ─────────────────────────────────
+\title{%
+  Impact des transferts de migrants sur la pauvreté multidimensionnelle des enfants au Sénégal
+}
+\author{Sié Rachid TRAORÉ}
+\date{Août 2026}
+
+% ============================================================
+\begin{document}
+
+
+% ── Page de garde ────────────────────────────────────────────
+\AddToShipoutPictureBG*{\ensaecadrepage}
+\input{styles/pagedeGarde}
+
+% ── Pages liminaires (numérotation romaine) ──────────────────
+\pagestyle{plain}
+\pagenumbering{roman}
+\setcounter{page}{1}
+
+\input{chapitres/decharge}
+\clearpage
+\input{chapitres/dedicace}
+\clearpage
+\input{chapitres/remerciements}
+\clearpage
+\input{chapitres/resume}
+\clearpage
+\input{chapitres/abstract}
+\clearpage
+
+% ── Sommaire (sections uniquement, via shorttoc) ─────────────
+% Interligne simple pour tenir sur une seule page.
+\begin{singlespace}
+\shorttoc{Sommaire}{1}
+\end{singlespace}
+\markboth{}{}
+\clearpage
+
+\listoffigures
+\markboth{}{}
+\clearpage
+\listoftables
+\markboth{}{}
+\clearpage
+
+\input{chapitres/abreviations}
+\clearpage
+
+% ── Corps du mémoire (numérotation arabe) ────────────────────
+\cleardoublepage
+\pagestyle{fancy}
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+% 1. Introduction
+\input{chapitres/introduction}
+
+% 2. Revue de la littérature
+\input{chapitres/chapitre1}
+
+% 3. Données et méthodologie
+\input{chapitres/chapitre2}
+
+% 4. Statistiques descriptives
+\input{chapitres/chapitre3_stats}
+
+% 5. Résultats des estimations
+\input{chapitres/chapitre3_resultats}
+
+% 6. Discussion
+\input{chapitres/chapitre4}
+
+% 7. Conclusion et recommandations
+\input{chapitres/conclusion}
+
+% ── Annexes ──────────────────────────────────────────────────
+\clearpage
+\phantomsection
+\addcontentsline{toc}{section}{Annexes}
+\section*{Annexes}
+\begin{appendices}
+  % La pastille porte la lettre de l'annexe, le titre reste seul
+  \renewcommand{\ensaebandeaunum}[1]{\ensaetetesection{#1}{\thesection}}
+  \sautunefois
+  \input{annexes/annexe_A}
+  \sautunefois
+  \input{annexes/annexe_motifs}
+  \newpage
+  \input{annexes/annexe_C}
+\end{appendices}
+
+% ── Bibliographie ────────────────────────────────────────────
+\clearpage
+\phantomsection
+\addcontentsline{toc}{section}{Références bibliographiques}
+\section*{Références bibliographiques}
+\printbibliography[heading=none]
+
+% ── Table des matières complète ──────────────────────────────
+% Profondeur limitee aux sous-sections et interligne simple pour tenir
+% sur deux pages.
+\clearpage
+\phantomsection
+\addcontentsline{toc}{section}{Table des matières}
+\setcounter{tocdepth}{2}
+\begin{singlespace}
+\tableofcontents
+\end{singlespace}
+
+\end{document}
